@@ -128,7 +128,10 @@ export async function extractPromotionFromImage(
     cleanBase64 = cleanBase64.split(',')[1];
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({
+    apiKey,
+    apiVersion: 'v1beta',
+  });
 
   // ฟังก์ชันย่อยสำหรับเรียก API และ Validate ด้วย Zod
   const callModel = async (): Promise<GeminiExtractedItem[]> => {
