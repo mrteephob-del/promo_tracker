@@ -99,8 +99,27 @@ export async function extractPromotionFromImage(
   mimeType: string = 'image/jpeg'
 ): Promise<GeminiExtractedItem[]> {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('ไม่พบ GEMINI_API_KEY ในการตั้งค่า Environment Variables');
+  if (!apiKey || apiKey === 'your-gemini-api-key') {
+    console.warn('ไม่พบ GEMINI_API_KEY ที่ถูกต้อง กำลังคืนค่าข้อมูลจำลองสำหรับการทดสอบ (Mock Demo)');
+    return [
+      {
+        store_guess: 'Mini BigC',
+        brand: 'เนสกาแฟ',
+        item_name: 'เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ',
+        color: 'แดง,เขียว',
+        pack_size: 40,
+        bonus_sachets: 2,
+        promotion_type: 'ลดราคา',
+        period_start: '06/11/2026',
+        period_end: '08/11/2026',
+        mechanic:
+          'เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา 40+2 ซอง และ เอสเปรสโซ โรสต์ 40 ซอง ปกติ 176 บาท 155/แพ็ค ประหยัด 21 บาท ซื้อ 2 แพ็ค ฟรี 1 ซอง',
+        retail_price: 176.0,
+        pro_price: 155.0,
+        confidence: 0.95,
+        notes: '(โหมดทดสอบจำลอง: ยังไม่ได้ตั้งค่า GEMINI_API_KEY) คำนวณราคาปกติจากราคาโปรโมชั่น + ประหยัด 21 บาท',
+      },
+    ];
   }
 
   // ตัด data URL prefix ออกถ้ามี
@@ -161,4 +180,3 @@ export async function extractPromotionFromImage(
     }
   }
 }
-

@@ -2,22 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Coffee, History, PlusCircle, LogOut } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Coffee, History, PlusCircle } from 'lucide-react';
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth', { method: 'DELETE' });
-      router.push('/login');
-      router.refresh();
-    } catch (e) {
-      console.error('Logout error', e);
-    }
-  };
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
@@ -37,7 +26,7 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* Navigation & Logout */}
+        {/* Navigation */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Link
             href="/"
@@ -48,7 +37,7 @@ export default function Header() {
             }`}
           >
             <PlusCircle className="w-4 h-4" />
-            <span className="hidden xs:inline">บันทึกโปร</span>
+            <span>บันทึกโปร</span>
           </Link>
 
           <Link
@@ -60,19 +49,10 @@ export default function Header() {
             }`}
           >
             <History className="w-4 h-4" />
-            <span className="hidden xs:inline">ประวัติ & สรุป</span>
+            <span>ประวัติ & สรุป</span>
           </Link>
-
-          <button
-            onClick={handleLogout}
-            title="ออกจากระบบ"
-            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
         </div>
       </div>
     </header>
   );
 }
-

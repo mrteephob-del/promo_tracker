@@ -6,7 +6,7 @@
 
 ## 📌 คุณสมบัติเด่น (Features)
 
-1. **Mobile-First Experience (ภาษาไทย 100%):** ออกแบบเพื่อการใช้งานบนสมาร์ทโฟนเป็นหลัก ถ่ายรูปจากกล้องมือถือหรือเลือกจากคลังภาพได้สะดวก
+1. **Mobile-First Experience (ภาษาไทย 100%):** ออกแบบเพื่อการใช้งานบนสมาร์ทโฟนเป็นหลัก ถ่ายรูปจากกล้องมือถือหรือเลือกจากคลังภาพได้สะดวก เข้าใช้งานได้ทันทีโดยไม่ต้องใส่รหัสผ่าน
 2. **Client-side Image Optimization:** บีบอัดรูปภาพฝั่งเบราว์เซอร์อัตโนมัติ (ด้านยาวสุดไม่เกิน 1600px, JPEG คุณภาพ 0.85) ช่วยประหยัดเน็ตและวิเคราะห์ได้เร็ว
 3. **AI Vision Extraction (Gemini 2.5 Flash):**
    - แยกข้อมูลเฉพาะ 4 แบรนด์ที่ติดตาม: **เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์**
@@ -30,9 +30,8 @@
    - ดึงข้อมูล 50 รายการล่าสุด
    - กรองตามร้านค้า, แบรนด์, หรือสัปดาห์
    - ตาราง Matrix สรุปจำนวนโปรโมชั่นในสัปดาห์ปัจจุบัน (ร้านค้า x แบรนด์)
-7. **ระบบความปลอดภัย (Security):**
-   - ล็อกอินด้วยรหัสผ่าน (`APP_PASSWORD`) เก็บ Session ปลอดภัยใน HTTP-Only Cookie
-   - ซ่อน `GEMINI_API_KEY` และ `APPS_SCRIPT_SECRET` ไว้ที่ Server เท่านั้น
+7. **ความปลอดภัยของระบบ (Security):**
+   - ซ่อน `GEMINI_API_KEY` และ `APPS_SCRIPT_SECRET` ไว้ที่ Server เท่านั้น ไม่เปิดเผยฝั่ง Client
 
 ---
 
@@ -86,7 +85,6 @@ cp .env.example .env.local
 GEMINI_API_KEY="your-gemini-api-key"
 APPS_SCRIPT_URL="https://script.google.com/macros/s/your-deployment-id/exec"
 APPS_SCRIPT_SECRET="your-apps-script-secret-key"
-APP_PASSWORD="your-secure-password"
 ```
 
 ### 3. รัน Unit Tests
@@ -98,7 +96,7 @@ npm test
 ```bash
 npm run dev
 ```
-เปิดเบราว์เซอร์ไปที่ `http://localhost:3000`
+เปิดเบราว์เซอร์ไปที่ `http://localhost:3000` แล้วเริ่มใช้งานได้ทันที
 
 ---
 
@@ -124,6 +122,4 @@ npm run dev
    - `GEMINI_API_KEY`
    - `APPS_SCRIPT_URL`
    - `APPS_SCRIPT_SECRET`
-   - `APP_PASSWORD`
 4. กด **Deploy** แล้วเริ่มใช้งานได้ทันที
-
