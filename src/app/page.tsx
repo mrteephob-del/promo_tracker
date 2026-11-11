@@ -18,6 +18,7 @@ import {
   Loader2,
   RefreshCw,
   CheckCheck,
+  Info,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -364,6 +365,17 @@ export default function HomePage() {
               <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-700 text-sm">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
                 <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Info Banner when fallback to manual */}
+            {items.some((it) => it.confidence === 0 && it.notes?.includes('ไม่พบรายการ')) && (
+              <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-start gap-2.5 text-blue-800 text-xs sm:text-sm">
+                <Info className="w-5 h-5 flex-shrink-0 text-blue-600 mt-0.5" />
+                <div>
+                  <span className="font-semibold">เปิดแบบฟอร์มกรอกข้อมูลเอง (Manual Entry):</span>{' '}
+                  เนื่องจากในรูปภาพที่อัปโหลด AI ตรวจไม่พบโปรโมชั่นกาแฟซอง (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) ระบบจึงเปิดแบบฟอร์มให้คุณกรอกข้อมูลด้วยตนเอง โดยสามารถกดปุ่ม &quot;ดูรูป&quot; เพื่อเทียบข้อมูลได้ทันที
+                </div>
               </div>
             )}
 

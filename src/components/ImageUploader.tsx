@@ -80,6 +80,7 @@ export default function ImageUploader({ onExtracted, onManualEntry }: ImageUploa
     setError(null);
 
     const allItems: PromotionItem[] = [];
+    const errors: string[] = [];
     const recordDateDMY = convertYMDtoDMY(recordDateYMD);
 
     try {
@@ -87,35 +88,70 @@ export default function ImageUploader({ onExtracted, onManualEntry }: ImageUploa
         setAnalysisProgress(`กำลังวิเคราะห์รูปที่ ${i + 1} จาก ${images.length}...`);
         const img = images[i];
 
-        const res = await fetch('/api/extract', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            imageBase64: img.base64,
-            mimeType: img.mimeType,
-            defaultStore: selectedStore === 'auto' ? undefined : selectedStore,
-            defaultChannel: selectedChannel,
-            recordDate: recordDateDMY,
-          }),
-        });
+        try {
+          const res = await fetch('/api/extract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              imageBase64: img.base64,
+              mimeType: img.mimeType,
+              defaultStore: selectedStore === 'auto' ? undefined : selectedStore,
+              defaultChannel: selectedChannel,
+              recordDate: recordDateDMY,
+            }),
+          });
 
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || `การวิเคราะห์รูปที่ ${i + 1} ล้มเหลว`);
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            errors.push(`รูปที่ ${i + 1}: ${data.error || 'วิเคราะห์ไม่สำเร็จ'}`);
+            continue;
+          }
+
+          // แนบรูปภาพอ้างอิงให้กับแต่ละ item
+          const itemsWithImage = (data.items || []).map((item: PromotionItem) => ({
+            ...item,
+            imageId: `img-${i}`,
+            imagePreviewUrl: img.dataUrl,
+          }));
+
+          allItems.push(...itemsWithImage);
+        } catch (fetchErr) {
+          errors.push(
+            `รูปที่ ${i + 1}: ${fetchErr instanceof Error ? fetchErr.message : 'เชื่อมต่อล้มเหลว'}`
+          );
         }
+      }
 
-        // แนบรูปภาพอ้างอิงให้กับแต่ละ item
-        const itemsWithImage = (data.items || []).map((item: PromotionItem) => ({
-          ...item,
-          imageId: `img-${i}`,
-          imagePreviewUrl: img.dataUrl,
-        }));
-
-        allItems.push(...itemsWithImage);
+      if (allItems.length === 0 && errors.length > 0) {
+        throw new Error(errors.join(' \n '));
       }
 
       if (allItems.length === 0) {
-        setError('AI ไม่พบรายการโปรโมชั่นกาแฟซองในรูปภาพ คุณสามารถเพิ่มข้อมูลเองได้');
+        // ถ้า AI อ่านรูปไม่ได้เลย ให้เปิดฟอร์มกรอกเองได้ (manual entry) ใช้ตารางเดียวกันตามข้อกำหนด
+        for (let idx = 0; idx < images.length; idx++) {
+          allItems.push({
+            id: `manual-fallback-${Date.now()}-${idx}`,
+            selected: true,
+            date: recordDateDMY,
+            store: selectedStore === 'auto' ? '7-11' : selectedStore,
+            brand: 'เนสกาแฟ',
+            itemName: '',
+            color: 'แดง',
+            packSize: 40,
+            bonusSachets: 0,
+            promotion: 'ลดราคา',
+            channel: selectedChannel,
+            freqWeek: 1,
+            period: '',
+            machanic: '',
+            retailPrice: null,
+            proPrice: null,
+            confidence: 0,
+            notes: 'AI ไม่พบรายการโปรโมชั่นกาแฟซอง จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง',
+            imageId: `img-${idx}`,
+            imagePreviewUrl: images[idx].dataUrl,
+          });
+        }
       }
 
       onExtracted(allItems, images);
