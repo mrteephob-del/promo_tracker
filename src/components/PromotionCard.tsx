@@ -1,0 +1,472 @@
+'use client';
+
+import React from 'react';
+import {
+  Trash2,
+  AlertTriangle,
+  ZoomIn,
+  TrendingDown,
+  Info,
+  DollarSign,
+  Package,
+  Layers,
+  Sparkles,
+} from 'lucide-react';
+import {
+  PromotionItem,
+  TRACKED_BRANDS,
+  TRACKED_STORES,
+  TRACKED_CHANNELS,
+  PROMO_COLORS,
+  PROMOTION_TYPES,
+} from '@/types';
+import {
+  calculateDiscount,
+  calculatePricePerSachet,
+  isTrackedBrand,
+} from '@/lib/calc';
+
+interface PromotionCardProps {
+  item: PromotionItem;
+  index: number;
+  total: number;
+  onUpdate: (updatedItem: PromotionItem) => void;
+  onDelete: (id: string) => void;
+  onViewImage: (url: string) => void;
+}
+
+export default function PromotionCard({
+  item,
+  index,
+  total,
+  onUpdate,
+  onDelete,
+  onViewImage,
+}: PromotionCardProps) {
+  // คำนวณส่วนลดและราคาต่อซองแบบ Real-time
+  const discount = calculateDiscount(item.retailPrice, item.proPrice);
+  const unitRetail = calculatePricePerSachet(item.retailPrice, item.packSize);
+  const unitPro = calculatePricePerSachet(item.proPrice, item.packSize);
+
+  const isLowConfidence = item.confidence < 0.7;
+  const isUntracked = !isTrackedBrand(item.brand);
+
+  const handleChange = (field: keyof PromotionItem, value: any) => {
+    const updated = { ...item, [field]: value };
+    // ตรวจสอบแบรนด์ใหม่กรณีผู้ใช้แก้ไข
+    if (field === 'brand') {
+      updated.isUntrackedBrand = !isTrackedBrand(value);
+    }
+    onUpdate(updated);
+  };
+
+  // สไตล์สำหรับฟิลด์ที่ต้องการเน้นสีเหลือง (ความมั่นใจต่ำหรือว่าง)
+  const getFieldClass = (val: any) => {
+    const isEmpty = val === null || val === undefined || val === '';
+    if (isEmpty || isLowConfidence) {
+      return 'bg-amber-50/70 border-amber-300 text-slate-800 focus:ring-amber-500 focus:bg-white';
+    }
+    return 'bg-white border-slate-200 text-slate-800 focus:ring-amber-500';
+  };
+
+  return (
+    <div
+      className={`rounded-3xl border transition-all shadow-sm ${
+        item.selected
+          ? 'border-amber-200 bg-white ring-1 ring-amber-200/50'
+          : 'border-slate-200 bg-slate-50/60 opacity-80'
+      }`}
+    >
+      {/* Card Header */}
+      <div className="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between gap-3">
+        {/* Selection Checkbox & Index */}
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={item.selected}
+            onChange={(e) => handleChange('selected', e.target.checked)}
+            className="w-5 h-5 text-amber-600 rounded-lg border-slate-300 focus:ring-amber-500 cursor-pointer"
+            id={`select-${item.id}`}
+          />
+          <label
+            htmlFor={`select-${item.id}`}
+            className="font-bold text-sm sm:text-base text-slate-800 cursor-pointer flex items-center gap-2"
+          >
+            <span>รายการที่ {index + 1} จาก {total}</span>
+            {item.confidence < 0.7 && (
+              <span className="text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-600" />
+                ความมั่นใจ {(item.confidence * 100).toFixed(0)}%
+              </span>
+            )}
+          </label>
+        </div>
+
+        {/* Thumbnail and Delete button */}
+        <div className="flex items-center gap-2">
+          {item.imagePreviewUrl && (
+            <button
+              type="button"
+              onClick={() => onViewImage(item.imagePreviewUrl!)}
+              className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded-xl transition-colors cursor-pointer"
+              title="ดูรูปภาพต้นฉบับ"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">ดูรูป</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => onDelete(item.id)}
+            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+            title="ลบรายการนี้"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Warnings & Alerts */}
+      <div className="px-3.5 sm:px-4 pt-3 space-y-2">
+        {/* Untracked Brand Alert */}
+        {isUntracked && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-800 text-xs sm:text-sm">
+            <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold">แบรนด์นี้ไม่อยู่ใน 4 แบรนด์ที่ติดตาม:</span>{' '}
+              แบรนด์ &quot;{item.brand || 'ไม่ระบุ'}&quot; ไม่ใช่ เนสกาแฟ, มอคโคน่า, เบอร์ดี้ หรือ ซุปเปอร์ (ระบบยกเลิกการเลือกเป็นค่าเริ่มต้น)
+            </div>
+          </div>
+        )}
+
+        {/* Duplicate Alert */}
+        {item.isDuplicate && (
+          <div className="p-3 bg-amber-50 border border-amber-300 rounded-2xl flex items-start gap-2.5 text-amber-900 text-xs sm:text-sm">
+            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold">⚠️ ตรวจพบข้อมูลอาจซ้ำ:</span>{' '}
+              {item.duplicateReason || 'มีโปรโมชั่นของ ร้าน + แบรนด์ + สี + ช่วงเวลา + ราคาโปร นี้ในชีตแล้ว'}
+            </div>
+          </div>
+        )}
+
+        {/* AI Notes */}
+        {item.notes && (
+          <div className="p-2.5 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-2 text-blue-800 text-xs">
+            <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <span>{item.notes}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Calculated Badges (Helper for checking) */}
+      <div className="px-3.5 sm:px-4 py-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200/60 text-xs">
+          {/* Discount amount */}
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg">
+              <TrendingDown className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px]">ส่วนลด</span>
+              <span className="font-bold text-emerald-600">
+                {discount.amount !== null ? `${discount.amount.toFixed(2)} บ.` : '-'}
+                {discount.percent !== null && ` (${discount.percent}%)`}
+              </span>
+            </div>
+          </div>
+
+          {/* Unit price normal */}
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-slate-200 text-slate-700 rounded-lg">
+              <DollarSign className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px]">ราคา/ซอง (ปกติ)</span>
+              <span className="font-medium text-slate-700">
+                {unitRetail !== null ? `${unitRetail.toFixed(2)} บ.` : '-'}
+              </span>
+            </div>
+          </div>
+
+          {/* Unit price promo */}
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-amber-100 text-amber-700 rounded-lg">
+              <Package className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px]">ราคา/ซอง (โปร)</span>
+              <span className="font-bold text-amber-700">
+                {unitPro !== null ? `${unitPro.toFixed(2)} บ.` : '-'}
+              </span>
+            </div>
+          </div>
+
+          {/* Freq/Week */}
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg">
+              <Layers className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[10px]">ความถี่ในสัปดาห์</span>
+              <span className="font-bold text-indigo-700">
+                ครั้งที่ {item.freqWeek || 1}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Fields Grid */}
+      <div className="p-3.5 sm:p-4 pt-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs sm:text-sm">
+        {/* Brand */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            แบรนด์ <span className="text-rose-500">*</span>
+          </label>
+          <select
+            value={item.brand}
+            onChange={(e) => handleChange('brand', e.target.value)}
+            className={`w-full rounded-xl px-3 py-2 border text-sm font-medium focus:outline-none focus:ring-2 ${getFieldClass(
+              item.brand
+            )}`}
+          >
+            {TRACKED_BRANDS.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+            {!isTrackedBrand(item.brand) && item.brand && (
+              <option value={item.brand}>{item.brand} (นอกขอบเขต)</option>
+            )}
+          </select>
+        </div>
+
+        {/* Store */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ร้านค้า <span className="text-rose-500">*</span>
+          </label>
+          <select
+            value={item.store}
+            onChange={(e) => handleChange('store', e.target.value)}
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.store
+            )}`}
+          >
+            {TRACKED_STORES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+            {!(TRACKED_STORES as readonly string[]).includes(item.store) && item.store && (
+              <option value={item.store}>{item.store}</option>
+            )}
+          </select>
+        </div>
+
+        {/* Color */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            สีซอง <span className="text-rose-500">*</span>
+          </label>
+          <select
+            value={item.color}
+            onChange={(e) => handleChange('color', e.target.value)}
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.color
+            )}`}
+          >
+            {PROMO_COLORS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Promotion Type */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ประเภทโปรโมชั่น
+          </label>
+          <select
+            value={item.promotion}
+            onChange={(e) => handleChange('promotion', e.target.value)}
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.promotion
+            )}`}
+          >
+            {PROMOTION_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Item Name (Span 2 cols on tablet/desktop) */}
+        <div className="sm:col-span-2">
+          <label className="block text-slate-600 font-semibold mb-1">
+            ชื่อสินค้าเต็มตามรูป <span className="text-rose-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={item.itemName}
+            onChange={(e) => handleChange('itemName', e.target.value)}
+            placeholder="เช่น เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ"
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.itemName
+            )}`}
+          />
+        </div>
+
+        {/* Pack Size & Bonus Sachets */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ขนาดแพ็ค (ซอง) / ซองแถม
+          </label>
+          <div className="flex items-center gap-1.5">
+            <input
+              type="number"
+              value={item.packSize ?? ''}
+              onChange={(e) =>
+                handleChange(
+                  'packSize',
+                  e.target.value === '' ? null : parseInt(e.target.value, 10)
+                )
+              }
+              placeholder="40"
+              className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+                item.packSize
+              )}`}
+            />
+            <span className="text-slate-400 font-bold">+</span>
+            <input
+              type="number"
+              value={item.bonusSachets ?? ''}
+              onChange={(e) =>
+                handleChange(
+                  'bonusSachets',
+                  e.target.value === '' ? null : parseInt(e.target.value, 10)
+                )
+              }
+              placeholder="2"
+              className="w-16 rounded-xl px-2 py-2 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-center"
+            />
+          </div>
+        </div>
+
+        {/* Period */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ช่วงโปร (dd/mm/yyyy - dd/mm/yyyy)
+          </label>
+          <input
+            type="text"
+            value={item.period}
+            onChange={(e) => handleChange('period', e.target.value)}
+            placeholder="06/11/2026 - 08/11/2026"
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.period
+            )}`}
+          />
+        </div>
+
+        {/* Retail Price */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ราคาปกติ (บาท)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={item.retailPrice ?? ''}
+            onChange={(e) =>
+              handleChange(
+                'retailPrice',
+                e.target.value === '' ? null : parseFloat(e.target.value)
+              )
+            }
+            placeholder="176.00"
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.retailPrice
+            )}`}
+          />
+        </div>
+
+        {/* Pro Price */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ราคาโปร (บาท) <span className="text-rose-500">*</span>
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={item.proPrice ?? ''}
+            onChange={(e) =>
+              handleChange(
+                'proPrice',
+                e.target.value === '' ? null : parseFloat(e.target.value)
+              )
+            }
+            placeholder="155.00"
+            className={`w-full rounded-xl px-3 py-2 border text-sm font-semibold focus:outline-none focus:ring-2 ${getFieldClass(
+              item.proPrice
+            )}`}
+          />
+        </div>
+
+        {/* Channel */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            ช่องทาง
+          </label>
+          <select
+            value={item.channel}
+            onChange={(e) => handleChange('channel', e.target.value)}
+            className="w-full rounded-xl px-3 py-2 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+          >
+            {TRACKED_CHANNELS.map((ch) => (
+              <option key={ch} value={ch}>
+                {ch}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Date Recorded */}
+        <div>
+          <label className="block text-slate-600 font-semibold mb-1">
+            วันที่บันทึก (dd/mm/yyyy)
+          </label>
+          <input
+            type="text"
+            value={item.date}
+            onChange={(e) => handleChange('date', e.target.value)}
+            placeholder="09/11/2026"
+            className="w-full rounded-xl px-3 py-2 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+          />
+        </div>
+
+        {/* Mechanic (Full width) */}
+        <div className="sm:col-span-2 md:col-span-4">
+          <label className="block text-slate-600 font-semibold mb-1">
+            รายละเอียดกลไกโปรโมชั่น (Machanic) <span className="text-rose-500">*</span>
+          </label>
+          <textarea
+            rows={2}
+            value={item.machanic}
+            onChange={(e) => handleChange('machanic', e.target.value)}
+            placeholder="เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา 40+2 ซอง ปกติ 176 บาท 155/แพ็ค ประหยัด 21 บาท ซื้อ 2 แพ็ค ฟรี 1 ซอง"
+            className={`w-full rounded-xl px-3 py-2 border text-sm focus:outline-none focus:ring-2 ${getFieldClass(
+              item.machanic
+            )}`}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
