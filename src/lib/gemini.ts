@@ -111,14 +111,32 @@ const NOODLE_SYSTEM_PROMPT = `
 7. สกัดสินค้าทุกรายการในหมวดบะหมี่ โจ๊ก ข้าวต้ม ที่ปรากฏในภาพออกมาให้ครบถ้วน
 `;
 
+function getGeminiApiKeys(): string[] {
+  const keys: string[] = [];
+  if (process.env.GEMINI_API_KEYS) {
+    keys.push(...process.env.GEMINI_API_KEYS.split(',').map((k) => k.trim()).filter(Boolean));
+  }
+  if (process.env.GEMINI_API_KEY) {
+    const split = process.env.GEMINI_API_KEY.split(',').map((k) => k.trim()).filter(Boolean);
+    for (const k of split) {
+      if (!keys.includes(k) && k !== 'your-gemini-api-key') keys.push(k);
+    }
+  }
+  for (let i = 1; i <= 10; i++) {
+    const k = process.env[`GEMINI_API_KEY_${i}`]?.trim();
+    if (k && !keys.includes(k) && k !== 'your-gemini-api-key') keys.push(k);
+  }
+  return keys;
+}
+
 export async function extractPromotionFromImage(
   imageBase64: string,
   mimeType: string = 'image/jpeg',
   category: PromoCategory = 'coffee',
   modelMode: AiModelMode = 'flash'
 ): Promise<GeminiExtractedItem[]> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'your-gemini-api-key') {
+  const apiKeys = getGeminiApiKeys();
+  if (apiKeys.length === 0) {
     console.warn('ไม่พบ GEMINI_API_KEY ที่ถูกต้อง กำลังคืนค่าข้อมูลจำลองสำหรับการทดสอบ (Mock Demo)');
     if (category === 'noodle') {
       return [
@@ -166,77 +184,74 @@ export async function extractPromotionFromImage(
     cleanBase64 = cleanBase64.split(',')[1];
   }
 
-  const ai = new GoogleGenAI({
-    apiKey,
-    apiVersion: 'v1beta',
-  });
-
   const promptText = category === 'noodle' ? NOODLE_SYSTEM_PROMPT : COFFEE_SYSTEM_PROMPT;
-  const targetModel = modelMode === 'pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+  const candidateModels = [
+    'gemini-3-flash-preview',
+    'gemini-2.5-flash',
+  ];
 
-  const callModel = async (modelToUse: string): Promise<GeminiExtractedItem[]> => {
-    const response = await ai.models.generateContent({
-      model: modelToUse,
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { text: promptText },
-            {
-              text: `โปรดวิเคราะห์รูปโปรโมชั่นนี้ในหมวด "${
-                category === 'noodle' ? 'บะหมี่ โจ๊ก ข้าวต้ม' : 'กาแฟซอง'
-              }" อย่างละเอียด โดยถอดรหัสป้ายราคา รสชาติ บรรจุภัณฑ์ และกลไกโปรโมชั่นให้ถูกต้องแม่นยำที่สุด แล้วส่งคืนเฉพาะ JSON Array ตามสกีมาที่กำหนด`,
-            },
-            {
-              inlineData: {
-                mimeType,
-                data: cleanBase64,
-              },
-            },
-          ],
-        },
-      ],
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: geminiResponseSchemaConfig,
-        temperature: 0.0, // ปรับเป็น 0.0 เพื่อความแม่นยำสูงสุดและลดโอกาสอ่านเพี้ยน
-      },
+  let lastError: unknown = null;
+
+  for (let keyIdx = 0; keyIdx < apiKeys.length; keyIdx++) {
+    const currentKey = apiKeys[keyIdx];
+    const ai = new GoogleGenAI({
+      apiKey: currentKey,
+      apiVersion: 'v1beta',
     });
 
-    let responseText = response.text?.trim() || '[]';
-    if (responseText.startsWith('```json')) {
-      responseText = responseText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-    } else if (responseText.startsWith('```')) {
-      responseText = responseText.replace(/^```\s*/, '').replace(/\s*```$/, '');
-    }
-    const parsedJson = JSON.parse(responseText);
-    const validated = GeminiResponseSchema.parse(parsedJson);
-    return validated;
-  };
+    for (const modelToUse of candidateModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelToUse,
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { text: promptText },
+                {
+                  text: `โปรดวิเคราะห์รูปโปรโมชั่นนี้ในหมวด "${
+                    category === 'noodle' ? 'บะหมี่ โจ๊ก ข้าวต้ม' : 'กาแฟซอง'
+                  }" อย่างละเอียด โดยถอดรหัสป้ายราคา รสชาติ บรรจุภัณฑ์ และกลไกโปรโมชั่นให้ถูกต้องแม่นยำที่สุด แล้วส่งคืนเฉพาะ JSON Array ตามสกีมาที่กำหนด`,
+                },
+                {
+                  inlineData: {
+                    mimeType,
+                    data: cleanBase64,
+                  },
+                },
+              ],
+            },
+          ],
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: geminiResponseSchemaConfig,
+            temperature: 0.0,
+          },
+        });
 
-  try {
-    return await callModel(targetModel);
-  } catch (firstError) {
-    console.warn(`Gemini extraction with ${targetModel} attempt 1 failed, retrying once...`, firstError);
-    try {
-      // ถ้าลองโมเดลแรกไม่ผ่าน ให้ลอง fallback เป็น flash หรือ retry อีกรอบ
-      return await callModel(targetModel);
-    } catch (retryError) {
-      // หาก Pro ติดปัญหา ลอง fallback มาที่ flash
-      if (targetModel !== 'gemini-2.5-flash') {
-        console.warn('Fallback from Pro to Flash model...');
-        try {
-          return await callModel('gemini-2.5-flash');
-        } catch (fallbackErr) {
-          console.error('Gemini fallback failed:', fallbackErr);
+        let responseText = response.text?.trim() || '[]';
+        if (responseText.startsWith('```json')) {
+          responseText = responseText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        } else if (responseText.startsWith('```')) {
+          responseText = responseText.replace(/^```\s*/, '').replace(/\s*```$/, '');
+        }
+        const parsedJson = JSON.parse(responseText);
+        const validated = GeminiResponseSchema.parse(parsedJson);
+        return validated;
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Key ${keyIdx + 1}] Model ${modelToUse} failed:`, err?.status || err?.message?.slice(0, 80));
+        if (err?.status === 429) {
+          // โควตาเต็ม ให้ข้ามไป Key ถัดไปทันที
+          break;
         }
       }
-      console.error('Gemini extraction retry failed:', retryError);
-      throw new Error(
-        `ไม่สามารถอ่านข้อมูลโปรโมชั่นจากรูปภาพได้: ${
-          retryError instanceof Error ? retryError.message : 'รูปแบบข้อมูลไม่ถูกต้อง'
-        }`
-      );
     }
   }
+
+  throw new Error(
+    `ไม่สามารถอ่านข้อมูลโปรโมชั่นจากรูปภาพได้: ${
+      lastError instanceof Error ? lastError.message : 'เกิดข้อผิดพลาดในการเรียก AI'
+    }`
+  );
 }
