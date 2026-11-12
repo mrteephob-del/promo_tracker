@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractPromotionFromImage } from '@/lib/gemini';
-import { PromotionItem, PromoCategory } from '@/types';
+import { PromotionItem, PromoCategory, AiModelMode } from '@/types';
 import { isTrackedBrand, getBangkokTodayDMY } from '@/lib/calc';
 
 export async function POST(req: NextRequest) {
@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
       defaultChannel,
       recordDate,
       category = 'coffee',
+      modelMode = 'pro',
     } = body;
 
     if (!imageBase64) {
@@ -23,9 +24,15 @@ export async function POST(req: NextRequest) {
     }
 
     const currentCategory: PromoCategory = category === 'noodle' ? 'noodle' : 'coffee';
+    const currentModelMode: AiModelMode = modelMode === 'flash' ? 'flash' : 'pro';
 
-    // เรียก Gemini 2.5 Flash
-    const extractedList = await extractPromotionFromImage(imageBase64, mimeType, currentCategory);
+    // เรียก Gemini (Gemini 2.5 Pro หรือ Flash ตามที่เลือก)
+    const extractedList = await extractPromotionFromImage(
+      imageBase64,
+      mimeType,
+      currentCategory,
+      currentModelMode
+    );
 
     const formattedDate = recordDate || getBangkokTodayDMY();
 
@@ -73,6 +80,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       category: currentCategory,
+      modelMode: currentModelMode,
       items,
       count: items.length,
     });

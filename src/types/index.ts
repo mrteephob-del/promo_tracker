@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export type PromoCategory = 'coffee' | 'noodle';
+export type AiModelMode = 'flash' | 'pro';
 
 export interface CategoryConfig {
   id: PromoCategory;

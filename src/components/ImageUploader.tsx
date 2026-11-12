@@ -21,6 +21,7 @@ import {
   TrackedChannel,
   PromotionItem,
   PromoCategory,
+  AiModelMode,
 } from '@/types';
 import { compressImage, CompressedImageResult } from '@/lib/image';
 import { getBangkokTodayYMD, convertYMDtoDMY } from '@/lib/calc';
@@ -35,6 +36,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
   const [selectedStore, setSelectedStore] = useState<string>('auto');
   const [selectedChannel, setSelectedChannel] = useState<string>('หน้าร้าน');
   const [recordDateYMD, setRecordDateYMD] = useState<string>(getBangkokTodayYMD());
+  const [modelMode, setModelMode] = useState<AiModelMode>('pro');
 
   const [images, setImages] = useState<CompressedImageResult[]>([]);
   const [compressing, setCompressing] = useState<boolean>(false);
@@ -101,6 +103,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
               defaultChannel: selectedChannel,
               recordDate: recordDateDMY,
               category,
+              modelMode,
             }),
           });
 
@@ -183,6 +186,45 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
         <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
           ถ่ายจากกล้องมือถือหรือเลือกรูปจากแกลเลอรี่ AI จะช่วยอ่านและแยกข้อมูลอัตโนมัติ
         </p>
+      </div>
+
+      {/* AI Accuracy Mode Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/80">
+        <div>
+          <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-amber-600" />
+            <span>ระดับความแม่นยำของ AI:</span>
+          </span>
+          <span className="text-[11px] text-slate-500 block mt-0.5">
+            {modelMode === 'pro'
+              ? '🎯 โหมดแม่นยำสูง (Gemini Pro) - วิเคราะห์ภาพละเอียด อ่านป้ายตัวหนังสือเล็ก/ป้ายราคาซับซ้อนแม่นยำที่สุด'
+              : '⚡ โหมดปกติ (Gemini Flash) - เน้นความเร็ว ประมวลผลไว'}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200 shadow-xs self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setModelMode('pro')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              modelMode === 'pro'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>🎯 แม่นยำสูง (Pro)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setModelMode('flash')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              modelMode === 'flash'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>⚡ ปกติ (Flash)</span>
+          </button>
+        </div>
       </div>
 
       {/* Select Store, Channel, and Date */}
@@ -298,7 +340,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             แตะหรือลากรูปภาพมาวางที่นี่
           </p>
           <p className="text-xs text-slate-400 mt-1">
-            รองรับ JPG, PNG (ระบบจะบีบอัดภาพให้อัตโนมัติสูงสุด 1600px)
+            รองรับ JPG, PNG (ระบบจะบีบอัดภาพความละเอียดสูง 2600px คมชัดระดับ HD)
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import { GeminiExtractedItem, GeminiResponseSchema, PromoCategory } from '@/types';
+import { GeminiExtractedItem, GeminiResponseSchema, PromoCategory, AiModelMode } from '@/types';
 
 const geminiResponseSchemaConfig = {
   type: Type.ARRAY,
@@ -13,11 +13,11 @@ const geminiResponseSchemaConfig = {
       },
       brand: {
         type: Type.STRING,
-        description: 'ชื่อแบรนด์ เช่น มาม่า, ไวไว, ยำยำ, นิสชิน, คนอร์ หรือ เนสกาแฟ, มอคโคน่า',
+        description: 'ชื่อแบรนด์ เช่น มาม่า, ไวไว, ยำยำ, นิสชิน, คนอร์ หรือ เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์',
       },
       item_name: {
         type: Type.STRING,
-        description: 'ชื่อสินค้าและรสชาติเต็มตามที่เห็นในรูป เช่น มาม่า รสต้มยำกุ้ง, คนอร์ คัพโจ๊ก รสหมู',
+        description: 'ชื่อสินค้าและรสชาติเต็มตามที่เห็นในรูป เช่น มาม่า รสต้มยำกุ้งน้ำข้น, เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา',
       },
       color: {
         type: Type.STRING,
@@ -25,11 +25,11 @@ const geminiResponseSchemaConfig = {
       },
       pack_size: {
         type: Type.INTEGER,
-        description: 'จำนวนซอง/ถ้วย/ชิ้น ต่อแพ็ค เช่น 1 (ถ้าขายเดี่ยว) หรือ 4, 5, 6, 10 (ถ้าเป็นแพ็ค)',
+        description: 'จำนวนซอง/ถ้วย/ชิ้น ต่อแพ็ค เช่น 1 (ถ้าขายเดี่ยว) หรือ 4, 5, 6, 10, 40 (ถ้าเป็นแพ็ค)',
       },
       bonus_sachets: {
         type: Type.INTEGER,
-        description: 'จำนวนของแถม เช่น 1 จากข้อความ 5+1 ซอง หรือ null',
+        description: 'จำนวนของแถม เช่น 1 จาก 5+1 ซอง หรือ 2 จาก 40+2 ซอง หรือ null',
       },
       promotion_type: {
         type: Type.STRING,
@@ -61,7 +61,7 @@ const geminiResponseSchemaConfig = {
       },
       notes: {
         type: Type.STRING,
-        description: 'หมายเหตุเพิ่มเติม เช่น ชนิดบรรจุภัณฑ์ (ซอง หรือ ถ้วย) หรือราคาที่คำนวณจากประหยัด X บาท',
+        description: 'หมายเหตุเพิ่มเติม เช่น ราคาต่อชิ้นที่เฉลี่ยมาจากซื้อหลายชิ้น หรือระบุว่าเป็นราคาที่คำนวณจากประหยัด X บาท',
       },
     },
     required: ['store_guess', 'brand', 'item_name', 'color', 'mechanic', 'confidence'],
@@ -69,44 +69,53 @@ const geminiResponseSchemaConfig = {
 };
 
 const COFFEE_SYSTEM_PROMPT = `
-คุณเป็นผู้เชี่ยวชาญการอ่านและวิเคราะห์รูปภาพโปรโมชั่นของร้านสะดวกซื้อและซูเปอร์มาร์เก็ตในประเทศไทย (เช่น 7-11, CJ More, Mini BigC, Lotus, Top)
+คุณเป็นผู้เชี่ยวชาญระดับสูงในการอ่านและถอดรหัสป้ายราคาและโบรชัวร์โปรโมชั่นของร้านสะดวกซื้อและห้างสรรพสินค้าในไทย (เช่น 7-11, CJ More, Mini BigC, Lotus, Top)
 เป้าหมายของคุณคือ สกัดข้อมูลโปรโมชั่นของ "กาแฟซองปรุงสำเร็จ (Instant Coffee Sachets)" โดยเน้น 4 แบรนด์ที่ติดตามเป็นหลัก:
-1. เนสกาแฟ (Nescafé)
-2. มอคโคน่า (Moccona)
-3. เบอร์ดี้ (Birdy)
-4. ซุปเปอร์ (Super)
+1. เนสกาแฟ (Nescafé) - สูตรสีแดง: ริช อโรมา / สูตรสีเขียว: เอสเปรสโซ โรสต์
+2. มอคโคน่า (Moccona) - สูตรสีแดง: ริช แอนด์ สมูท / สูตรสีเขียว: เอสเปรสโซ
+3. เบอร์ดี้ (Birdy) - สูตรสีแดง: โรบัสต้า / สูตรสีเขียว: เอสเปรสโซ
+4. ซุปเปอร์ (Super) - สูตรสีแดง: ออริจินัล / สูตรสีเขียว: เอสเปรสโซ
 
-กฎสำคัญ:
-1. แปลงปี พ.ศ. เป็น ค.ศ. (เช่น 2569 เป็น 2026) ถ้าไม่มีปีให้ใช้ปีปัจจุบัน (2026) รูปแบบ dd/mm/yyyy
-2. ห้ามเดาราคา หากไม่เห็นให้เป็น null
-3. ขนาดแพ็ค: กรณีมีซองแถม เช่น "40+2 ซอง" ให้ใส่ pack_size = 40 และ bonus_sachets = 2
-4. กรณีบอกเฉพาะ "ประหยัด X บาท": คำนวณราคาปกติ = ราคาโปร + X และระบุใน notes
-5. สีซอง (color): "แดง", "เขียว", "แดง,เขียว"
-6. รายละเอียดกลไกโปร (mechanic): เขียนภาษาไทยครบถ้วนตามรูป
-7. หากพบกาแฟซองแบรนด์อื่น หรือสินค้าโปรโมชั่นอื่นที่เด่นชัด ให้สกัดออกมาด้วยโดยใส่ชื่อแบรนด์จริงตามที่เห็น
+เทคนิคการถอดรหัสป้ายโปรโมชั่นไทย:
+1. ป้าย "ปกติ XX พิเศษ YY ประหยัด ZZ":
+   - retail_price = XX, pro_price = YY, ระบุใน mechanic ให้ชัดเจน
+2. ป้าย "ประหยัด X บาท" (ไม่มีราคาปกติ):
+   - ให้คำนวณ retail_price = pro_price + X และระบุใน notes ว่า "คำนวณราคาปกติจากราคาโปรโมชั่น + ประหยัด X บาท"
+3. ป้าย "ซื้อ 2 แพ็ค ฟรี 1 ซอง" หรือ "40+2 ซอง":
+   - pack_size = 40 (นับเฉพาะซองหลัก), bonus_sachets = 2
+4. แปลงปี พ.ศ. เป็น ค.ศ. เสมอ (เช่น 2569 -> 2026, 69 -> 2026) หากวันที่ไม่มีปี ให้ใช้ปี 2026 ในรูปแบบ dd/mm/yyyy
+5. ห้ามเดาราคา หากไม่เห็นตัวเลขราคาบนป้ายให้ใส่เป็น null
+6. หากในภาพมีสินค้าหลายตัว ให้แยกออกเป็นแต่ละ Object ใน Array ให้ครบถ้วน
 `;
 
 const NOODLE_SYSTEM_PROMPT = `
-คุณเป็นผู้เชี่ยวชาญการอ่านและวิเคราะห์รูปภาพโปรโมชั่นของร้านสะดวกซื้อและซูเปอร์มาร์เก็ตในประเทศไทย (เช่น 7-11, CJ More, Mini BigC, Lotus, Top)
+คุณเป็นผู้เชี่ยวชาญระดับสูงในการอ่านและถอดรหัสป้ายราคาและโบรชัวร์โปรโมชั่นของร้านสะดวกซื้อและห้างสรรพสินค้าในไทย (เช่น 7-11, CJ More, Mini BigC, Lotus, Top)
 เป้าหมายของคุณคือ สกัดข้อมูลโปรโมชั่นของกลุ่มสินค้าดังต่อไปนี้ ทุกแบรนด์:
 1. บะหมี่กึ่งสำเร็จรูป (Instant Noodles) - ทุกแบรนด์ (มาม่า, ไวไว, ยำยำ, นิสชิน, ซัมยัง ฯลฯ) ทั้ง "แบบซอง" และ "แบบถ้วย/คัพ"
 2. โจ๊กกึ่งสำเร็จรูป (Instant Congee/Porridge) - ทุกแบรนด์ (คนอร์, มาม่า, เกษตร ฯลฯ) ทั้ง "แบบซอง" และ "แบบถ้วย"
 3. ข้าวต้มกึ่งสำเร็จรูป (Instant Rice Soup) - ทุกแบรนด์ "แบบถ้วย"
 
-กฎสำคัญ:
-1. แปลงปี พ.ศ. เป็น ค.ศ. (เช่น 2569 เป็น 2026) ถ้าไม่มีปีให้ใช้ปีปัจจุบัน (2026) รูปแบบ dd/mm/yyyy
-2. ห้ามเดาราคา หากไม่เห็นให้เป็น null
-3. บรรจุภัณฑ์ (ฟิลด์ color): ให้ระบุชัดเจนว่า "ซอง" หรือ "ถ้วย/คัพ"
-4. ขนาดแพ็ค (pack_size): หากขายแยกเดี่ยว (เช่น 1 ซอง/1 ถ้วย) ให้ใส่ pack_size = 1 หากเป็นแพ็ค (เช่น แพ็ค 5 ซอง, แพ็ค 6 ถ้วย) ให้ใส่จำนวนชิ้นในแพ็ค
-5. รายละเอียดกลไกโปร (mechanic): เขียนภาษาไทยครบถ้วน เช่น "มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น 60 กรัม แพ็ค 10 ซอง ปกติ 67 บาท พิเศษ 59 บาท ประหยัด 8 บาท" หรือ "คนอร์ คัพโจ๊ก รสหมู 35 กรัม 1 ถ้วย ปกติ 18 บาท พิเศษ 2 ถ้วย 32 บาท"
-6. กรณีบอกเฉพาะ "ประหยัด X บาท": คำนวณราคาปกติ = ราคาโปร + X
-7. สกัดสินค้าทุกรายการในหมวดบะหมี่ โจ๊ก ข้าวต้ม ที่ปรากฏในรูปภาพให้ครบถ้วนทุกรายการ
+เทคนิคการถอดรหัสป้ายโปรโมชั่นไทย:
+1. ป้าย "ซื้อ 2 ชิ้น XX บาท" (พบบ่อยใน 7-11):
+   - ตัวอย่าง: "มาม่าคัพ ปกติถ้วยละ 15.- ซื้อ 2 ถ้วย 25.-"
+   - ให้บันทึก: retail_price = 15.00 (ราคาปกติ 1 ชิ้น), pro_price = 12.50 (ราคาโปรเฉลี่ยต่อชิ้น), mechanic = "ซื้อ 2 ถ้วย 25 บาท ปกติถ้วยละ 15 บาท (ประหยัด 5 บาท)"
+2. ป้าย "ชิ้นที่สอง 1 บาท":
+   - ตัวอย่าง: "ชิ้นแรก 20 บาท ชิ้นที่สอง 1 บาท"
+   - ให้บันทึก: retail_price = 20.00, pro_price = 10.50 (เฉลี่ยชิ้นละ 10.50 บาท), mechanic = "ชิ้นที่สอง 1 บาท เมื่อซื้อ 2 ชิ้น รวม 21 บาท (ปกติ 40 บาท)"
+3. ป้าย "แพ็ค / ลัง":
+   - สังเกตตัวเลขจำนวนซองในแพ็ค เช่น "แพ็ค 5 ซอง", "แพ็ค 6 ถ้วย", "แพ็ค 10 ซอง" ➔ ให้ใส่ pack_size เป็นจำนวนนั้น
+   - หากเป็นซองหรือถ้วยเดี่ยว ➔ pack_size = 1
+4. บรรจุภัณฑ์ (ฟิลด์ color): ระบุชัดเจนว่า "ซอง" หรือ "ถ้วย/คัพ"
+5. ชื่อสินค้าและรสชาติ: สกัดชื่อรสชาติให้ครบถ้วน เช่น "มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น", "คนอร์ คัพโจ๊ก รสหมู", "ไวไว บะหมี่กึ่งสำเร็จรูป รสหมูสับต้มยำ"
+6. แปลงปี พ.ศ. เป็น ค.ศ. เสมอ (เช่น 2569 -> 2026) หากวันที่ไม่มีปี ให้ใช้ปี 2026 ในรูปแบบ dd/mm/yyyy
+7. สกัดสินค้าทุกรายการในหมวดบะหมี่ โจ๊ก ข้าวต้ม ที่ปรากฏในภาพออกมาให้ครบถ้วน
 `;
 
 export async function extractPromotionFromImage(
   imageBase64: string,
   mimeType: string = 'image/jpeg',
-  category: PromoCategory = 'coffee'
+  category: PromoCategory = 'coffee',
+  modelMode: AiModelMode = 'flash'
 ): Promise<GeminiExtractedItem[]> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === 'your-gemini-api-key') {
@@ -124,8 +133,8 @@ export async function extractPromotionFromImage(
           period_start: '06/11/2026',
           period_end: '08/11/2026',
           mechanic: 'มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น 60 กรัม ปกติ 7 บาท พิเศษ 2 ซอง 13 บาท ประหยัด 1 บาท',
-          retail_price: 14.0,
-          pro_price: 13.0,
+          retail_price: 7.0,
+          pro_price: 6.5,
           confidence: 0.95,
           notes: '(โหมดทดสอบจำลอง: บะหมี่กึ่งสำเร็จรูป)',
         },
@@ -163,16 +172,21 @@ export async function extractPromotionFromImage(
   });
 
   const promptText = category === 'noodle' ? NOODLE_SYSTEM_PROMPT : COFFEE_SYSTEM_PROMPT;
+  const targetModel = modelMode === 'pro' ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
 
-  const callModel = async (): Promise<GeminiExtractedItem[]> => {
+  const callModel = async (modelToUse: string): Promise<GeminiExtractedItem[]> => {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: modelToUse,
       contents: [
         {
           role: 'user',
           parts: [
             { text: promptText },
-            { text: `โปรดวิเคราะห์รูปโปรโมชั่นนี้ในหมวด "${category === 'noodle' ? 'บะหมี่ โจ๊ก ข้าวต้ม' : 'กาแฟซอง'}" และส่งคืนเฉพาะ JSON Array ตามสกีมาที่กำหนด` },
+            {
+              text: `โปรดวิเคราะห์รูปโปรโมชั่นนี้ในหมวด "${
+                category === 'noodle' ? 'บะหมี่ โจ๊ก ข้าวต้ม' : 'กาแฟซอง'
+              }" อย่างละเอียด โดยถอดรหัสป้ายราคา รสชาติ บรรจุภัณฑ์ และกลไกโปรโมชั่นให้ถูกต้องแม่นยำที่สุด แล้วส่งคืนเฉพาะ JSON Array ตามสกีมาที่กำหนด`,
+            },
             {
               inlineData: {
                 mimeType,
@@ -185,7 +199,7 @@ export async function extractPromotionFromImage(
       config: {
         responseMimeType: 'application/json',
         responseSchema: geminiResponseSchemaConfig,
-        temperature: 0.1,
+        temperature: 0.0, // ปรับเป็น 0.0 เพื่อความแม่นยำสูงสุดและลดโอกาสอ่านเพี้ยน
       },
     });
 
@@ -201,12 +215,22 @@ export async function extractPromotionFromImage(
   };
 
   try {
-    return await callModel();
+    return await callModel(targetModel);
   } catch (firstError) {
-    console.warn('Gemini extraction attempt 1 failed, retrying once...', firstError);
+    console.warn(`Gemini extraction with ${targetModel} attempt 1 failed, retrying once...`, firstError);
     try {
-      return await callModel();
+      // ถ้าลองโมเดลแรกไม่ผ่าน ให้ลอง fallback เป็น flash หรือ retry อีกรอบ
+      return await callModel(targetModel);
     } catch (retryError) {
+      // หาก Pro ติดปัญหา ลอง fallback มาที่ flash
+      if (targetModel !== 'gemini-2.5-flash') {
+        console.warn('Fallback from Pro to Flash model...');
+        try {
+          return await callModel('gemini-2.5-flash');
+        } catch (fallbackErr) {
+          console.error('Gemini fallback failed:', fallbackErr);
+        }
+      }
       console.error('Gemini extraction retry failed:', retryError);
       throw new Error(
         `ไม่สามารถอ่านข้อมูลโปรโมชั่นจากรูปภาพได้: ${
