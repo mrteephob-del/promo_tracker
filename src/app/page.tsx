@@ -6,7 +6,7 @@ import ImageUploader from '@/components/ImageUploader';
 import PromotionCard from '@/components/PromotionCard';
 import ImageModal from '@/components/ImageModal';
 import SuccessModal from '@/components/SuccessModal';
-import { PromotionItem, SheetRowData } from '@/types';
+import { PromotionItem, SheetRowData, PromoCategory, CATEGORIES } from '@/types';
 import { CompressedImageResult } from '@/lib/image';
 import { getBangkokTodayDMY, formatPrice } from '@/lib/calc';
 import {
@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
+  const [category, setCategory] = useState<PromoCategory>('coffee');
   const [step, setStep] = useState<'upload' | 'review'>('upload');
   const [items, setItems] = useState<PromotionItem[]>([]);
   const [compressedImages, setCompressedImages] = useState<CompressedImageResult[]>([]);
@@ -35,6 +36,7 @@ export default function HomePage() {
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   const [saveSuccessData, setSaveSuccessData] = useState<{
     rowsAdded: number;
+    sheetName?: string;
     spreadsheetUrl?: string;
     imageUrls?: string[];
   } | null>(null);
@@ -51,15 +53,17 @@ export default function HomePage() {
 
   // กรณีเลือกกรอกข้อมูลเอง
   const handleManualEntry = (store: string, channel: string, date: string) => {
+    const isCoffee = category === 'coffee';
     const newItem: PromotionItem = {
       id: `manual-${Date.now()}`,
+      category,
       selected: true,
       date: date || getBangkokTodayDMY(),
       store: store || '7-11',
-      brand: 'เนสกาแฟ',
+      brand: isCoffee ? 'เนสกาแฟ' : 'มาม่า',
       itemName: '',
-      color: 'แดง',
-      packSize: 40,
+      color: isCoffee ? 'แดง' : 'ซอง',
+      packSize: isCoffee ? 40 : 1,
       bonusSachets: 0,
       promotion: 'ลดราคา',
       channel: channel || 'หน้าร้าน',
@@ -101,7 +105,10 @@ export default function HomePage() {
       const res = await fetch('/api/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rows: sheetRows }),
+        body: JSON.stringify({
+          rows: sheetRows,
+          sheetName: CATEGORIES[category].sheetName,
+        }),
       });
 
       const data = await res.json();
@@ -138,15 +145,17 @@ export default function HomePage() {
 
   // เพิ่มแถวใหม่
   const handleAddNewRow = () => {
+    const isCoffee = category === 'coffee';
     const newItem: PromotionItem = {
       id: `new-${Date.now()}`,
+      category,
       selected: true,
       date: getBangkokTodayDMY(),
       store: '7-11',
-      brand: 'เนสกาแฟ',
+      brand: isCoffee ? 'เนสกาแฟ' : 'มาม่า',
       itemName: '',
-      color: 'แดง',
-      packSize: 40,
+      color: isCoffee ? 'แดง' : 'ซอง',
+      packSize: isCoffee ? 40 : 1,
       bonusSachets: 0,
       promotion: 'ลดราคา',
       channel: 'หน้าร้าน',
@@ -220,6 +229,7 @@ export default function HomePage() {
         body: JSON.stringify({
           rows: rowsPayload,
           images: imagesPayload,
+          sheetName: CATEGORIES[category].sheetName,
         }),
       });
 
@@ -230,6 +240,7 @@ export default function HomePage() {
 
       setSaveSuccessData({
         rowsAdded: data.rowsAdded || rowsPayload.length,
+        sheetName: data.sheetName || CATEGORIES[category].sheetName,
         spreadsheetUrl: data.spreadsheetUrl,
         imageUrls: data.imageUrls,
       });
@@ -269,23 +280,79 @@ export default function HomePage() {
       <Header />
 
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 pb-24 space-y-6">
+        {/* Category Switcher Tabs */}
+        <div className="flex p-1.5 bg-slate-200/80 rounded-2xl max-w-lg mx-auto sm:mx-0 shadow-inner">
+          <button
+            type="button"
+            onClick={() => {
+              setCategory('coffee');
+              if (step === 'upload') setItems([]);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              category === 'coffee'
+                ? 'bg-white text-amber-900 shadow-md shadow-slate-300'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="text-base">☕</span>
+            <span>กาแฟซอง</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              PRT
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setCategory('noodle');
+              if (step === 'upload') setItems([]);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              category === 'noodle'
+                ? 'bg-white text-orange-900 shadow-md shadow-slate-300'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="text-base">🍜</span>
+            <span>บะหมี่ / โจ๊ก / ข้าวต้ม</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-800">
+              NOODLE
+            </span>
+          </button>
+        </div>
+
         {step === 'upload' ? (
           /* Step 1: Uploading Images */
           <div className="space-y-6">
-            <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white rounded-3xl p-6 sm:p-8 shadow-lg shadow-amber-600/10">
-              <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider mb-2">
-                Mobile-First AI Assistant
-              </span>
+            <div
+              className={`text-white rounded-3xl p-6 sm:p-8 shadow-lg transition-all ${
+                category === 'coffee'
+                  ? 'bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 shadow-amber-600/10'
+                  : 'bg-gradient-to-r from-orange-600 via-red-600 to-amber-700 shadow-orange-600/10'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider">
+                  {category === 'coffee' ? 'Coffee Tracker' : 'Noodles & Porridge Tracker'}
+                </span>
+                <span className="text-xs bg-black/20 px-2.5 py-1 rounded-full font-medium">
+                  แท็บ Sheet: {CATEGORIES[category].sheetName}
+                </span>
+              </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                บันทึกโปรโมชั่นกาแฟซอง
+                {category === 'coffee'
+                  ? 'บันทึกโปรโมชั่นกาแฟซอง'
+                  : 'บันทึกโปรโมชั่น บะหมี่ โจ๊ก ข้าวต้ม'}
               </h1>
-              <p className="text-amber-100 text-xs sm:text-sm mt-1 max-w-xl">
-                ระบบสกัดข้อมูลโปรโมชั่นของ 4 แบรนด์หลัก (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์)
-                จากรูปภาพร้าน 7-11, CJ More, Mini BigC, Lotus, Top และส่งต่อลง Google Sheet ทันที
+              <p className="text-white/80 text-xs sm:text-sm mt-1 max-w-xl">
+                {category === 'coffee'
+                  ? 'ระบบสกัดข้อมูลโปรโมชั่นของ 4 แบรนด์หลัก (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) บันทึกลงแท็บ PRT'
+                  : 'บะหมี่กึ่งสำเร็จรูปทุกแบรนด์ (ซอง/ถ้วย), โจ๊ก (ซอง/ถ้วย), และข้าวต้ม (ถ้วย) บันทึกลงแท็บ NOODLE'}
               </p>
             </div>
 
             <ImageUploader
+              category={category}
               onExtracted={handleExtracted}
               onManualEntry={handleManualEntry}
             />
@@ -479,6 +546,7 @@ export default function HomePage() {
       <SuccessModal
         isOpen={!!saveSuccessData}
         rowsAdded={saveSuccessData?.rowsAdded || 0}
+        sheetName={saveSuccessData?.sheetName}
         spreadsheetUrl={saveSuccessData?.spreadsheetUrl}
         imageUrls={saveSuccessData?.imageUrls}
         onUploadMore={handleUploadMore}

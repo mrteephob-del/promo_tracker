@@ -6,12 +6,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const rows: SheetRowData[] = body.rows || [];
+    const sheetName = body.sheetName || 'PRT';
 
     if (!Array.isArray(rows) || rows.length === 0) {
       return NextResponse.json({ ok: true, results: [] });
     }
 
-    const result = await checkDuplicatesWithSheet(rows);
+    const result = await checkDuplicatesWithSheet(rows, sheetName);
     return NextResponse.json(result);
   } catch (err) {
     console.error('API /api/check Error:', err);
@@ -27,4 +28,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

@@ -6,8 +6,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limitParam = searchParams.get('limit');
     const limit = limitParam ? parseInt(limitParam, 10) : 50;
+    const sheetName = searchParams.get('sheetName') || 'PRT';
 
-    const result = await fetchRecentSheetRows(limit);
+    const result = await fetchRecentSheetRows(limit, sheetName);
     return NextResponse.json(result);
   } catch (err) {
     console.error('API /api/history Error:', err);
@@ -23,4 +24,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

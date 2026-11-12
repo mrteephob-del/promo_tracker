@@ -6,6 +6,7 @@ import { CheckCircle2, ExternalLink, PlusCircle, FileSpreadsheet, Image as Image
 interface SuccessModalProps {
   isOpen: boolean;
   rowsAdded: number;
+  sheetName?: string;
   spreadsheetUrl?: string;
   imageUrls?: string[];
   onUploadMore: () => void;
@@ -14,6 +15,7 @@ interface SuccessModalProps {
 export default function SuccessModal({
   isOpen,
   rowsAdded,
+  sheetName = 'PRT',
   spreadsheetUrl,
   imageUrls = [],
   onUploadMore,
@@ -55,7 +57,7 @@ export default function SuccessModal({
               rel="noopener noreferrer"
               className="text-amber-700 hover:text-amber-800 font-semibold inline-flex items-center gap-1 hover:underline"
             >
-              <span>เปิดดูแท็บ PRT</span>
+              <span>เปิดดูแท็บ {sheetName}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>

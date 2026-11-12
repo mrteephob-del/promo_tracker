@@ -1,13 +1,13 @@
 /**
  * Promo Tracker - Google Apps Script Backend Web App
  * 
- * จัดการการบันทึกโปรโมชั่นกาแฟซองลง Google Sheet และรูปภาพลง Google Drive
+ * จัดการการบันทึกโปรโมชั่นกาแฟซอง และ บะหมี่/โจ๊ก/ข้าวต้ม ลง Google Sheet และรูปภาพลง Google Drive
  * 
  * Script Properties ที่ต้องตั้งค่า:
  * - SECRET: รหัสลับความปลอดภัยที่ตรงกับ APPS_SCRIPT_SECRET ใน Next.js
  * - FOLDER_ID: Google Drive Folder ID สำหรับเก็บรูปภาพ
  * - SPREADSHEET_ID: 11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4 (หรือเว้นว่างถ้าผูกกับชีตโดยตรง)
- * - SHEET_NAME: PRT (ค่าเริ่มต้นคือ PRT)
+ * - SHEET_NAME: PRT (ค่าเริ่มต้นสำหรับกาแฟซอง)
  */
 
 function getSettings() {
@@ -20,7 +20,7 @@ function getSettings() {
   };
 }
 
-function getSheet() {
+function getSheet(targetSheetName) {
   var settings = getSettings();
   var ss;
   try {
@@ -37,12 +37,13 @@ function getSheet() {
     throw new Error('ไม่พบ Google Spreadsheet โปรดตรวจสอบ SPREADSHEET_ID');
   }
   
-  var sheet = ss.getSheetByName(settings.SHEET_NAME);
+  var actualSheetName = targetSheetName || settings.SHEET_NAME || 'PRT';
+  var sheet = ss.getSheetByName(actualSheetName);
   if (!sheet) {
-    sheet = ss.insertSheet(settings.SHEET_NAME);
+    sheet = ss.insertSheet(actualSheetName);
     // เพิ่ม Header แถวที่ 1 หากยังไม่มี
     sheet.appendRow([
-      'Date', 'Store', 'Brand', 'Item Name', 'Color',
+      'Date', 'Store', 'Brand', 'Item Name', 'Color/Package',
       'Pack Size', 'Promotion', 'Channel', 'Freq/Week',
       'Period', 'Machanic', 'Retail Price', 'Pro Price', 'Image'
     ]);
@@ -79,14 +80,15 @@ function doPost(e) {
     }
 
     var action = payload.action;
+    var sheetName = payload.sheetName || 'PRT';
 
     // 2. แยกตาม Action
     if (action === 'checkDuplicates') {
-      return handleCheckDuplicates(payload);
+      return handleCheckDuplicates(payload, sheetName);
     } else if (action === 'save') {
-      return handleSave(payload);
+      return handleSave(payload, sheetName);
     } else if (action === 'list') {
-      return handleList(payload);
+      return handleList(payload, sheetName);
     } else {
       return jsonResponse({ ok: false, error: 'ไม่รู้จัก action: ' + action });
     }
@@ -140,9 +142,7 @@ function parseDateDMY(dateStr) {
 function getWeekKey(dateObj) {
   if (!dateObj) return 'unknown';
   var d = new Date(Date.UTC(dateObj.getUTCFullYear(), dateObj.getUTCMonth(), dateObj.getUTCDate()));
-  // แปลงวันอาทิตย์ (0) เป็น 7 เพื่อให้จันทร์เป็น 1 และอาทิตย์เป็น 7
   var dayOfWeek = d.getUTCDay() || 7;
-  // หาวันพฤหัสบดีของสัปดาห์นั้น
   d.setUTCDate(d.getUTCDate() + 4 - dayOfWeek);
   var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
@@ -151,14 +151,12 @@ function getWeekKey(dateObj) {
 
 /**
  * Action: checkDuplicates
- * คืนค่า Freq/Week และสถานะซ้ำซ้อนของรายการที่ส่งเข้ามา
  */
-function handleCheckDuplicates(payload) {
+function handleCheckDuplicates(payload, sheetName) {
   var rows = payload.rows || [];
-  var sheet = getSheet();
+  var sheet = getSheet(sheetName);
   var data = sheet.getDataRange().getValues();
   
-  // existingRows: เก็บข้อมูลแถวเดิม (ข้าม Header แถว 0)
   var existingRecords = [];
   for (var i = 1; i < data.length; i++) {
     var r = data[i];
@@ -182,8 +180,6 @@ function handleCheckDuplicates(payload) {
     });
   }
 
-  // คำนวณผลลัพธ์สำหรับแต่ละ row ที่ส่งเข้ามา
-  // ติดตาม Freq ภายใน batch เดียวกันด้วย
   var batchCounts = {};
 
   var results = rows.map(function(item) {
@@ -195,7 +191,6 @@ function handleCheckDuplicates(payload) {
     var itemPeriod = String(item.period || '').trim();
     var itemProPrice = (parseFloat(item.proPrice) || 0).toFixed(2);
 
-    // 1. นับ Freq/Week ในชีตเดิม
     var existingFreq = 0;
     var isDuplicate = false;
     var duplicateReason = '';
@@ -206,7 +201,6 @@ function handleCheckDuplicates(payload) {
         existingFreq++;
       }
       
-      // ตรวจสอบความซ้ำซ้อน: Store + Brand + Color + Period + Pro Price
       if (
         ex.store === itemStore &&
         ex.brand === itemBrand &&
@@ -215,11 +209,10 @@ function handleCheckDuplicates(payload) {
         ex.proPrice === itemProPrice
       ) {
         isDuplicate = true;
-        duplicateReason = 'พบข้อมูล Store, Brand, Color, Period และ Pro Price ตรงกับในชีตแล้ว';
+        duplicateReason = 'พบข้อมูล Store, Brand, Color/Package, Period และ Pro Price ตรงกับในชีตแล้ว';
       }
     }
 
-    // 2. บวกจำนวนที่อยู่ใน batch เดียวกันก่อนหน้านี้
     var batchKey = itemStore + '|' + itemBrand + '|' + itemWeekKey;
     var priorInBatch = batchCounts[batchKey] || 0;
     batchCounts[batchKey] = priorInBatch + 1;
@@ -241,19 +234,17 @@ function handleCheckDuplicates(payload) {
 
 /**
  * Action: save
- * บันทึกรูปภาพลง Drive (ถ้ามี) และ append แถวลงชีต
  */
-function handleSave(payload) {
+function handleSave(payload, sheetName) {
   var rows = payload.rows || [];
-  var images = payload.images || []; // array of { id, base64, mimeType, filename }
+  var images = payload.images || [];
   var settings = getSettings();
-  var sheet = getSheet();
+  var sheet = getSheet(sheetName);
 
   if (rows.length === 0) {
     return jsonResponse({ ok: false, error: 'ไม่มีแถวข้อมูลที่จะบันทึก' });
   }
 
-  // 1. จัดการโฟลเดอร์ Google Drive สำหรับบันทึกรูปภาพ
   var driveFolder = null;
   if (settings.FOLDER_ID) {
     try {
@@ -263,7 +254,6 @@ function handleSave(payload) {
     }
   }
 
-  // อัปโหลดรูปภาพและเก็บ Map: imageId -> View URL
   var imageUrlMap = {};
   var uploadedUrls = [];
 
@@ -274,7 +264,6 @@ function handleSave(payload) {
     var viewUrl = '';
     if (driveFolder) {
       try {
-        // หาหรือสร้าง Subfolder ตามเดือน yyyy-mm
         var now = new Date();
         var yyyy = now.getFullYear();
         var mm = ('0' + (now.getMonth() + 1)).slice(-2);
@@ -288,7 +277,6 @@ function handleSave(payload) {
           targetSubfolder = driveFolder.createFolder(subfolderName);
         }
 
-        // แปลง base64 เป็น blob
         var rawBase64 = img.base64;
         if (rawBase64.indexOf(',') > -1) {
           rawBase64 = rawBase64.split(',')[1];
@@ -300,7 +288,6 @@ function handleSave(payload) {
         var blob = Utilities.newBlob(decodedBytes, mimeType, fileName);
         var file = targetSubfolder.createFile(blob);
         
-        // ตั้งสิทธิ์ Everyone with link can view
         file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
         viewUrl = file.getUrl();
       } catch (uploadErr) {
@@ -315,7 +302,6 @@ function handleSave(payload) {
     uploadedUrls.push(viewUrl);
   }
 
-  // 2. เตรียมแถวข้อมูลที่จะ Append ลงแท็บ PRT (Columns A - N)
   var appendRows = [];
   for (var idx = 0; idx < rows.length; idx++) {
     var r = rows[idx];
@@ -329,30 +315,28 @@ function handleSave(payload) {
       imgUrl = uploadedUrls[0];
     }
 
-    // ฟอร์แมตสูตร Column N
     var imageFormula = imgUrl ? '=HYPERLINK("' + imgUrl + '","ดูรูป")' : '';
 
     var rowArray = [
-      r.date || '',                                // A: Date (dd/mm/yyyy)
-      r.store || '',                               // B: Store
-      r.brand || '',                               // C: Brand
-      r.itemName || '',                            // D: Item Name
-      r.color || '',                               // E: Color
-      parseInt(r.packSize, 10) || '',              // F: Pack Size
-      r.promotion || '',                           // G: Promotion
-      r.channel || '',                             // H: Channel
-      parseInt(r.freqWeek, 10) || 1,               // I: Freq/Week
-      r.period || '',                              // J: Period
-      r.machanic || '',                            // K: Machanic
-      formatPriceNumber(r.retailPrice),            // L: Retail Price
-      formatPriceNumber(r.proPrice),               // M: Pro Price
-      imageFormula                                 // N: Image
+      r.date || '',
+      r.store || '',
+      r.brand || '',
+      r.itemName || '',
+      r.color || '',
+      parseInt(r.packSize, 10) || '',
+      r.promotion || '',
+      r.channel || '',
+      parseInt(r.freqWeek, 10) || 1,
+      r.period || '',
+      r.machanic || '',
+      formatPriceNumber(r.retailPrice),
+      formatPriceNumber(r.proPrice),
+      imageFormula
     ];
 
     appendRows.push(rowArray);
   }
 
-  // 3. เขียนข้อมูลลง Google Sheet
   var startRow = sheet.getLastRow() + 1;
   var numRows = appendRows.length;
   var numCols = 14;
@@ -360,17 +344,16 @@ function handleSave(payload) {
   var range = sheet.getRange(startRow, 1, numRows, numCols);
   range.setValues(appendRows);
 
-  // ตั้ง Number Format ให้คอลัมน์ราคา L และ M เป็น ทศนิยม 2 ตำแหน่ง
   var priceRange = sheet.getRange(startRow, 12, numRows, 2);
   priceRange.setNumberFormat('#,##0.00');
 
-  // ตั้ง Date Format ให้คอลัมน์ A
   var dateRange = sheet.getRange(startRow, 1, numRows, 1);
-  dateRange.setNumberFormat('@'); // Plain text สำหรับ dd/mm/yyyy
+  dateRange.setNumberFormat('@');
 
   return jsonResponse({
     ok: true,
     rowsAdded: numRows,
+    sheetName: sheetName,
     imageUrls: uploadedUrls,
     spreadsheetUrl: sheet.getParent().getUrl()
   });
@@ -384,14 +367,13 @@ function formatPriceNumber(val) {
 
 /**
  * Action: list
- * ดึง 50 แถวล่าสุดจากชีต
  */
-function handleList(payload) {
-  var sheet = getSheet();
+function handleList(payload, sheetName) {
+  var sheet = getSheet(sheetName);
   var lastRow = sheet.getLastRow();
   
   if (lastRow <= 1) {
-    return jsonResponse({ ok: true, rows: [] });
+    return jsonResponse({ ok: true, sheetName: sheetName, rows: [] });
   }
 
   var count = payload.limit || 50;
@@ -403,11 +385,10 @@ function handleList(payload) {
   var formulas = range.getFormulas();
 
   var resultList = [];
-  for (var i = values.length - 1; i >= 0; i--) { // เรียงจากล่าสุดไปเก่าสุด
+  for (var i = values.length - 1; i >= 0; i--) {
     var r = values[i];
     var f = formulas[i];
 
-    // ดึง URL จาก formula HYPERLINK ถ้ามี
     var imgUrl = '';
     var formulaN = f[13] || '';
     var match = formulaN.match(/HYPERLINK\("([^"]+)"/i);
@@ -435,6 +416,7 @@ function handleList(payload) {
 
   return jsonResponse({
     ok: true,
+    sheetName: sheetName,
     rows: resultList
   });
 }
@@ -450,4 +432,3 @@ function formatDateString(val) {
   }
   return String(val);
 }
-

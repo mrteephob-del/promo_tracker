@@ -15,6 +15,8 @@ import {
 import {
   PromotionItem,
   TRACKED_BRANDS,
+  COMMON_NOODLE_BRANDS,
+  NOODLE_PACKAGE_TYPES,
   TRACKED_STORES,
   TRACKED_CHANNELS,
   PROMO_COLORS,
@@ -48,13 +50,14 @@ export default function PromotionCard({
   const unitRetail = calculatePricePerSachet(item.retailPrice, item.packSize);
   const unitPro = calculatePricePerSachet(item.proPrice, item.packSize);
 
+  const isCoffee = item.category !== 'noodle';
   const isLowConfidence = item.confidence < 0.7;
-  const isUntracked = !isTrackedBrand(item.brand);
+  const isUntracked = isCoffee && !isTrackedBrand(item.brand);
 
   const handleChange = (field: keyof PromotionItem, value: any) => {
     const updated = { ...item, [field]: value };
     // ตรวจสอบแบรนด์ใหม่กรณีผู้ใช้แก้ไข
-    if (field === 'brand') {
+    if (field === 'brand' && isCoffee) {
       updated.isUntrackedBrand = !isTrackedBrand(value);
     }
     onUpdate(updated);
@@ -232,14 +235,15 @@ export default function PromotionCard({
               item.brand
             )}`}
           >
-            {TRACKED_BRANDS.map((b) => (
+            {(isCoffee ? TRACKED_BRANDS : COMMON_NOODLE_BRANDS).map((b) => (
               <option key={b} value={b}>
                 {b}
               </option>
             ))}
-            {!isTrackedBrand(item.brand) && item.brand && (
-              <option value={item.brand}>{item.brand} (นอกขอบเขต)</option>
-            )}
+            {item.brand &&
+              !(isCoffee ? (TRACKED_BRANDS as readonly string[]) : (COMMON_NOODLE_BRANDS as readonly string[])).includes(
+                item.brand
+              ) && <option value={item.brand}>{item.brand}</option>}
           </select>
         </div>
 
@@ -266,10 +270,10 @@ export default function PromotionCard({
           </select>
         </div>
 
-        {/* Color */}
+        {/* Color / Package Type */}
         <div>
           <label className="block text-slate-600 font-semibold mb-1">
-            สีซอง <span className="text-rose-500">*</span>
+            {isCoffee ? 'สีซอง' : 'บรรจุภัณฑ์'} <span className="text-rose-500">*</span>
           </label>
           <select
             value={item.color}
@@ -278,11 +282,20 @@ export default function PromotionCard({
               item.color
             )}`}
           >
-            {PROMO_COLORS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
+            {isCoffee ? (
+              <>
+                <option value="แดง">แดง</option>
+                <option value="เขียว">เขียว</option>
+                <option value="แดง,เขียว">แดง,เขียว</option>
+              </>
+            ) : (
+              <>
+                <option value="ซอง">ซอง</option>
+                <option value="ถ้วย/คัพ">ถ้วย/คัพ</option>
+                <option value="ชาม">ชาม</option>
+                <option value="แพ็ค">แพ็ค</option>
+              </>
+            )}
           </select>
         </div>
 

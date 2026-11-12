@@ -20,16 +20,18 @@ import {
   TrackedStore,
   TrackedChannel,
   PromotionItem,
+  PromoCategory,
 } from '@/types';
 import { compressImage, CompressedImageResult } from '@/lib/image';
 import { getBangkokTodayYMD, convertYMDtoDMY } from '@/lib/calc';
 
 interface ImageUploaderProps {
+  category: PromoCategory;
   onExtracted: (items: PromotionItem[], images: CompressedImageResult[]) => void;
   onManualEntry: (store: string, channel: string, date: string) => void;
 }
 
-export default function ImageUploader({ onExtracted, onManualEntry }: ImageUploaderProps) {
+export default function ImageUploader({ category, onExtracted, onManualEntry }: ImageUploaderProps) {
   const [selectedStore, setSelectedStore] = useState<string>('auto');
   const [selectedChannel, setSelectedChannel] = useState<string>('หน้าร้าน');
   const [recordDateYMD, setRecordDateYMD] = useState<string>(getBangkokTodayYMD());
@@ -98,6 +100,7 @@ export default function ImageUploader({ onExtracted, onManualEntry }: ImageUploa
               defaultStore: selectedStore === 'auto' ? undefined : selectedStore,
               defaultChannel: selectedChannel,
               recordDate: recordDateDMY,
+              category,
             }),
           });
 
@@ -131,13 +134,14 @@ export default function ImageUploader({ onExtracted, onManualEntry }: ImageUploa
         for (let idx = 0; idx < images.length; idx++) {
           allItems.push({
             id: `manual-fallback-${Date.now()}-${idx}`,
+            category,
             selected: true,
             date: recordDateDMY,
             store: selectedStore === 'auto' ? '7-11' : selectedStore,
-            brand: 'เนสกาแฟ',
-            itemName: '',
-            color: 'แดง',
-            packSize: 40,
+            brand: category === 'noodle' ? 'มาม่า' : 'เนสกาแฟ',
+            itemName: category === 'noodle' ? 'มาม่า บะหมี่กึ่งสำเร็จรูป' : '',
+            color: category === 'noodle' ? 'ซอง' : 'แดง',
+            packSize: category === 'noodle' ? 1 : 40,
             bonusSachets: 0,
             promotion: 'ลดราคา',
             channel: selectedChannel,
@@ -147,7 +151,7 @@ export default function ImageUploader({ onExtracted, onManualEntry }: ImageUploa
             retailPrice: null,
             proPrice: null,
             confidence: 0,
-            notes: 'AI ไม่พบรายการโปรโมชั่นกาแฟซอง จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง',
+            notes: `AI ไม่พบรายการโปรโมชั่น${category === 'noodle' ? 'บะหมี่/โจ๊ก/ข้าวต้ม' : 'กาแฟซอง'} จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง`,
             imageId: `img-${idx}`,
             imagePreviewUrl: images[idx].dataUrl,
           });

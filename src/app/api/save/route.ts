@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const rows: SheetRowData[] = body.rows || [];
     const images = body.images || [];
+    const sheetName = body.sheetName || 'PRT';
 
     if (!Array.isArray(rows) || rows.length === 0) {
       return NextResponse.json(
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await saveRowsAndImagesToSheet(rows, images);
+    const result = await saveRowsAndImagesToSheet(rows, images, sheetName);
     return NextResponse.json(result);
   } catch (err) {
     console.error('API /api/save Error:', err);
@@ -31,4 +32,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

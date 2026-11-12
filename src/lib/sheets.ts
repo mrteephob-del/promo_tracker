@@ -28,7 +28,6 @@ async function callGasWebhook<T>(payload: Omit<GasPayload, 'secret'>): Promise<T
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(fullPayload),
-    // ป้องกัน caching
     cache: 'no-store',
   });
 
@@ -45,9 +44,12 @@ async function callGasWebhook<T>(payload: Omit<GasPayload, 'secret'>): Promise<T
 }
 
 /**
- * เรียก Apps Script เพื่อตรวจสอบ Freq/Week และความซ้ำซ้อนใน Sheet
+ * เรียก Apps Script เพื่อตรวจสอบ Freq/Week และความซ้ำซ้อนใน Sheet ตามแท็บ
  */
-export async function checkDuplicatesWithSheet(rows: SheetRowData[]): Promise<{
+export async function checkDuplicatesWithSheet(
+  rows: SheetRowData[],
+  sheetName: string = 'PRT'
+): Promise<{
   ok: boolean;
   results: {
     freqWeek: number;
@@ -57,39 +59,47 @@ export async function checkDuplicatesWithSheet(rows: SheetRowData[]): Promise<{
 }> {
   return await callGasWebhook({
     action: 'checkDuplicates',
+    sheetName,
     rows,
   });
 }
 
 /**
- * เรียก Apps Script เพื่อบันทึกรูปลง Drive และบันทึกแถวลง Sheet
+ * เรียก Apps Script เพื่อบันทึกรูปลง Drive และบันทึกแถวลง Sheet ตามแท็บ
  */
 export async function saveRowsAndImagesToSheet(
   rows: SheetRowData[],
-  images: { id: string; base64: string; mimeType: string; filename?: string }[]
+  images: { id: string; base64: string; mimeType: string; filename?: string }[],
+  sheetName: string = 'PRT'
 ): Promise<{
   ok: boolean;
   rowsAdded: number;
+  sheetName?: string;
   imageUrls: string[];
   spreadsheetUrl?: string;
 }> {
   return await callGasWebhook({
     action: 'save',
+    sheetName,
     rows,
     images,
   });
 }
 
 /**
- * เรียก Apps Script เพื่อดึงประวัติ 50 แถวล่าสุด
+ * เรียก Apps Script เพื่อดึงประวัติ 50 แถวล่าสุดตามแท็บ
  */
-export async function fetchRecentSheetRows(limit: number = 50): Promise<{
+export async function fetchRecentSheetRows(
+  limit: number = 50,
+  sheetName: string = 'PRT'
+): Promise<{
   ok: boolean;
+  sheetName?: string;
   rows: (SheetRowData & { imageUrl?: string })[];
 }> {
   return await callGasWebhook({
     action: 'list',
+    sheetName,
     limit,
   });
 }
-

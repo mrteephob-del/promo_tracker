@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import {
   TRACKED_BRANDS,
+  COMMON_NOODLE_BRANDS,
   TRACKED_STORES,
   SheetRowData,
+  PromoCategory,
+  CATEGORIES,
 } from '@/types';
 import { getWeekIdentifier, getBangkokDate } from '@/lib/calc';
 import {
@@ -23,6 +26,7 @@ import {
 } from 'lucide-react';
 
 export default function HistoryPage() {
+  const [category, setCategory] = useState<PromoCategory>('coffee');
   const [rows, setRows] = useState<(SheetRowData & { imageUrl?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,11 +36,14 @@ export default function HistoryPage() {
   const [brandFilter, setBrandFilter] = useState<string>('all');
   const [weekFilter, setWeekFilter] = useState<string>('all');
 
-  const fetchHistory = async () => {
+  const sheetName = CATEGORIES[category].sheetName;
+
+  const fetchHistory = async (targetCategory = category) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/history?limit=50');
+      const targetSheet = CATEGORIES[targetCategory].sheetName;
+      const res = await fetch(`/api/history?limit=50&sheetName=${targetSheet}`);
       const data = await res.json();
       if (!res.ok || !data.ok) {
         throw new Error(data.error || 'ไม่สามารถโหลดประวัติโปรโมชั่นได้');
@@ -53,10 +60,11 @@ export default function HistoryPage() {
   };
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    fetchHistory(category);
+  }, [category]);
 
   const currentWeekKey = getWeekIdentifier(getBangkokDate());
+  const activeBrands = category === 'coffee' ? TRACKED_BRANDS : COMMON_NOODLE_BRANDS.slice(0, 6);
 
   // สรุปจำนวนโปรโมชั่นในสัปดาห์ปัจจุบัน (Store x Brand Matrix)
   const currentWeekRows = rows.filter((r) => {
@@ -67,7 +75,7 @@ export default function HistoryPage() {
   const matrixCounts: Record<string, Record<string, number>> = {};
   TRACKED_STORES.forEach((s) => {
     matrixCounts[s] = {};
-    TRACKED_BRANDS.forEach((b) => {
+    activeBrands.forEach((b) => {
       matrixCounts[s][b] = 0;
     });
   });
@@ -104,13 +112,13 @@ export default function HistoryPage() {
               <span>ประวัติโปรโมชั่น & สรุปภาพรวม</span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              ดึงข้อมูล 50 รายการล่าสุดจาก Google Sheet แท็บ PRT
+              ดึงข้อมูล 50 รายการล่าสุดจาก Google Sheet แท็บ {sheetName}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={fetchHistory}
+              onClick={() => fetchHistory(category)}
               disabled={loading}
               className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer disabled:opacity-50"
             >
@@ -125,10 +133,43 @@ export default function HistoryPage() {
               className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs sm:text-sm font-medium rounded-xl transition-all"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-              <span>เปิด Sheet</span>
+              <span>เปิด Sheet ({sheetName})</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
+        </div>
+
+        {/* Category Switcher Tabs */}
+        <div className="flex p-1.5 bg-slate-200/80 rounded-2xl max-w-lg shadow-inner">
+          <button
+            type="button"
+            onClick={() => setCategory('coffee')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              category === 'coffee'
+                ? 'bg-white text-amber-900 shadow-md shadow-slate-300'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>☕ กาแฟซอง</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              PRT
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCategory('noodle')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              category === 'noodle'
+                ? 'bg-white text-orange-900 shadow-md shadow-slate-300'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>🍜 บะหมี่ / โจ๊ก / ข้าวต้ม</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-800">
+              NOODLE
+            </span>
+          </button>
         </div>
 
         {/* Error message */}
@@ -144,7 +185,9 @@ export default function HistoryPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-amber-600" />
-              <span>สรุปโปรโมชั่นประจำสัปดาห์นี้ ({currentWeekKey})</span>
+              <span>
+                สรุปโปรโมชั่นประจำสัปดาห์นี้ ({currentWeekKey}) - แท็บ {sheetName}
+              </span>
             </h2>
             <span className="text-xs text-slate-400">
               รวม {currentWeekRows.length} รายการ
@@ -156,7 +199,7 @@ export default function HistoryPage() {
               <thead>
                 <tr className="bg-slate-50 border-y border-slate-200 text-slate-600">
                   <th className="py-2.5 px-3 font-semibold">ร้านค้า</th>
-                  {TRACKED_BRANDS.map((b) => (
+                  {activeBrands.map((b) => (
                     <th key={b} className="py-2.5 px-3 font-semibold text-center">
                       {b}
                     </th>
@@ -172,7 +215,7 @@ export default function HistoryPage() {
                   return (
                     <tr key={s} className="hover:bg-slate-50/50">
                       <td className="py-2.5 px-3 font-medium text-slate-800">{s}</td>
-                      {TRACKED_BRANDS.map((b) => {
+                      {activeBrands.map((b) => {
                         const count = matrixCounts[s]?.[b] || 0;
                         storeTotal += count;
                         return (
@@ -232,7 +275,7 @@ export default function HistoryPage() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="all">ทุกแบรนด์</option>
-                {TRACKED_BRANDS.map((b) => (
+                {activeBrands.map((b) => (
                   <option key={b} value={b}>
                     {b}
                   </option>
@@ -259,13 +302,13 @@ export default function HistoryPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-slate-200/80 p-8 space-y-3">
             <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
-            <p className="text-sm text-slate-500">กำลังโหลดข้อมูลโปรโมชั่นจาก Google Sheet...</p>
+            <p className="text-sm text-slate-500">กำลังโหลดข้อมูลจาก Google Sheet แท็บ {sheetName}...</p>
           </div>
         ) : filteredRows.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8 space-y-2">
             <History className="w-10 h-10 text-slate-300 mx-auto" />
-            <p className="text-sm font-semibold text-slate-700">ไม่พบข้อมูลโปรโมชั่นที่ตรงกับเงื่อนไข</p>
-            <p className="text-xs text-slate-400">ลองปรับเปลี่ยนตัวกรอง หรือตรวจสอบข้อมูลใน Google Sheet</p>
+            <p className="text-sm font-semibold text-slate-700">ไม่พบข้อมูลโปรโมชั่นในแท็บ {sheetName}</p>
+            <p className="text-xs text-slate-400">ลองสลับหมวด หรือเริ่มบันทึกโปรโมชั่นใหม่</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -287,7 +330,9 @@ export default function HistoryPage() {
                           ? 'bg-amber-100 text-amber-800'
                           : r.color.includes('แดง')
                           ? 'bg-rose-100 text-rose-800'
-                          : 'bg-emerald-100 text-emerald-800'
+                          : r.color.includes('เขียว')
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-indigo-100 text-indigo-800'
                       }`}
                     >
                       {r.color}
@@ -329,7 +374,7 @@ export default function HistoryPage() {
                     )}
                     {r.packSize && (
                       <span className="text-slate-500">
-                        ({r.packSize} ซอง)
+                        ({r.packSize} {category === 'noodle' ? 'ชิ้น' : 'ซอง'})
                       </span>
                     )}
                   </div>
@@ -363,4 +408,3 @@ export default function HistoryPage() {
     </>
   );
 }
-
