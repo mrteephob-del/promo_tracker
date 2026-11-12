@@ -523,6 +523,57 @@ function cleanAndNormalizeData() {
         noodleUpdates++;
       }
     }
+
+    // 3. แยกแถวที่รวมหลายแบรนด์ (เช่น "มาม่า, ไวไว, ยำยำ, นิสชิน") ออกเป็น 1 แถวต่อ 1 แบรนด์เดี่ยว
+    var currentLastRow = sheetNoodle.getLastRow();
+    if (currentLastRow > 1) {
+      var currentRange = sheetNoodle.getRange(2, 1, currentLastRow - 1, 14);
+      var currentValues = currentRange.getValues();
+      var currentFormulas = currentRange.getFormulas();
+      var validBrands = ['มาม่า', 'ไวไว', 'ยำยำ', 'นิสชิน', 'ซัมยัง', 'คนอร์', 'เกษตร', 'ควิก'];
+      
+      var rowsToDelete = [];
+      var rowsToAdd = [];
+
+      for (var idx = 0; idx < currentValues.length; idx++) {
+        var bStr = String(currentValues[idx][2] || '').trim();
+        if (bStr.indexOf(',') > -1 || bStr.indexOf('/') > -1) {
+          var rawSplits = bStr.split(/[,/]+/).map(function(s) { return s.trim(); });
+          var matchedBrands = [];
+          for (var sIdx = 0; sIdx < rawSplits.length; sIdx++) {
+            var spl = rawSplits[sIdx];
+            for (var vbIdx = 0; vbIdx < validBrands.length; vbIdx++) {
+              if (spl.indexOf(validBrands[vbIdx]) > -1 && matchedBrands.indexOf(validBrands[vbIdx]) === -1) {
+                matchedBrands.push(validBrands[vbIdx]);
+                break;
+              }
+            }
+          }
+
+          if (matchedBrands.length > 0) {
+            rowsToDelete.push(idx + 2);
+            for (var mIdx = 0; mIdx < matchedBrands.length; mIdx++) {
+              var sBrand = matchedBrands[mIdx];
+              var cloned = currentValues[idx].slice();
+              cloned[2] = sBrand;
+              if (currentFormulas[idx][13]) {
+                cloned[13] = currentFormulas[idx][13];
+              }
+              rowsToAdd.push(cloned);
+            }
+          }
+        }
+      }
+
+      for (var delIdx = rowsToDelete.length - 1; delIdx >= 0; delIdx--) {
+        sheetNoodle.deleteRow(rowsToDelete[delIdx]);
+      }
+
+      if (rowsToAdd.length > 0) {
+        sheetNoodle.getRange(sheetNoodle.getLastRow() + 1, 1, rowsToAdd.length, 14).setValues(rowsToAdd);
+        Logger.log('Split ' + rowsToDelete.length + ' combined rows into ' + rowsToAdd.length + ' individual brand rows');
+      }
+    }
   }
   Logger.log('NOODLE Updated: ' + noodleUpdates + ' rows, Deleted: ' + noodleDeleted + ' rows');
 
