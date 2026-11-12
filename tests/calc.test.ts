@@ -126,3 +126,16 @@ describe('Tracked Brands Validation', () => {
   });
 });
 
+describe('Categories and Sheet Mapping', () => {
+  it('maps coffee to PRT tab and noodle to NOODLE tab', async () => {
+    const { CATEGORIES, COMMON_NOODLE_BRANDS } = await import('../src/types');
+    expect(CATEGORIES.coffee.sheetName).toBe('PRT');
+    expect(CATEGORIES.noodle.sheetName).toBe('NOODLE');
+    expect(COMMON_NOODLE_BRANDS).toContain('มาม่า');
+    expect(COMMON_NOODLE_BRANDS).toContain('ไวไว');
+    expect(COMMON_NOODLE_BRANDS).toContain('ยำยำ');
+    expect(COMMON_NOODLE_BRANDS).toContain('นิสชิน');
+    expect(COMMON_NOODLE_BRANDS).toContain('คนอร์');
+  });
+});
+
