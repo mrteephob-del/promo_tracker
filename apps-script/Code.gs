@@ -89,6 +89,9 @@ function doPost(e) {
       return handleSave(payload, sheetName);
     } else if (action === 'list') {
       return handleList(payload, sheetName);
+    } else if (action === 'clean') {
+      var resClean = cleanAndNormalizeData();
+      return jsonResponse({ ok: true, result: resClean });
     } else {
       return jsonResponse({ ok: false, error: 'ไม่รู้จัก action: ' + action });
     }
@@ -431,4 +434,101 @@ function formatDateString(val) {
     return d + '/' + m + '/' + y;
   }
   return String(val);
+}
+
+/**
+ * ฟังก์ชันทำความสะอาดและปรับปรุงชื่อแบรนด์ให้ถูกต้องและเป็นมาตรฐานเดียวกัน
+ * สามารถกดเรียกใช้ (Run) ได้โดยตรงจาก Google Apps Script Editor โดยไม่ต้องส่ง Request
+ */
+function cleanAndNormalizeData() {
+  var settings = getSettings();
+  var ss;
+  try {
+    if (settings.SPREADSHEET_ID) {
+      ss = SpreadsheetApp.openById(settings.SPREADSHEET_ID);
+    } else {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+    }
+  } catch (err) {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
+
+  if (!ss) {
+    throw new Error('ไม่พบ Google Spreadsheet');
+  }
+
+  // 1. ทำความสะอาดแถบ PRT (กาแฟซอง)
+  var sheetPrt = ss.getSheetByName('PRT');
+  var prtUpdates = 0;
+  if (sheetPrt && sheetPrt.getLastRow() > 1) {
+    var numRowsPrt = sheetPrt.getLastRow() - 1;
+    var rangePrt = sheetPrt.getRange(2, 3, numRowsPrt, 1);
+    var brandsPrt = rangePrt.getValues();
+    for (var i = 0; i < brandsPrt.length; i++) {
+      var brand = String(brandsPrt[i][0] || '').trim();
+      var newBrand = brand;
+      if (brand === 'Moccona') newBrand = 'มอคโคน่า';
+      else if (brand === 'Birdy') newBrand = 'เบอร์ดี้';
+      else if (brand === 'Super') newBrand = 'ซุปเปอร์';
+      else if (brand === 'Nescafe') newBrand = 'เนสกาแฟ';
+
+      if (newBrand !== brand) {
+        brandsPrt[i][0] = newBrand;
+        prtUpdates++;
+      }
+    }
+    if (prtUpdates > 0) {
+      rangePrt.setValues(brandsPrt);
+    }
+  }
+  Logger.log('PRT Updated: ' + prtUpdates + ' rows');
+
+  // 2. ทำความสะอาดแถบ NOODLE (บะหมี่ โจ๊ก ข้าวต้ม)
+  var sheetNoodle = ss.getSheetByName('NOODLE');
+  var noodleUpdates = 0;
+  var noodleDeleted = 0;
+  if (sheetNoodle && sheetNoodle.getLastRow() > 1) {
+    var lastRow = sheetNoodle.getLastRow();
+    // วนลูปจากล่างขึ้นบนสำหรับการลบแถวที่ไม่ใช่บะหมี่/โจ๊ก
+    for (var r = lastRow; r >= 2; r--) {
+      var rowValues = sheetNoodle.getRange(r, 1, 1, 4).getValues()[0];
+      var brand = String(rowValues[2] || '').trim();
+      var itemName = String(rowValues[3] || '').trim();
+
+      // ตรวจสอบแถวที่ต้องลบ (ไม่ใช่บะหมี่ โจ๊ก ข้าวต้ม)
+      var isNonNoodle =
+        (brand === 'เบญจรงค์' && (itemName.indexOf('5 กก') > -1 || itemName.indexOf('ข้าวขาว') > -1 || itemName.indexOf('ข้าวต้ม 5') > -1)) ||
+        (brand === 'ฟ้าไทย' && (itemName.indexOf('ผงทำอาหาร') > -1 || itemName.indexOf('ผงทำน้ำซุป') > -1)) ||
+        (brand === 'ฟิชไทย' || brand === 'ปลาไทย') ||
+        (brand === 'รสดี' && itemName.indexOf('มาม่า') === -1 && itemName.indexOf('บะหมี่') === -1 && itemName.indexOf('โจ๊ก') === -1) ||
+        (brand === 'ระฆังทอง' && itemName.indexOf('พะโล้') > -1) ||
+        (brand === 'หมึกกี้เมียว' || brand === 'พลอยพลัส') ||
+        (brand === 'หมึกกรุบ' && itemName.indexOf('คนอร์') === -1);
+
+      if (isNonNoodle) {
+        sheetNoodle.deleteRow(r);
+        noodleDeleted++;
+        Logger.log('Deleted non-noodle row ' + r + ': ' + brand + ' - ' + itemName);
+        continue;
+      }
+
+      // ปรับชื่อแบรนด์ให้เป็นมาตรฐาน
+      var newBrand = brand;
+      if (brand === 'Samyang' || brand === 'Buldak' || brand === 'Bulldak') newBrand = 'ซัมยัง';
+      else if (brand === 'Paldo' || brand === 'พัลโด' || brand === 'พาลาโด' || brand === 'Paldo Koreno') newBrand = 'พาลโด';
+      else if (brand === 'Otoya') newBrand = 'โอโตยะ';
+
+      if (newBrand !== brand) {
+        sheetNoodle.getRange(r, 3).setValue(newBrand);
+        noodleUpdates++;
+      }
+    }
+  }
+  Logger.log('NOODLE Updated: ' + noodleUpdates + ' rows, Deleted: ' + noodleDeleted + ' rows');
+
+  return {
+    prtUpdates: prtUpdates,
+    noodleUpdates: noodleUpdates,
+    noodleDeleted: noodleDeleted
+  };
 }
