@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Coffee, History, PlusCircle } from 'lucide-react';
+import { Coffee, History, PlusCircle, LayoutDashboard } from 'lucide-react';
 
 export default function Header() {
   const pathname = usePathname();
@@ -21,13 +21,13 @@ export default function Header() {
               Promo Tracker
             </span>
             <span className="text-[11px] text-amber-700 font-medium block">
-              บันทึกโปรโมชั่นกาแฟซอง
+              ระบบวิเคราะห์โปรโมชั่น
             </span>
           </div>
         </Link>
 
         {/* Navigation */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Link
             href="/"
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${
@@ -49,7 +49,19 @@ export default function Header() {
             }`}
           >
             <History className="w-4 h-4" />
-            <span>ประวัติ & สรุป</span>
+            <span>ประวัติ</span>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${
+              pathname === '/dashboard'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            <span className="font-semibold">Dashboard</span>
           </Link>
         </div>
       </div>
