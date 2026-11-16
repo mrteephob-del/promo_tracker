@@ -14,8 +14,10 @@ import {
   AlertCircle,
   Loader2,
   KeyRound,
+  Crop,
 } from 'lucide-react';
 import ApiKeyModal from '@/components/ApiKeyModal';
+import ImageCropModal from '@/components/ImageCropModal';
 import {
   TRACKED_STORES,
   TRACKED_CHANNELS,
@@ -47,6 +49,8 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
   const [analysisProgress, setAnalysisProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
+  const [isCropModalOpen, setIsCropModalOpen] = useState<boolean>(false);
+  const [selectedCropIndex, setSelectedCropIndex] = useState<number>(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -75,6 +79,37 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const openCropModal = (index: number) => {
+    if (index >= 0 && index < images.length) {
+      setSelectedCropIndex(index);
+      setIsCropModalOpen(true);
+    }
+  };
+
+  const handleApplyCrop = (croppedImage: CompressedImageResult, mode: 'replace' | 'add') => {
+    if (mode === 'replace') {
+      setImages((prev) =>
+        prev.map((img, i) => (i === selectedCropIndex ? croppedImage : img))
+      );
+    } else {
+      setImages((prev) => [...prev, croppedImage]);
+    }
+  };
+
+  const handleResetOriginal = (idx: number) => {
+    setImages((prev) =>
+      prev.map((img, i) => {
+        if (i !== idx || !img.originalDataUrl) return img;
+        return {
+          ...img,
+          dataUrl: img.originalDataUrl,
+          base64: img.originalDataUrl.split(',')[1] || '',
+          isCropped: false,
+        };
+      })
+    );
   };
 
   // วิเคราะห์รูปภาพด้วย Gemini
@@ -367,10 +402,15 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
       {/* Selected Images Preview Thumbnails */}
       {images.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-600">
-              รูปภาพที่เลือก ({images.length} รูป)
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <span>รูปภาพที่เลือก ({images.length} รูป)</span>
+              {images.some((im) => im.isCropped) && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  มีรูปที่ตีกรอบโฟกัสแล้ว
+                </span>
+              )}
             </span>
             <button
               onClick={() => setImages([])}
@@ -379,33 +419,84 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
               ล้างทั้งหมด
             </button>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {images.map((img, idx) => (
               <div
                 key={idx}
-                className="relative group rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-100"
+                onClick={() => openCropModal(idx)}
+                className="relative group rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-amber-400 aspect-square bg-slate-100 cursor-pointer shadow-xs transition-all"
+                title="คลิกเพื่อตีกรอบหรือตัดเฉพาะส่วน (Crop & Focus)"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={img.dataUrl}
                   alt={`Preview ${idx + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+
+                {/* Crop Button Badge */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openCropModal(idx);
+                  }}
+                  className={`absolute top-1.5 left-1.5 px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold shadow-xs backdrop-blur-xs ${
+                    img.isCropped
+                      ? 'bg-amber-500 text-slate-950 font-black'
+                      : 'bg-black/60 hover:bg-amber-600 text-white'
+                  }`}
+                  title="ตีกรอบเลือกเฉพาะสินค้า"
+                >
+                  <Crop className="w-3 h-3" />
+                  <span>{img.isCropped ? 'โฟกัสแล้ว' : 'ครอป'}</span>
+                </button>
+
+                {/* Delete Button */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     removeImage(idx);
                   }}
-                  className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-rose-600 text-white rounded-full transition-colors cursor-pointer"
+                  className="absolute top-1.5 right-1.5 p-1.5 bg-black/60 hover:bg-rose-600 text-white rounded-full transition-colors cursor-pointer"
+                  title="ลบรูปนี้"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
-                <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] px-1 py-0.5 text-center truncate">
-                  {(img.compressedSize / 1024).toFixed(0)} KB
+
+                {/* Bottom info banner */}
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent text-white text-[10px] px-2 py-1 flex items-center justify-between">
+                  <span className="truncate">{idx + 1}. {(img.compressedSize / 1024).toFixed(0)} KB</span>
+                  {img.isCropped && (
+                    <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-1 rounded">
+                      Crop HD
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Quick Crop Tip Banner */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 bg-amber-50/90 rounded-2xl border border-amber-200/80 text-xs text-amber-950">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+                <Crop className="w-3.5 h-3.5" />
+              </div>
+              <span className="leading-snug">
+                <strong>ใบปลิวจากเพจมีหลายสินค้า?</strong> แตะที่รูปหรือกดปุ่ม <strong>"ครอป"</strong> เพื่อลากสี่เหลี่ยมเลือกเฉพาะช่องสินค้าที่ต้องการสแกน
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => openCropModal(0)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-colors shrink-0 cursor-pointer self-start sm:self-auto shadow-xs"
+            >
+              <Crop className="w-3.5 h-3.5" />
+              <span>ตีกรอบรูปภาพ</span>
+            </button>
           </div>
         </div>
       )}
@@ -472,6 +563,15 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
       <ApiKeyModal
         isOpen={isKeyModalOpen}
         onClose={() => setIsKeyModalOpen(false)}
+      />
+
+      <ImageCropModal
+        isOpen={isCropModalOpen}
+        onClose={() => setIsCropModalOpen(false)}
+        image={images[selectedCropIndex] || null}
+        imageIndex={selectedCropIndex}
+        onApplyCrop={handleApplyCrop}
+        onResetOriginal={handleResetOriginal}
       />
     </div>
   );

@@ -11,6 +11,8 @@ export interface CompressedImageResult {
   originalSize: number;
   compressedSize: number;
   filename: string;
+  originalDataUrl?: string; // เก็บรูปต้นฉบับเต็มขนาดไว้ เผื่อต้องการรีเซ็ตหรือครอปซ้ำ
+  isCropped?: boolean; // ระบุว่ารูปนี้ผ่านการครอปเฉพาะจุดมาแล้ว
 }
 
 export async function compressImage(
@@ -88,6 +90,8 @@ export async function compressImage(
           originalSize: file.size,
           compressedSize,
           filename: file.name,
+          originalDataUrl: dataUrl,
+          isCropped: false,
         });
       };
 
@@ -105,5 +109,104 @@ export async function compressImage(
     };
 
     reader.readAsDataURL(file);
+  });
+}
+
+export interface CropNormalizedRect {
+  x: number; // 0.0 ถึง 1.0 (อิงตามความกว้างของรูป)
+  y: number; // 0.0 ถึง 1.0 (อิงตามความสูงของรูป)
+  width: number; // 0.0 ถึง 1.0
+  height: number; // 0.0 ถึง 1.0
+}
+
+/**
+ * ตัดส่วนรูปภาพตามพิกัด Normalized (0.0 ถึง 1.0) จากรูปต้นฉบับความละเอียดสูง
+ * พร้อม Upscale คมชัดระดับ HD เพื่อให้ Gemini OCR อ่านตัวหนังสือและตัวเลขได้ 100%
+ */
+export async function cropImageRegion(
+  sourceDataUrl: string,
+  rect: CropNormalizedRect,
+  originalFilename: string = 'cropped-promo.jpg',
+  quality: number = 0.95
+): Promise<CompressedImageResult> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const naturalW = img.naturalWidth || img.width;
+      const naturalH = img.naturalHeight || img.height;
+
+      // ป้องกันค่าหลุดขอบ (clamp)
+      const clampedX = Math.max(0, Math.min(1, rect.x));
+      const clampedY = Math.max(0, Math.min(1, rect.y));
+      const clampedW = Math.max(0.01, Math.min(1 - clampedX, rect.width));
+      const clampedH = Math.max(0.01, Math.min(1 - clampedY, rect.height));
+
+      const cropX = Math.round(clampedX * naturalW);
+      const cropY = Math.round(clampedY * naturalH);
+      const cropW = Math.round(clampedW * naturalW);
+      const cropH = Math.round(clampedH * naturalH);
+
+      if (cropW <= 0 || cropH <= 0) {
+        reject(new Error('ขนาดของกรอบที่ครอปต้องมากกว่า 0'));
+        return;
+      }
+
+      // ปรับขนาดเป้าหมายให้คมชัดระดับ HD สำหรับ OCR (ด้านยาวสุดอย่างน้อย 1200px แต่ไม่เกิน 2400px)
+      let targetW = cropW;
+      let targetH = cropH;
+      const maxDim = Math.max(targetW, targetH);
+      if (maxDim < 1200) {
+        const scale = 1200 / maxDim;
+        targetW = Math.round(targetW * scale);
+        targetH = Math.round(targetH * scale);
+      } else if (maxDim > 2400) {
+        const scale = 2400 / maxDim;
+        targetW = Math.round(targetW * scale);
+        targetH = Math.round(targetH * scale);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW;
+      canvas.height = targetH;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('ไม่สามารถสร้าง Canvas Context ได้'));
+        return;
+      }
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // พื้นหลังสีขาว
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, targetW, targetH);
+
+      // วาดส่วนที่ถูกครอปจากรูปความละเอียดสูง
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, targetW, targetH);
+
+      const croppedDataUrl = canvas.toDataURL('image/jpeg', quality);
+      const base64 = croppedDataUrl.split(',')[1] || '';
+      const compressedSize = Math.round((base64.length * 3) / 4);
+
+      resolve({
+        base64,
+        dataUrl: croppedDataUrl,
+        mimeType: 'image/jpeg',
+        width: targetW,
+        height: targetH,
+        originalSize: compressedSize,
+        compressedSize,
+        filename: originalFilename.replace(/\.[^/.]+$/, '') + '-crop.jpg',
+        originalDataUrl: sourceDataUrl,
+        isCropped: true,
+      });
+    };
+
+    img.onerror = () => {
+      reject(new Error('ไม่สามารถโหลดรูปภาพเพื่อครอปได้'));
+    };
+
+    img.src = sourceDataUrl;
   });
 }
