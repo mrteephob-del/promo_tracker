@@ -529,7 +529,7 @@ export default function DashboardPage() {
   // สถิติเปรียบเทียบร้านค้า (Store Comparison)
   const storeComparison = useMemo(() => {
     const stats: Record<string, { count: number; sumDisc: number; discCount: number }> = {};
-    
+
     // คำนวณจาก rawList เพื่อให้เห็นภาพรวมของทุกร้านค้า แม้ผู้ใช้เลือกฟิลเตอร์ร้านใดร้านหนึ่ง
     rawList.forEach((r) => {
       const s = r.store || 'ไม่ระบุ';
@@ -903,11 +903,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('overview')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
-                  viewMode === 'overview'
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'overview'
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <BarChart3 className="w-4 h-4 text-amber-600" />
                 <span>ภาพรวมและชาร์ต</span>
@@ -916,17 +915,15 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('monthly')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
-                  viewMode === 'monthly'
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'monthly'
                     ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <CalendarDays className="w-4 h-4" />
                 <span>สถิติรายเดือน</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                  viewMode === 'monthly' ? 'bg-amber-700/60 text-white' : 'bg-amber-100 text-amber-900'
-                }`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === 'monthly' ? 'bg-amber-700/60 text-white' : 'bg-amber-100 text-amber-900'
+                  }`}>
                   12 เดือน
                 </span>
               </button>
@@ -934,17 +931,15 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('frequency')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
-                  viewMode === 'frequency'
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'frequency'
                     ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs shadow-indigo-500/20'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <Zap className="w-4 h-4" />
                 <span>ความถี่จัดโปร</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                  viewMode === 'frequency' ? 'bg-indigo-800/60 text-white' : 'bg-indigo-100 text-indigo-900'
-                }`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === 'frequency' ? 'bg-indigo-800/60 text-white' : 'bg-indigo-100 text-indigo-900'
+                  }`}>
                   {frequencyAnalytics.overallAvgMonthlyFreq} ดีล/ด.
                 </span>
               </button>
@@ -952,17 +947,15 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('comparison')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${
-                  viewMode === 'comparison'
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'comparison'
                     ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs shadow-rose-500/20'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <Swords className="w-4 h-4" />
                 <span>เทียบราคาข้ามห้าง</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                  viewMode === 'comparison' ? 'bg-rose-800/60 text-white' : 'bg-rose-100 text-rose-900'
-                }`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === 'comparison' ? 'bg-rose-800/60 text-white' : 'bg-rose-100 text-rose-900'
+                  }`}>
                   {crossStoreList.length} ดีล
                 </span>
               </button>
@@ -990,11 +983,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setSelectedStore('all')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer ${
-                  selectedStore === 'all'
+                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer ${selectedStore === 'all'
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-                }`}
+                  }`}
               >
                 ทุกห้าง <span className="opacity-70 font-normal">({rawList.length})</span>
               </button>
@@ -1003,11 +995,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setSelectedStore('CJ More')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                  selectedStore === 'CJ More'
+                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === 'CJ More'
                     ? 'bg-orange-500 text-white shadow-xs shadow-orange-500/30'
                     : 'bg-orange-50/70 text-orange-800 hover:bg-orange-100 border border-orange-200/60'
-                }`}
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-orange-400 shrink-0" />
                 <span>CJ More</span>
@@ -1018,11 +1009,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setSelectedStore('Mini BigC')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                  selectedStore === 'Mini BigC'
+                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === 'Mini BigC'
                     ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30'
                     : 'bg-emerald-50/70 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
-                }`}
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
                 <span>Mini BigC</span>
@@ -1033,11 +1023,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setSelectedStore("Lotus's")}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                  selectedStore === "Lotus's"
+                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === "Lotus's"
                     ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/30'
                     : 'bg-sky-50/70 text-sky-800 hover:bg-sky-100 border border-sky-200/60'
-                }`}
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-sky-400 shrink-0" />
                 <span>Lotus's</span>
@@ -1070,11 +1059,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  selectedCategory === 'all' && selectedSubCategory === 'all'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedCategory === 'all' && selectedSubCategory === 'all'
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                  }`}
               >
                 ทุกหมวดหมู่ ({coffeeRows.length + noodleRows.length})
               </button>
@@ -1082,11 +1070,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => { setSelectedCategory('coffee'); setSelectedSubCategory('all'); }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedCategory === 'coffee'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${selectedCategory === 'coffee'
                     ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/20'
                     : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
-                }`}
+                  }`}
               >
                 <Coffee className="w-3.5 h-3.5" />
                 <span>☕ กาแฟ ({coffeeRows.length})</span>
@@ -1095,11 +1082,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => { setSelectedCategory('noodle'); setSelectedSubCategory('all'); }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedCategory === 'noodle'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${selectedCategory === 'noodle'
                     ? 'bg-orange-500 text-white shadow-xs shadow-orange-500/20'
                     : 'bg-orange-50 text-orange-800 hover:bg-orange-100'
-                }`}
+                  }`}
               >
                 <UtensilsCrossed className="w-3.5 h-3.5" />
                 <span>🍜 บะหมี่/โจ๊ก ({noodleRows.length})</span>
@@ -1120,11 +1106,10 @@ export default function DashboardPage() {
                         key={sc.id}
                         type="button"
                         onClick={() => setSelectedSubCategory(active ? 'all' : (sc.id as any))}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                          active
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${active
                             ? 'bg-slate-800 text-white shadow-2xs'
                             : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60'
-                        }`}
+                          }`}
                       >
                         <span>{sc.label}</span>
                         <span className="ml-1 text-[10px] opacity-70">({sc.count})</span>
@@ -1282,424 +1267,422 @@ export default function DashboardPage() {
               </div>
             </div>
 
-        {/* MONTHLY PROMOTION SEASONALITY CARD */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-xs">
-                <CalendarDays className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
-                  <span>แนวโน้มการจัดโปรโมชั่นรายเดือน (Monthly Promotion Seasonality)</span>
-                  {monthlyInsights.peakMonth && (
-                    <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black border border-amber-200">
-                      <Crown className="w-3 h-3 text-amber-600" />
-                      <span>พีคสุด: {monthlyInsights.peakMonth.fullName} ({monthlyInsights.peakMonth.count} ดีล)</span>
-                    </span>
-                  )}
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  แสดงความหนาแน่นของการจัดโปรโมชั่นตลอด 12 เดือน เผยช่วงเวลาที่ห้างและแบรนด์แข่งขันดุเดือดที่สุด
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setViewMode('monthly')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black transition-colors cursor-pointer self-start sm:self-center border border-amber-200"
-            >
-              <span>ดูตารางวิเคราะห์สถิติ 12 เดือน</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Quick Highlight Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div className="p-3 bg-gradient-to-br from-amber-50 to-orange-50/70 rounded-2xl border border-amber-100/90">
-              <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1">
-                <span>🏆 อันดับ 1 จัดโปรเยอะสุด</span>
-              </div>
-              <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                {monthlyInsights.peakMonth?.fullName || '-'}
-              </div>
-              <div className="text-[11px] text-amber-700 font-semibold">
-                {monthlyInsights.peakMonth?.count || 0} ดีล ({monthlyInsights.peakMonth?.percent || 0}% ของทั้งปี)
-              </div>
-            </div>
-
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-              <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
-                <span>🔥 อันดับ 2 รองแชมป์</span>
-              </div>
-              <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                {monthlyInsights.runnerUpMonth?.fullName || '-'}
-              </div>
-              <div className="text-[11px] text-slate-500 font-semibold">
-                {monthlyInsights.runnerUpMonth?.count || 0} ดีล ({monthlyInsights.runnerUpMonth?.percent || 0}% ของทั้งปี)
-              </div>
-            </div>
-
-            <div className="p-3 bg-rose-50/60 rounded-2xl border border-rose-100">
-              <div className="text-[11px] font-bold text-rose-800 flex items-center gap-1">
-                <span>🏷️ ลดราคาเฉลี่ยลึกสุด</span>
-              </div>
-              <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                {monthlyInsights.deepestDiscMonth?.fullName || '-'}
-              </div>
-              <div className="text-[11px] text-rose-700 font-semibold">
-                ส่วนลดเฉลี่ย -{monthlyInsights.deepestDiscMonth?.avgDiscount || 0}%
-              </div>
-            </div>
-
-            <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100">
-              <div className="text-[11px] font-bold text-blue-800 flex items-center gap-1">
-                <span>📊 ครึ่งปีแรก (H1 Peak)</span>
-              </div>
-              <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                {monthlyInsights.h1Percent}%
-              </div>
-              <div className="text-[11px] text-blue-700 font-semibold">
-                {monthlyInsights.h1Count} จาก {monthlyInsights.totalDated} ดีล
-              </div>
-            </div>
-          </div>
-
-          {/* 12-Month Bar Chart */}
-          <div className="pt-2">
-            <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 sm:gap-2.5 items-end h-56 pt-6 pb-2">
-              {monthlyStats.slice(1).map((m) => {
-                const isPeak = m.month === monthlyInsights.peakMonth?.month;
-                const isRunnerUp = m.month === monthlyInsights.runnerUpMonth?.month;
-                const heightPct = Math.max(8, (m.count / monthlyInsights.maxCount) * 100);
-
-                return (
-                  <div
-                    key={m.month}
-                    onClick={() => {
-                      setSelectedMonth(m.month);
-                      setViewMode('monthly');
-                    }}
-                    className="group flex flex-col items-center justify-end h-full cursor-pointer"
-                    title={`${m.fullName}: ${m.count} ดีล (${m.percent}%) ห้างเด่น: ${m.topStore} ลดเฉลี่ย: ${m.avgDiscount}%`}
-                  >
-                    {/* Top Indicator / Badge */}
-                    <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
-                      {isPeak ? (
-                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-xs">
-                          <Crown className="w-2.5 h-2.5" />
-                          <span>{m.count}</span>
-                        </span>
-                      ) : isRunnerUp ? (
-                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-xs">
-                          <span>🔥{m.count}</span>
-                        </span>
-                      ) : (
-                        <span className="text-[11px] font-black text-slate-700 group-hover:text-amber-600">
-                          {m.count}
+            {/* MONTHLY PROMOTION SEASONALITY CARD */}
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-xs">
+                    <CalendarDays className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+                      <span>แนวโน้มการจัดโปรโมชั่นรายเดือน (Monthly Promotion Seasonality)</span>
+                      {monthlyInsights.peakMonth && (
+                        <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-black border border-amber-200">
+                          <Crown className="w-3 h-3 text-amber-600" />
+                          <span>พีคสุด: {monthlyInsights.peakMonth.fullName} ({monthlyInsights.peakMonth.count} ดีล)</span>
                         </span>
                       )}
-                    </div>
-
-                    {/* Vertical Bar */}
-                    <div className="w-full max-w-[42px] bg-slate-100 rounded-2xl p-1 flex flex-col justify-end h-full">
-                      <div
-                        style={{ height: `${heightPct}%` }}
-                        className={`w-full rounded-xl transition-all duration-500 shadow-2xs ${
-                          isPeak
-                            ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
-                            : isRunnerUp
-                            ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
-                            : m.count > 0
-                            ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
-                            : 'bg-slate-200'
-                        }`}
-                      />
-                    </div>
-
-                    {/* Month Label */}
-                    <div className="mt-2 text-center">
-                      <span
-                        className={`text-xs font-black block ${
-                          isPeak
-                            ? 'text-amber-600 font-black'
-                            : isRunnerUp
-                            ? 'text-orange-600 font-black'
-                            : 'text-slate-700 group-hover:text-slate-900'
-                        }`}
-                      >
-                        {m.name}
-                      </span>
-                      <span className="text-[10px] text-slate-400 font-semibold block truncate max-w-[42px]">
-                        {m.topStore !== '-' ? m.topStore.replace(' More', '').replace(' daily', '') : ''}
-                      </span>
-                    </div>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      แสดงความหนาแน่นของการจัดโปรโมชั่นตลอด 12 เดือน เผยช่วงเวลาที่ห้างและแบรนด์แข่งขันดุเดือดที่สุด
+                    </p>
                   </div>
-                );
-              })}
-            </div>
+                </div>
 
-            {/* Footer notice / Undated deals */}
-            {monthlyInsights.undatedCount > 0 && (
-              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 gap-1.5 mt-2">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>
-                    นอกจากนี้มีอีก <strong>{monthlyInsights.undatedCount} ดีล</strong> เป็นโปรโมชั่นป้ายเหลืองต่อเนื่อง / ไม่ระบุวันหมดอายุ
-                  </span>
-                </span>
                 <button
                   type="button"
                   onClick={() => setViewMode('monthly')}
-                  className="font-bold text-amber-700 hover:text-amber-800 transition-colors text-left sm:text-right cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black transition-colors cursor-pointer self-start sm:self-center border border-amber-200"
                 >
-                  คลิกดูรายละเอียดเชิงลึกครบทั้ง 12 เดือน →
+                  <span>ดูตารางวิเคราะห์สถิติ 12 เดือน</span>
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* VISUAL CHARTS SECTION (2 Columns) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Chart 1: Donut Chart - Brand Share of Voice */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <PieIcon className="w-4 h-4 text-amber-600" />
-                  <span>สัดส่วนแบรนด์ในตลาดโปรโมชั่น (Share of Voice)</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  แบรนด์ที่มีรายการโปรโมชั่นหนาแน่นที่สุดในรอบนี้
-                </p>
-              </div>
-            </div>
+              {/* Quick Highlight Pills */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="p-3 bg-gradient-to-br from-amber-50 to-orange-50/70 rounded-2xl border border-amber-100/90">
+                  <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1">
+                    <span>🏆 อันดับ 1 จัดโปรเยอะสุด</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                    {monthlyInsights.peakMonth?.fullName || '-'}
+                  </div>
+                  <div className="text-[11px] text-amber-700 font-semibold">
+                    {monthlyInsights.peakMonth?.count || 0} ดีล ({monthlyInsights.peakMonth?.percent || 0}% ของทั้งปี)
+                  </div>
+                </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6 py-2">
-              {/* SVG Donut */}
-              <div className="relative w-44 h-44 flex-shrink-0 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="35"
-                    fill="transparent"
-                    stroke="#f1f5f9"
-                    strokeWidth="15"
-                  />
-                  {brandData.map((b, i) => (
-                    <circle
-                      key={i}
-                      cx="50"
-                      cy="50"
-                      r="35"
-                      fill="transparent"
-                      stroke={b.color}
-                      strokeWidth="15"
-                      strokeDasharray={b.strokeDasharray}
-                      strokeDashoffset={b.strokeDashoffset}
-                      className="transition-all duration-700 hover:opacity-80"
-                    />
-                  ))}
-                </svg>
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
+                    <span>🔥 อันดับ 2 รองแชมป์</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                    {monthlyInsights.runnerUpMonth?.fullName || '-'}
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-semibold">
+                    {monthlyInsights.runnerUpMonth?.count || 0} ดีล ({monthlyInsights.runnerUpMonth?.percent || 0}% ของทั้งปี)
+                  </div>
+                </div>
 
-                {/* Center Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                  <span className="text-xs font-bold text-slate-400">รวม</span>
-                  <span className="text-xl font-black text-slate-900 leading-tight">
-                    {filteredList.length}
-                  </span>
-                  <span className="text-[10px] font-semibold text-slate-400">รายการ</span>
+                <div className="p-3 bg-rose-50/60 rounded-2xl border border-rose-100">
+                  <div className="text-[11px] font-bold text-rose-800 flex items-center gap-1">
+                    <span>🏷️ ลดราคาเฉลี่ยลึกสุด</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                    {monthlyInsights.deepestDiscMonth?.fullName || '-'}
+                  </div>
+                  <div className="text-[11px] text-rose-700 font-semibold">
+                    ส่วนลดเฉลี่ย -{monthlyInsights.deepestDiscMonth?.avgDiscount || 0}%
+                  </div>
+                </div>
+
+                <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100">
+                  <div className="text-[11px] font-bold text-blue-800 flex items-center gap-1">
+                    <span>📊 ครึ่งปีแรก (H1 Peak)</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                    {monthlyInsights.h1Percent}%
+                  </div>
+                  <div className="text-[11px] text-blue-700 font-semibold">
+                    {monthlyInsights.h1Count} จาก {monthlyInsights.totalDated} ดีล
+                  </div>
                 </div>
               </div>
 
-              {/* Legend with Color Dots */}
-              <div className="flex-1 w-full space-y-2">
-                {brandData.map((b, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-xs"
-                        style={{ backgroundColor: b.color }}
-                      />
-                      <span className="font-bold text-slate-800">{b.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-slate-900">{b.count} ดีล</span>
-                      <span className="text-[11px] font-semibold text-slate-400 w-12 text-right">
-                        ({b.percent}%)
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+              {/* 12-Month Bar Chart */}
+              <div className="pt-2">
+                <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 sm:gap-2.5 items-end h-56 pt-6 pb-2">
+                  {monthlyStats.slice(1).map((m) => {
+                    const isPeak = m.month === monthlyInsights.peakMonth?.month;
+                    const isRunnerUp = m.month === monthlyInsights.runnerUpMonth?.month;
+                    const heightPct = Math.max(8, (m.count / monthlyInsights.maxCount) * 100);
 
-          {/* Chart 2: Price War Benchmark (Average Price per Sachet/Unit) */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-emerald-600" />
-                  <span>สงครามราคา: ราคาเฉลี่ยต่อหน่วยตามแบรนด์ (Unit Price Benchmark)</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  ราคาเฉลี่ยต่อซอง/หน่วย หลังหักโปรโมชั่น (ยิ่งต่ำ ยิ่งคุ้มค่าต่อผู้บริโภค)
-                </p>
-              </div>
-            </div>
-
-            {/* Horizontal Benchmark Bars */}
-            <div className="space-y-3.5 py-1">
-              {brandPriceBenchmark.map((b, idx) => {
-                const maxPrice = Math.max(...brandPriceBenchmark.map((x) => x.avgUnitPrice), 1);
-                const widthPercent = Math.min(100, Math.max(15, (b.avgUnitPrice / maxPrice) * 100));
-
-                return (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-black flex items-center justify-center">
-                          {idx + 1}
-                        </span>
-                        <span>{b.brand}</span>
-                      </span>
-                      <span className="font-black text-slate-900">
-                        {b.avgUnitPrice} <span className="text-[11px] font-normal text-slate-500">บาท/หน่วย</span>
-                      </span>
-                    </div>
-                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                    return (
                       <div
-                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-700"
-                        style={{ width: `${widthPercent}%` }}
-                      />
-                    </div>
+                        key={m.month}
+                        onClick={() => {
+                          setSelectedMonth(m.month);
+                          setViewMode('monthly');
+                        }}
+                        className="group flex flex-col items-center justify-end h-full cursor-pointer"
+                        title={`${m.fullName}: ${m.count} ดีล (${m.percent}%) ห้างเด่น: ${m.topStore} ลดเฉลี่ย: ${m.avgDiscount}%`}
+                      >
+                        {/* Top Indicator / Badge */}
+                        <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
+                          {isPeak ? (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-xs">
+                              <Crown className="w-2.5 h-2.5" />
+                              <span>{m.count}</span>
+                            </span>
+                          ) : isRunnerUp ? (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-xs">
+                              <span>🔥{m.count}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-black text-slate-700 group-hover:text-amber-600">
+                              {m.count}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Vertical Bar */}
+                        <div className="w-full max-w-[42px] bg-slate-100 rounded-2xl p-1 flex flex-col justify-end h-full">
+                          <div
+                            style={{ height: `${heightPct}%` }}
+                            className={`w-full rounded-xl transition-all duration-500 shadow-2xs ${isPeak
+                                ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
+                                : isRunnerUp
+                                  ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
+                                  : m.count > 0
+                                    ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
+                                    : 'bg-slate-200'
+                              }`}
+                          />
+                        </div>
+
+                        {/* Month Label */}
+                        <div className="mt-2 text-center">
+                          <span
+                            className={`text-xs font-black block ${isPeak
+                                ? 'text-amber-600 font-black'
+                                : isRunnerUp
+                                  ? 'text-orange-600 font-black'
+                                  : 'text-slate-700 group-hover:text-slate-900'
+                              }`}
+                          >
+                            {m.name}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-semibold block truncate max-w-[42px]">
+                            {m.topStore !== '-' ? m.topStore.replace(' More', '').replace(' daily', '') : ''}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer notice / Undated deals */}
+                {monthlyInsights.undatedCount > 0 && (
+                  <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 gap-1.5 mt-2">
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <span>
+                        นอกจากนี้มีอีก <strong>{monthlyInsights.undatedCount} ดีล</strong> เป็นโปรโมชั่นป้ายเหลืองต่อเนื่อง / ไม่ระบุวันหมดอายุ
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('monthly')}
+                      className="font-bold text-amber-700 hover:text-amber-800 transition-colors text-left sm:text-right cursor-pointer"
+                    >
+                      คลิกดูรายละเอียดเชิงลึกครบทั้ง 12 เดือน →
+                    </button>
                   </div>
-                );
-              })}
+                )}
+              </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between mt-2">
-              <span>* คำนวณจากราคาโปรโมชั่นหารด้วยจำนวนซอง/ชิ้นในแพ็ค</span>
-              <span className="font-semibold text-emerald-700">ลำดับที่ 1 = ถูกและคุ้มสุด</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Store Comparison & Promotion Mechanics Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Card: Store Comparison */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs">
-            <h3 className="text-sm font-black text-slate-900 flex items-center gap-2 mb-1">
-              <Store className="w-4 h-4 text-amber-600" />
-              <span>เปรียบเทียบระหว่างร้านค้า (Store Comparison)</span>
-            </h3>
-            <p className="text-xs text-slate-400 mb-4">
-              จำนวนโปรโมชั่นและส่วนลดเฉลี่ยของแต่ละห้าง
-            </p>
-
-            <div className="space-y-4">
-              {storeComparison.map((s, idx) => (
-                <div key={idx} className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-black text-slate-900 text-sm">{s.store}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[11px] font-black">
-                        {s.count} รายการ
-                      </span>
-                      <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 text-[11px] font-black border border-rose-200">
-                        ลดเฉลี่ย -{s.avgDisc}%
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-amber-600 rounded-full transition-all duration-700"
-                      style={{ width: `${s.percentOfMax}%` }}
-                    />
+            {/* VISUAL CHARTS SECTION (2 Columns) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Chart 1: Donut Chart - Brand Share of Voice */}
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                      <PieIcon className="w-4 h-4 text-amber-600" />
+                      <span>สัดส่วนแบรนด์ในตลาดโปรโมชั่น (Share of Voice)</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      แบรนด์ที่มีรายการโปรโมชั่นหนาแน่นที่สุดในรอบนี้
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Card: Promo Mechanics Breakdown */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <Tag className="w-4 h-4 text-blue-600" />
-                  <span>กลไกโปรโมชั่นที่ร้านค้าใช้บ่อย (Promotional Mechanics)</span>
-                </h3>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200 animate-pulse">
-                  คลิกดูรายการสินค้า ↗
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 mb-4">
-                สัดส่วนประเภทโปรโมชั่นที่พบในใบปลิวและป้ายราคาหน้าร้าน
-              </p>
+                <div className="flex flex-col sm:flex-row items-center gap-6 py-2">
+                  {/* SVG Donut */}
+                  <div className="relative w-44 h-44 flex-shrink-0 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="35"
+                        fill="transparent"
+                        stroke="#f1f5f9"
+                        strokeWidth="15"
+                      />
+                      {brandData.map((b, i) => (
+                        <circle
+                          key={i}
+                          cx="50"
+                          cy="50"
+                          r="35"
+                          fill="transparent"
+                          stroke={b.color}
+                          strokeWidth="15"
+                          strokeDasharray={b.strokeDasharray}
+                          strokeDashoffset={b.strokeDashoffset}
+                          className="transition-all duration-700 hover:opacity-80"
+                        />
+                      ))}
+                    </svg>
 
-              {/* Segmented Color Bar (Clickable) */}
-              <div className="w-full h-4 rounded-xl overflow-hidden flex shadow-xs mb-4 p-0.5 bg-slate-100 border border-slate-200/60">
-                {promoMechanics.map((p, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setSelectedMechanicModal(p.label);
-                      setMechanicSearchQuery('');
-                      setMechanicStoreFilter('all');
-                    }}
-                    style={{ width: `${p.percent}%`, backgroundColor: p.color }}
-                    title={`${p.label}: ${p.count} รายการ (${p.percent}%) - คลิกเพื่อดูรายการสินค้า`}
-                    className="h-full hover:opacity-85 active:opacity-60 transition-opacity cursor-pointer first:rounded-l-lg last:rounded-r-lg"
-                  />
-                ))}
-              </div>
-
-              {/* Legend List (Clickable to view items) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {promoMechanics.map((p, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setSelectedMechanicModal(p.label);
-                      setMechanicSearchQuery('');
-                      setMechanicStoreFilter('all');
-                    }}
-                    className="flex items-center justify-between text-xs p-2.5 bg-slate-50 hover:bg-amber-50/60 hover:border-amber-300 border border-slate-200/60 rounded-xl transition-all cursor-pointer text-left group shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0 group-hover:scale-125 transition-transform" style={{ backgroundColor: p.color }} />
-                      <span className="font-bold text-slate-700 group-hover:text-amber-900 transition-colors">{p.label}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-black text-slate-900">
-                        {p.count} <span className="text-[10px] text-slate-400 font-normal">({p.percent}%)</span>
+                    {/* Center Content */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                      <span className="text-xs font-bold text-slate-400">รวม</span>
+                      <span className="text-xl font-black text-slate-900 leading-tight">
+                        {filteredList.length}
                       </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
+                      <span className="text-[10px] font-semibold text-slate-400">รายการ</span>
                     </div>
-                  </button>
-                ))}
+                  </div>
+
+                  {/* Legend with Color Dots */}
+                  <div className="flex-1 w-full space-y-2">
+                    {brandData.map((b, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-3 h-3 rounded-full flex-shrink-0 shadow-xs"
+                            style={{ backgroundColor: b.color }}
+                          />
+                          <span className="font-bold text-slate-800">{b.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-black text-slate-900">{b.count} ดีล</span>
+                          <span className="text-[11px] font-semibold text-slate-400 w-12 text-right">
+                            ({b.percent}%)
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart 2: Price War Benchmark (Average Price per Sachet/Unit) */}
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-emerald-600" />
+                      <span>สงครามราคา: ราคาเฉลี่ยต่อหน่วยตามแบรนด์ (Unit Price Benchmark)</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      ราคาเฉลี่ยต่อซอง/หน่วย หลังหักโปรโมชั่น (ยิ่งต่ำ ยิ่งคุ้มค่าต่อผู้บริโภค)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Horizontal Benchmark Bars */}
+                <div className="space-y-3.5 py-1">
+                  {brandPriceBenchmark.map((b, idx) => {
+                    const maxPrice = Math.max(...brandPriceBenchmark.map((x) => x.avgUnitPrice), 1);
+                    const widthPercent = Math.min(100, Math.max(15, (b.avgUnitPrice / maxPrice) * 100));
+
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs font-semibold">
+                          <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                            <span className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-black flex items-center justify-center">
+                              {idx + 1}
+                            </span>
+                            <span>{b.brand}</span>
+                          </span>
+                          <span className="font-black text-slate-900">
+                            {b.avgUnitPrice} <span className="text-[11px] font-normal text-slate-500">บาท/หน่วย</span>
+                          </span>
+                        </div>
+                        <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-700"
+                            style={{ width: `${widthPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between mt-2">
+                  <span>* คำนวณจากราคาโปรโมชั่นหารด้วยจำนวนซอง/ชิ้นในแพ็ค</span>
+                  <span className="font-semibold text-emerald-700">ลำดับที่ 1 = ถูกและคุ้มสุด</span>
+                </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 mt-4 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>โปรโมชั่นส่วนใหญ่ของร้านสะดวกซื้อเป็น <strong>ลดราคาป้ายเหลืองตรงๆ</strong> รองลงมาคือ <strong>ซื้อคู่ถูกกว่า</strong></span>
+            {/* Store Comparison & Promotion Mechanics Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Card: Store Comparison */}
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs">
+                <h3 className="text-sm font-black text-slate-900 flex items-center gap-2 mb-1">
+                  <Store className="w-4 h-4 text-amber-600" />
+                  <span>เปรียบเทียบระหว่างร้านค้า (Store Comparison)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  จำนวนโปรโมชั่นและส่วนลดเฉลี่ยของแต่ละห้าง
+                </p>
+
+                <div className="space-y-4">
+                  {storeComparison.map((s, idx) => (
+                    <div key={idx} className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-black text-slate-900 text-sm">{s.store}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[11px] font-black">
+                            {s.count} รายการ
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 text-[11px] font-black border border-rose-200">
+                            ลดเฉลี่ย -{s.avgDisc}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-amber-600 rounded-full transition-all duration-700"
+                          style={{ width: `${s.percentOfMax}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card: Promo Mechanics Breakdown */}
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-blue-600" />
+                      <span>กลไกโปรโมชั่นที่ร้านค้าใช้บ่อย (Promotional Mechanics)</span>
+                    </h3>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200 animate-pulse">
+                      คลิกดูรายการสินค้า ↗
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-4">
+                    สัดส่วนประเภทโปรโมชั่นที่พบในใบปลิวและป้ายราคาหน้าร้าน
+                  </p>
+
+                  {/* Segmented Color Bar (Clickable) */}
+                  <div className="w-full h-4 rounded-xl overflow-hidden flex shadow-xs mb-4 p-0.5 bg-slate-100 border border-slate-200/60">
+                    {promoMechanics.map((p, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setSelectedMechanicModal(p.label);
+                          setMechanicSearchQuery('');
+                          setMechanicStoreFilter('all');
+                        }}
+                        style={{ width: `${p.percent}%`, backgroundColor: p.color }}
+                        title={`${p.label}: ${p.count} รายการ (${p.percent}%) - คลิกเพื่อดูรายการสินค้า`}
+                        className="h-full hover:opacity-85 active:opacity-60 transition-opacity cursor-pointer first:rounded-l-lg last:rounded-r-lg"
+                      />
+                    ))}
+                  </div>
+
+                  {/* Legend List (Clickable to view items) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {promoMechanics.map((p, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setSelectedMechanicModal(p.label);
+                          setMechanicSearchQuery('');
+                          setMechanicStoreFilter('all');
+                        }}
+                        className="flex items-center justify-between text-xs p-2.5 bg-slate-50 hover:bg-amber-50/60 hover:border-amber-300 border border-slate-200/60 rounded-xl transition-all cursor-pointer text-left group shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0 group-hover:scale-125 transition-transform" style={{ backgroundColor: p.color }} />
+                          <span className="font-bold text-slate-700 group-hover:text-amber-900 transition-colors">{p.label}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-black text-slate-900">
+                            {p.count} <span className="text-[10px] text-slate-400 font-normal">({p.percent}%)</span>
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 mt-4 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>โปรโมชั่นส่วนใหญ่ของร้านสะดวกซื้อเป็น <strong>ลดราคาป้ายเหลืองตรงๆ</strong> รองลงมาคือ <strong>ซื้อคู่ถูกกว่า</strong></span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    )}
+        )}
 
         {/* VIEW 2: MONTHLY PROMOTION SEASONALITY INTELLIGENCE */}
         {viewMode === 'monthly' && (
@@ -1924,9 +1907,8 @@ export default function DashboardPage() {
                       <div
                         key={m.month}
                         onClick={() => setSelectedMonth(isSelected ? null : m.month)}
-                        className={`group flex flex-col items-center justify-end h-full cursor-pointer p-1 rounded-2xl transition-all ${
-                          isSelected ? 'bg-amber-50 ring-2 ring-amber-500 shadow-xs' : 'hover:bg-slate-50'
-                        }`}
+                        className={`group flex flex-col items-center justify-end h-full cursor-pointer p-1 rounded-2xl transition-all ${isSelected ? 'bg-amber-50 ring-2 ring-amber-500 shadow-xs' : 'hover:bg-slate-50'
+                          }`}
                         title={`${m.fullName}: รวม ${m.count} ดีล (CJ: ${cjCount}, Mini BigC: ${bigcCount}, Lotus's: ${lotusCount})`}
                       >
                         {/* Top Indicator Badge */}
@@ -1951,9 +1933,8 @@ export default function DashboardPage() {
                         <div className="w-full max-w-[46px] bg-slate-100 rounded-2xl p-1 flex flex-col justify-end h-full">
                           <div
                             style={{ height: `${heightPct}%` }}
-                            className={`w-full rounded-xl overflow-hidden flex flex-col-reverse shadow-2xs transition-all duration-500 ${
-                              isSelected ? 'ring-2 ring-amber-500' : ''
-                            }`}
+                            className={`w-full rounded-xl overflow-hidden flex flex-col-reverse shadow-2xs transition-all duration-500 ${isSelected ? 'ring-2 ring-amber-500' : ''
+                              }`}
                           >
                             {/* CJ More segment */}
                             {cjCount > 0 && (
@@ -1985,15 +1966,14 @@ export default function DashboardPage() {
                         {/* Month Label & Discount */}
                         <div className="mt-2 text-center w-full">
                           <span
-                            className={`text-xs font-black block ${
-                              isSelected
+                            className={`text-xs font-black block ${isSelected
                                 ? 'text-amber-700 underline font-black'
                                 : isPeak
-                                ? 'text-amber-600 font-black'
-                                : isRunnerUp
-                                ? 'text-orange-600 font-black'
-                                : 'text-slate-700'
-                            }`}
+                                  ? 'text-amber-600 font-black'
+                                  : isRunnerUp
+                                    ? 'text-orange-600 font-black'
+                                    : 'text-slate-700'
+                              }`}
                           >
                             {m.name}
                           </span>
@@ -2012,11 +1992,10 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedMonth(null)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                    selectedMonth === null
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${selectedMonth === null
                       ? 'bg-slate-900 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                    }`}
                 >
                   ทั้งหมด 12 เดือน
                 </button>
@@ -2030,11 +2009,10 @@ export default function DashboardPage() {
                       key={m.month}
                       type="button"
                       onClick={() => setSelectedMonth(isSelected ? null : m.month)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 ${
-                        isSelected
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 ${isSelected
                           ? 'bg-amber-600 text-white shadow-xs'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
+                        }`}
                     >
                       {isPeak && <span>👑</span>}
                       {isRunnerUp && <span>🔥</span>}
@@ -2238,9 +2216,8 @@ export default function DashboardPage() {
                         <tr
                           key={m.month}
                           onClick={() => setSelectedMonth(m.month)}
-                          className={`hover:bg-amber-50/40 transition-colors cursor-pointer ${
-                            selectedMonth === m.month ? 'bg-amber-50/70' : ''
-                          }`}
+                          className={`hover:bg-amber-50/40 transition-colors cursor-pointer ${selectedMonth === m.month ? 'bg-amber-50/70' : ''
+                            }`}
                         >
                           {/* Month Name + Badge */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
@@ -2285,9 +2262,8 @@ export default function DashboardPage() {
                               <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <div
                                   style={{ width: `${Math.min(100, m.percent * 6)}%` }}
-                                  className={`h-full rounded-full ${
-                                    isPeak ? 'bg-amber-500' : isRunnerUp ? 'bg-orange-500' : 'bg-slate-400'
-                                  }`}
+                                  className={`h-full rounded-full ${isPeak ? 'bg-amber-500' : isRunnerUp ? 'bg-orange-500' : 'bg-slate-400'
+                                    }`}
                                 />
                               </div>
                               <span className="font-bold text-slate-700 text-xs">
@@ -2315,11 +2291,10 @@ export default function DashboardPage() {
 
                           {/* Avg Discount */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-lg text-xs font-black ${
-                              m.avgDiscount >= 20
+                            <span className={`px-2 py-1 rounded-lg text-xs font-black ${m.avgDiscount >= 20
                                 ? 'bg-rose-50 text-rose-600 border border-rose-200'
                                 : 'bg-slate-100 text-slate-700'
-                            }`}>
+                              }`}>
                               {m.avgDiscount > 0 ? `-${m.avgDiscount}%` : '-'}
                             </span>
                           </td>
@@ -2564,13 +2539,12 @@ export default function DashboardPage() {
                                     className="flex-1 flex flex-col items-center justify-end h-full group relative"
                                   >
                                     <div
-                                      className={`w-full rounded-xs transition-all ${
-                                        cnt === 0
+                                      className={`w-full rounded-xs transition-all ${cnt === 0
                                           ? 'bg-slate-200/60'
                                           : isPeak
-                                          ? 'bg-gradient-to-t from-orange-600 to-amber-500 shadow-2xs'
-                                          : 'bg-amber-400/80'
-                                      }`}
+                                            ? 'bg-gradient-to-t from-orange-600 to-amber-500 shadow-2xs'
+                                            : 'bg-amber-400/80'
+                                        }`}
                                       style={{ height: `${heightPercent}%` }}
                                     />
                                     {/* Tooltip on hover */}
@@ -2850,7 +2824,7 @@ export default function DashboardPage() {
                     หลักการคาดการณ์ระยะเวลาโปรโมชั่นและการมาร์คสีใน Google Sheet
                   </h4>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    สำหรับรายการที่เว้นว่างวันจัดโปรโมชั่น ระบบได้ใช้ <strong>Contextual Batch Imputation</strong> โดยอ้างอิงจากรอบใบปลิวของห้างในชุดข้อมูลเดียวกันที่อยู่ติดกัน (ความแม่นยำสูงกว่า 95%) 
+                    สำหรับรายการที่เว้นว่างวันจัดโปรโมชั่น ระบบได้ใช้ <strong>Contextual Batch Imputation</strong> โดยอ้างอิงจากรอบใบปลิวของห้างในชุดข้อมูลเดียวกันที่อยู่ติดกัน (ความแม่นยำสูงกว่า 95%)
                     และได้ทำการมาร์คสีพื้นหลังเซลล์ด้วย <strong>สีเหลืองอ่อน (#FFF9C4)</strong> ในคอลัมน์ Period (J) พร้อมติด Note อธิบายใน Google Sheet ไว้อย่างชัดเจน
                   </p>
                 </div>
@@ -3031,13 +3005,12 @@ export default function DashboardPage() {
                             return (
                               <div
                                 key={sName}
-                                className={`p-3.5 rounded-2xl border transition-all ${
-                                  !storeData
+                                className={`p-3.5 rounded-2xl border transition-all ${!storeData
                                     ? 'bg-slate-50/50 border-slate-100 opacity-40'
                                     : isCheapest
-                                    ? 'bg-emerald-50/70 border-emerald-300 ring-2 ring-emerald-500/20 shadow-2xs'
-                                    : 'bg-white border-slate-200'
-                                }`}
+                                      ? 'bg-emerald-50/70 border-emerald-300 ring-2 ring-emerald-500/20 shadow-2xs'
+                                      : 'bg-white border-slate-200'
+                                  }`}
                               >
                                 <div className="flex items-center justify-between text-xs mb-1.5">
                                   <span className="font-black text-slate-700">{sName}</span>
@@ -3195,17 +3168,15 @@ export default function DashboardPage() {
                       key={s}
                       type="button"
                       onClick={() => setMechanicStoreFilter(s)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                        active
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${active
                           ? 'bg-slate-900 text-white shadow-2xs'
                           : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
-                      }`}
+                        }`}
                     >
                       <span>{s === 'all' ? 'ทุกห้าง' : s}</span>
                       <span
-                        className={`ml-1.5 text-[10px] px-1.5 py-0.2 rounded-full ${
-                          active ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-500'
-                        }`}
+                        className={`ml-1.5 text-[10px] px-1.5 py-0.2 rounded-full ${active ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-500'
+                          }`}
                       >
                         {count}
                       </span>
@@ -3248,11 +3219,10 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => setMechanicViewMode('list')}
-                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                      mechanicViewMode === 'list'
+                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${mechanicViewMode === 'list'
                         ? 'bg-slate-900 text-white'
                         : 'text-slate-400 hover:text-slate-700'
-                    }`}
+                      }`}
                     title="มุมมองแบบรายการ (List View)"
                   >
                     <List className="w-4 h-4" />
@@ -3260,11 +3230,10 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => setMechanicViewMode('grid')}
-                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                      mechanicViewMode === 'grid'
+                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${mechanicViewMode === 'grid'
                         ? 'bg-slate-900 text-white'
                         : 'text-slate-400 hover:text-slate-700'
-                    }`}
+                      }`}
                     title="มุมมองแบบการ์ดรูปภาพ (Grid View)"
                   >
                     <LayoutGrid className="w-4 h-4" />
@@ -3328,13 +3297,12 @@ export default function DashboardPage() {
                           <div className="min-w-0 space-y-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span
-                                className={`px-2 py-0.5 rounded-md text-[10px] font-black ${
-                                  r.store === 'CJ More'
+                                className={`px-2 py-0.5 rounded-md text-[10px] font-black ${r.store === 'CJ More'
                                     ? 'bg-orange-100 text-orange-800 border border-orange-200'
                                     : r.store === 'Mini BigC'
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                    : 'bg-sky-100 text-sky-800 border border-sky-200'
-                                }`}
+                                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                      : 'bg-sky-100 text-sky-800 border border-sky-200'
+                                  }`}
                               >
                                 {r.store}
                               </span>
@@ -3459,13 +3427,12 @@ export default function DashboardPage() {
                           {/* Store badge overlay */}
                           <div className="absolute top-2 left-2">
                             <span
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-black shadow-xs ${
-                                r.store === 'CJ More'
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-black shadow-xs ${r.store === 'CJ More'
                                   ? 'bg-orange-600 text-white'
                                   : r.store === 'Mini BigC'
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-sky-600 text-white'
-                              }`}
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-sky-600 text-white'
+                                }`}
                             >
                               {r.store}
                             </span>
