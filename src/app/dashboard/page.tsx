@@ -11,6 +11,7 @@ import {
   Search,
   Download,
   ExternalLink,
+  FileSpreadsheet,
   Sparkles,
   ArrowUpDown,
   RefreshCw,
@@ -876,7 +877,19 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-start md:self-center shrink-0">
+            <div className="flex items-center gap-2 self-start md:self-center shrink-0 flex-wrap">
+              <a
+                href="https://docs.google.com/spreadsheets/d/11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4/edit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 transition-all cursor-pointer shadow-2xs group"
+                title="เปิดดูข้อมูลต้นฉบับบน Google Sheets"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Google Sheet</span>
+                <ExternalLink className="w-3 h-3 text-emerald-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+
               <button
                 onClick={fetchData}
                 disabled={loading}
