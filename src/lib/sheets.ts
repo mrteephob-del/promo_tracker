@@ -1,21 +1,20 @@
 import { GasPayload, SheetRowData } from '@/types';
 
+const DEFAULT_GAS_URL =
+  'https://script.google.com/macros/s/AKfycbwf1D341f6ehamx0RSUycAfbtgvUTsdEOgkR5ld2OLedgMdgX8-cqK-wH2JbWhXCf4-/exec';
+const DEFAULT_GAS_SECRET = 'my_super_secret_promo_key_2026';
+
 function getGasConfig() {
   const url =
     (typeof window !== 'undefined' ? localStorage.getItem('apps_script_url') : null) ||
     process.env.NEXT_PUBLIC_APPS_SCRIPT_URL ||
-    process.env.APPS_SCRIPT_URL;
+    process.env.APPS_SCRIPT_URL ||
+    DEFAULT_GAS_URL;
   const secret =
     (typeof window !== 'undefined' ? localStorage.getItem('apps_script_secret') : null) ||
     process.env.NEXT_PUBLIC_APPS_SCRIPT_SECRET ||
-    process.env.APPS_SCRIPT_SECRET;
-
-  if (!url) {
-    throw new Error('ไม่พบ APPS_SCRIPT_URL ในการตั้งค่า Environment Variables หรือ Local Storage');
-  }
-  if (!secret) {
-    throw new Error('ไม่พบ APPS_SCRIPT_SECRET ในการตั้งค่า Environment Variables หรือ Local Storage');
-  }
+    process.env.APPS_SCRIPT_SECRET ||
+    DEFAULT_GAS_SECRET;
 
   return { url, secret };
 }
@@ -28,10 +27,11 @@ async function callGasWebhook<T>(payload: Omit<GasPayload, 'secret'>): Promise<T
     secret,
   };
 
+  // ใช้ text/plain;charset=utf-8 เพื่อป้องกัน Browser ส่ง CORS Preflight OPTIONS ซึ่ง Google Apps Script ไม่รองรับ
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'text/plain;charset=utf-8',
     },
     body: JSON.stringify(fullPayload),
     cache: 'no-store',

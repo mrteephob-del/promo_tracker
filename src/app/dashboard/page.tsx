@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { PromoCategory } from '@/types';
 import { getCachedHistoryRows } from '@/lib/client-api';
+import { fetchRecentSheetRows } from '@/lib/sheets';
 import {
   calculateDiscount,
   calculatePricePerSachet,
@@ -189,30 +190,52 @@ export default function DashboardPage() {
 
   // ดึงข้อมูล
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
     try {
+      // 1. พยายามดึงข้อมูลสดตรงจาก Google Apps Script Web App
       const [resPrt, resNoodle] = await Promise.all([
-        fetch('/api/history?sheetName=PRT&limit=2000'),
-        fetch('/api/history?sheetName=NOODLE&limit=2000'),
+        fetchRecentSheetRows(2000, 'PRT'),
+        fetchRecentSheetRows(2000, 'NOODLE'),
       ]);
 
-      if (resPrt.ok && resNoodle.ok) {
-        const dataPrt = await resPrt.json();
-        const dataNoodle = await resNoodle.json();
-
-        if (dataPrt.ok && Array.isArray(dataPrt.rows) && dataPrt.rows.length > 0) {
-          setCoffeeRows(dataPrt.rows);
-        }
-        if (dataNoodle.ok && Array.isArray(dataNoodle.rows) && dataNoodle.rows.length > 0) {
-          setNoodleRows(dataNoodle.rows);
-        }
+      if (resPrt && Array.isArray(resPrt.rows)) {
+        setCoffeeRows(resPrt.rows as unknown as SheetRow[]);
       }
-    } catch {
+      if (resNoodle && Array.isArray(resNoodle.rows)) {
+        setNoodleRows(resNoodle.rows as unknown as SheetRow[]);
+      }
+    } catch (gasErr) {
+      console.warn('ดึงข้อมูลสดจาก Apps Script ไม่สำเร็จ กำลังลอง Local API / แคช:', gasErr);
+      try {
+        const [resPrt, resNoodle] = await Promise.all([
+          fetch('/api/history?sheetName=PRT&limit=2000'),
+          fetch('/api/history?sheetName=NOODLE&limit=2000'),
+        ]);
+
+        if (resPrt.ok && resNoodle.ok) {
+          const dataPrt = await resPrt.json();
+          const dataNoodle = await resNoodle.json();
+
+          if (dataPrt.ok && Array.isArray(dataPrt.rows)) {
+            setCoffeeRows(dataPrt.rows);
+          }
+          if (dataNoodle.ok && Array.isArray(dataNoodle.rows)) {
+            setNoodleRows(dataNoodle.rows);
+          }
+          return;
+        }
+      } catch {
+        // ignore
+      }
+
       // โหมด Static Export (GitHub Pages) หรือไม่มีเซิร์ฟเวอร์ Node.js
-      // ใช้ข้อมูลแคชที่อัปเดตล่าสุด 1,021 รายการโดยอัตโนมัติ
       const cachedPrt = getCachedHistoryRows('PRT', 2000) as unknown as SheetRow[];
       const cachedNoodle = getCachedHistoryRows('NOODLE', 2000) as unknown as SheetRow[];
-      if (cachedPrt.length > 0) setCoffeeRows(cachedPrt);
-      if (cachedNoodle.length > 0) setNoodleRows(cachedNoodle);
+      setCoffeeRows(cachedPrt);
+      setNoodleRows(cachedNoodle);
+    } finally {
+      setLoading(false);
     }
   };
 

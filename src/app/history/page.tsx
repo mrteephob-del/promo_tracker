@@ -12,6 +12,7 @@ import {
 } from '@/types';
 import { getWeekIdentifier, getBangkokDate, classifyNoodleSubCategory } from '@/lib/calc';
 import { getCachedHistoryRows } from '@/lib/client-api';
+import { fetchRecentSheetRows } from '@/lib/sheets';
 import {
   History,
   Store,
@@ -43,22 +44,35 @@ export default function HistoryPage() {
   const sheetName = CATEGORIES[category].sheetName;
 
   const fetchHistory = async (targetCategory = category) => {
+    setLoading(true);
+    setError(null);
+    const targetSheet = CATEGORIES[targetCategory].sheetName;
     try {
-      const targetSheet = CATEGORIES[targetCategory].sheetName;
-      const res = await fetch(`/api/history?limit=200&sheetName=${targetSheet}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok && Array.isArray(data.rows) && data.rows.length > 0) {
-          setRows(data.rows);
-          return;
-        }
+      // 1. ลองดึงข้อมูลสดตรงจาก Google Apps Script Web App
+      const resGas = await fetchRecentSheetRows(200, targetSheet);
+      if (resGas && Array.isArray(resGas.rows)) {
+        setRows(resGas.rows);
+        return;
       }
     } catch {
-      // Static export fallback (GitHub Pages)
+      // 2. ลอง Local API หากมีเซิร์ฟเวอร์
+      try {
+        const res = await fetch(`/api/history?limit=200&sheetName=${targetSheet}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.rows)) {
+            setRows(data.rows);
+            return;
+          }
+        }
+      } catch {
+        // ignore
+      }
+    } finally {
+      setLoading(false);
     }
 
-    // โหลดข้อมูลล่าสุดจากแคช 1,021 รายการทันที
-    const targetSheet = CATEGORIES[targetCategory].sheetName;
+    // โหลดข้อมูลล่าสุดจากแคช
     const fallbackRows = getCachedHistoryRows(targetSheet, 200) as (SheetRowData & { imageUrl?: string })[];
     setRows(fallbackRows);
   };
