@@ -21,6 +21,7 @@ import {
   Flame,
   Percent,
   Eye,
+  Image as ImageIcon,
   ZoomIn,
   X,
   PieChart as PieIcon,
@@ -65,6 +66,15 @@ import {
   StoreFrequencyItem,
   RepeatedSKUItem,
 } from '@/lib/calc';
+
+function getGoogleDriveThumbUrl(url?: string): string {
+  if (!url) return '';
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) {
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
+  }
+  return url;
+}
 
 interface SheetRow {
   date: string;
@@ -1769,15 +1779,25 @@ export default function DashboardPage() {
                     {/* 2. Product Thumbnail + Details */}
                     <td className="py-3.5 px-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                        <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 relative text-slate-400">
                           {item.imageUrl ? (
                             <button
                               type="button"
                               onClick={() => setPreviewImage({ url: item.imageUrl!, title: `${item.brand} - ${item.itemName}`, store: item.store })}
-                              className="w-full h-full cursor-pointer hover:opacity-80 transition-opacity"
+                              className="w-full h-full cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center relative group"
+                              title="คลิกเพื่อดูรูปโปรโมชั่น"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={item.imageUrl} alt={item.itemName} className="w-full h-full object-cover" loading="lazy" />
+                              <img
+                                src={getGoogleDriveThumbUrl(item.imageUrl)}
+                                alt=""
+                                className="w-full h-full object-cover z-10"
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                              <ImageIcon className="w-4 h-4 text-slate-300 absolute" />
                             </button>
                           ) : (
                             <span className="text-[9px] text-slate-300">ไม่มีรูป</span>
@@ -2362,7 +2382,13 @@ export default function DashboardPage() {
                                 onClick={() => setPreviewImage({ url: item.imageUrl!, title: `${item.brand} - ${item.itemName}`, store: item.store })}
                                 className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200 cursor-pointer hover:ring-2 hover:ring-amber-500"
                               >
-                                <img src={item.imageUrl} alt={item.itemName} className="w-full h-full object-cover" loading="lazy" />
+                                <img
+                                  src={getGoogleDriveThumbUrl(item.imageUrl)}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
                               </button>
                             ) : (
                               <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-300 flex items-center justify-center text-[10px] flex-shrink-0">
@@ -2833,10 +2859,11 @@ export default function DashboardPage() {
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={sku.imageUrl}
-                            alt={sku.name}
+                            src={getGoogleDriveThumbUrl(sku.imageUrl)}
+                            alt=""
                             className="w-full h-full object-cover"
                             loading="lazy"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         </button>
                       ) : (
@@ -3190,10 +3217,11 @@ export default function DashboardPage() {
                                 className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-amber-500 flex-shrink-0 shadow-2xs group relative"
                               >
                                 <img
-                                  src={item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores["Lotus's"]?.imageUrl}
-                                  alt={item.name}
+                                  src={getGoogleDriveThumbUrl(item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores["Lotus's"]?.imageUrl)}
+                                  alt=""
                                   className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                                   loading="lazy"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
                               </button>
                             ) : null}
@@ -3800,25 +3828,27 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-auto p-2 bg-slate-900 flex items-center justify-center min-h-[300px]">
+            <div className="flex-1 overflow-auto p-4 bg-slate-900 flex flex-col items-center justify-center min-h-[320px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={previewImage.url}
+                src={getGoogleDriveThumbUrl(previewImage.url)}
                 alt="Promotion preview"
-                className="max-w-full max-h-[70vh] object-contain rounded-xl"
+                className="max-w-full max-h-[65vh] object-contain rounded-xl shadow-lg"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
               />
-            </div>
-
-            <div className="p-3 bg-slate-50 text-right border-t border-slate-100">
-              <a
-                href={previewImage.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-colors"
-              >
-                <span>เปิดรูปใน Google Drive</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              <div className="mt-4 text-center">
+                <a
+                  href={previewImage.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md shadow-amber-500/20"
+                >
+                  <span>เปิดดูภาพต้นฉบับใน Google Drive</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
