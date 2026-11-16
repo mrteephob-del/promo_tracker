@@ -27,9 +27,6 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
       - name: Install dependencies
         run: npm ci
 
@@ -40,14 +37,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
-
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./out
-          publish_branch: gh-pages
-          force_orphan: true
 
   deploy:
     environment:
