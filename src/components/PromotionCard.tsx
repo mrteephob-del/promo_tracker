@@ -82,8 +82,8 @@ export default function PromotionCard({
     >
       {/* Card Header */}
       <div className="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between gap-3">
-        {/* Selection Checkbox, Index & Category Tag */}
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* Selection Checkbox & Index */}
+        <div className="flex items-center gap-3">
           <input
             type="checkbox"
             checked={item.selected}
@@ -96,62 +96,13 @@ export default function PromotionCard({
             className="font-bold text-sm sm:text-base text-slate-800 cursor-pointer flex items-center gap-2"
           >
             <span>รายการที่ {index + 1} จาก {total}</span>
+            {item.confidence < 0.7 && (
+              <span className="text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-600" />
+                ความมั่นใจ {(item.confidence * 100).toFixed(0)}%
+              </span>
+            )}
           </label>
-
-          {/* AI Category Classification Switcher */}
-          <div className="flex items-center gap-0.5 p-0.5 bg-slate-100 rounded-xl border border-slate-200">
-            <button
-              type="button"
-              onClick={() => {
-                const updated: PromotionItem = {
-                  ...item,
-                  category: 'coffee',
-                  subCategory: 'กาแฟซอง',
-                  color: ['แดง', 'เขียว', 'แดง,เขียว'].includes(item.color) ? item.color : 'แดง',
-                  packSize: item.packSize && item.packSize > 1 ? item.packSize : 40,
-                  isUntrackedBrand: !isTrackedBrand(item.brand),
-                };
-                onUpdate(updated);
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                item.category === 'coffee'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="บันทึกลงแท็บ PRT (กาแฟซอง)"
-            >
-              <span>☕ กาแฟ (PRT)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const updated: PromotionItem = {
-                  ...item,
-                  category: 'noodle',
-                  subCategory: item.subCategory || 'บะหมี่กึ่งสำเร็จรูป',
-                  color: ['ซอง', 'ถ้วย/คัพ', 'ชาม', 'แพ็ค'].includes(item.color) ? item.color : 'ซอง',
-                  packSize: item.packSize && item.packSize > 0 ? item.packSize : 1,
-                  isUntrackedBrand: false,
-                };
-                onUpdate(updated);
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                item.category === 'noodle'
-                  ? 'bg-orange-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="บันทึกลงแท็บ NOODLE (บะหมี่ / โจ๊ก / ข้าวต้ม)"
-            >
-              <span>🍜 บะหมี่/โจ๊ก (NOODLE)</span>
-            </button>
-          </div>
-
-          {item.confidence < 0.7 && (
-            <span className="text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-600" />
-              ความมั่นใจ {(item.confidence * 100).toFixed(0)}%
-            </span>
-          )}
         </div>
 
         {/* Thumbnail and Delete button */}

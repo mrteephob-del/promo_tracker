@@ -79,11 +79,6 @@ export type PromotionType = (typeof PROMOTION_TYPES)[number];
  * Zod Schema สำหรับรับผลลัพธ์จาก Gemini 2.5 Flash
  */
 export const GeminiExtractedItemSchema = z.object({
-  category: z
-    .enum(['coffee', 'noodle'])
-    .optional()
-    .nullable()
-    .describe('หมวดหมู่สินค้า: coffee (สำหรับกาแฟซอง/กาแฟกระป๋อง) หรือ noodle (สำหรับบะหมี่, โจ๊ก, ข้าวต้ม, มันบด)'),
   store_guess: z.string().describe('ชื่อร้านค้าที่สังเกตได้จากโลโก้หรือข้อความ เช่น 7-11, CJ More, Mini BigC, Lotus, Top'),
   brand: z.string().describe('ชื่อแบรนด์ เช่น มาม่า, ไวไว, ยำยำ, คนอร์ หรือ เนสกาแฟ, มอคโคน่า'),
   item_name: z.string().describe('ชื่อสินค้าและรสชาติเต็มตามที่ปรากฏในรูป'),
