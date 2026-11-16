@@ -11,6 +11,7 @@ import {
   CATEGORIES,
 } from '@/types';
 import { getWeekIdentifier, getBangkokDate, classifyNoodleSubCategory } from '@/lib/calc';
+import { getCachedHistoryRows } from '@/lib/client-api';
 import {
   History,
   Store,
@@ -27,8 +28,10 @@ import {
 
 export default function HistoryPage() {
   const [category, setCategory] = useState<PromoCategory>('coffee');
-  const [rows, setRows] = useState<(SheetRowData & { imageUrl?: string })[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState<(SheetRowData & { imageUrl?: string })[]>(() =>
+    getCachedHistoryRows('PRT', 200) as (SheetRowData & { imageUrl?: string })[]
+  );
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Filters
@@ -40,24 +43,24 @@ export default function HistoryPage() {
   const sheetName = CATEGORIES[category].sheetName;
 
   const fetchHistory = async (targetCategory = category) => {
-    setLoading(true);
-    setError(null);
     try {
       const targetSheet = CATEGORIES[targetCategory].sheetName;
-      const res = await fetch(`/api/history?limit=50&sheetName=${targetSheet}`);
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'ไม่สามารถโหลดประวัติโปรโมชั่นได้');
+      const res = await fetch(`/api/history?limit=200&sheetName=${targetSheet}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.rows) && data.rows.length > 0) {
+          setRows(data.rows);
+          return;
+        }
       }
-      setRows(data.rows || []);
-    } catch (err) {
-      console.error('Fetch history error:', err);
-      setError(
-        err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการดึงข้อมูลจาก Google Sheet'
-      );
-    } finally {
-      setLoading(false);
+    } catch {
+      // Static export fallback (GitHub Pages)
     }
+
+    // โหลดข้อมูลล่าสุดจากแคช 1,021 รายการทันที
+    const targetSheet = CATEGORIES[targetCategory].sheetName;
+    const fallbackRows = getCachedHistoryRows(targetSheet, 200) as (SheetRowData & { imageUrl?: string })[];
+    setRows(fallbackRows);
   };
 
   useEffect(() => {

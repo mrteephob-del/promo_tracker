@@ -9,6 +9,7 @@ import SuccessModal from '@/components/SuccessModal';
 import { PromotionItem, SheetRowData, PromoCategory, CATEGORIES } from '@/types';
 import { CompressedImageResult } from '@/lib/image';
 import { getBangkokTodayDMY, formatPrice } from '@/lib/calc';
+import { checkDuplicatesClient, saveRowsClient } from '@/lib/client-api';
 import {
   ArrowLeft,
   Plus,
@@ -106,17 +107,8 @@ export default function HomePage() {
         proPrice: item.proPrice,
       }));
 
-      const res = await fetch('/api/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rows: sheetRows,
-          sheetName: CATEGORIES[category].sheetName,
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.ok && Array.isArray(data.results)) {
+      const data = await checkDuplicatesClient(sheetRows, CATEGORIES[category].sheetName);
+      if (data && data.ok && Array.isArray(data.results)) {
         setItems((prev) =>
           prev.map((item, idx) => {
             const checkRes = data.results[idx];
@@ -231,19 +223,14 @@ export default function HomePage() {
         imageId: it.imageId || (imagesPayload.length > 0 ? imagesPayload[0].id : undefined),
       }));
 
-      const res = await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rows: rowsPayload,
-          images: imagesPayload,
-          sheetName: CATEGORIES[category].sheetName,
-        }),
-      });
+      const data = await saveRowsClient(
+        rowsPayload,
+        imagesPayload,
+        CATEGORIES[category].sheetName
+      );
 
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'การบันทึกลง Google Sheet ล้มเหลว');
+      if (!data || !data.ok) {
+        throw new Error(data?.error || 'การบันทึกลง Google Sheet ล้มเหลว');
       }
 
       setSaveSuccessData({

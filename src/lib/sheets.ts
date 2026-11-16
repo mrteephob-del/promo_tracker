@@ -1,14 +1,20 @@
 import { GasPayload, SheetRowData } from '@/types';
 
 function getGasConfig() {
-  const url = process.env.APPS_SCRIPT_URL;
-  const secret = process.env.APPS_SCRIPT_SECRET;
+  const url =
+    (typeof window !== 'undefined' ? localStorage.getItem('apps_script_url') : null) ||
+    process.env.NEXT_PUBLIC_APPS_SCRIPT_URL ||
+    process.env.APPS_SCRIPT_URL;
+  const secret =
+    (typeof window !== 'undefined' ? localStorage.getItem('apps_script_secret') : null) ||
+    process.env.NEXT_PUBLIC_APPS_SCRIPT_SECRET ||
+    process.env.APPS_SCRIPT_SECRET;
 
   if (!url) {
-    throw new Error('ไม่พบ APPS_SCRIPT_URL ในการตั้งค่า Environment Variables');
+    throw new Error('ไม่พบ APPS_SCRIPT_URL ในการตั้งค่า Environment Variables หรือ Local Storage');
   }
   if (!secret) {
-    throw new Error('ไม่พบ APPS_SCRIPT_SECRET ในการตั้งค่า Environment Variables');
+    throw new Error('ไม่พบ APPS_SCRIPT_SECRET ในการตั้งค่า Environment Variables หรือ Local Storage');
   }
 
   return { url, secret };

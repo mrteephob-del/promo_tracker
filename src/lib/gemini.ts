@@ -111,8 +111,18 @@ const NOODLE_SYSTEM_PROMPT = `
 7. สกัดสินค้าทุกรายการในหมวดบะหมี่ โจ๊ก ข้าวต้ม ที่ปรากฏในภาพออกมาให้ครบถ้วน
 `;
 
-function getGeminiApiKeys(): string[] {
+export function getGeminiApiKeys(): string[] {
   const keys: string[] = [];
+  if (typeof window !== 'undefined') {
+    const localKey = localStorage.getItem('gemini_api_key');
+    if (localKey && localKey.trim()) keys.push(localKey.trim());
+  }
+  if (process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+    const split = process.env.NEXT_PUBLIC_GEMINI_API_KEY.split(',').map((k) => k.trim()).filter(Boolean);
+    for (const k of split) {
+      if (!keys.includes(k) && k !== 'your-gemini-api-key') keys.push(k);
+    }
+  }
   if (process.env.GEMINI_API_KEYS) {
     keys.push(...process.env.GEMINI_API_KEYS.split(',').map((k) => k.trim()).filter(Boolean));
   }

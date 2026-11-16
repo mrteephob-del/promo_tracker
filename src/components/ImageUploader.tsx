@@ -25,6 +25,7 @@ import {
 } from '@/types';
 import { compressImage, CompressedImageResult } from '@/lib/image';
 import { getBangkokTodayYMD, convertYMDtoDMY } from '@/lib/calc';
+import { extractPromotionClient } from '@/lib/client-api';
 
 interface ImageUploaderProps {
   category: PromoCategory;
@@ -93,23 +94,18 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
         const img = images[i];
 
         try {
-          const res = await fetch('/api/extract', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              imageBase64: img.base64,
-              mimeType: img.mimeType,
-              defaultStore: selectedStore === 'auto' ? undefined : selectedStore,
-              defaultChannel: selectedChannel,
-              recordDate: recordDateDMY,
-              category,
-              modelMode,
-            }),
+          const data = await extractPromotionClient({
+            imageBase64: img.base64,
+            mimeType: img.mimeType,
+            defaultStore: selectedStore === 'auto' ? undefined : selectedStore,
+            defaultChannel: selectedChannel,
+            recordDate: recordDateDMY,
+            category,
+            modelMode,
           });
 
-          const data = await res.json();
-          if (!res.ok || !data.ok) {
-            errors.push(`รูปที่ ${i + 1}: ${data.error || 'วิเคราะห์ไม่สำเร็จ'}`);
+          if (!data || !data.ok) {
+            errors.push(`รูปที่ ${i + 1}: ${data?.error || 'วิเคราะห์ไม่สำเร็จ'}`);
             continue;
           }
 

@@ -3,6 +3,8 @@ import { fetchRecentSheetRows } from '@/lib/sheets';
 import fs from 'fs';
 import path from 'path';
 
+export const dynamic = 'force-static';
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const limitParam = searchParams.get('limit');

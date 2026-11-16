@@ -44,6 +44,7 @@ import {
   ArrowDownAZ,
 } from 'lucide-react';
 import { PromoCategory } from '@/types';
+import { getCachedHistoryRows } from '@/lib/client-api';
 import {
   calculateDiscount,
   calculatePricePerSachet,
@@ -155,9 +156,10 @@ export default function DashboardPage() {
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'coffee' | 'noodle'>('all');
   const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategoryFilter>('all');
-  const [coffeeRows, setCoffeeRows] = useState<SheetRow[]>([]);
-  const [noodleRows, setNoodleRows] = useState<SheetRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  // โหลดข้อมูลเริ่มต้นจากแคช (ทำให้เปิด Dashboard บน GitHub Pages หรือเว็บโหลดเร็วทันที)
+  const [coffeeRows, setCoffeeRows] = useState<SheetRow[]>(() => getCachedHistoryRows('PRT', 2000) as unknown as SheetRow[]);
+  const [noodleRows, setNoodleRows] = useState<SheetRow[]>(() => getCachedHistoryRows('NOODLE', 2000) as unknown as SheetRow[]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // ตัวกรอง
@@ -178,24 +180,30 @@ export default function DashboardPage() {
 
   // ดึงข้อมูล
   const fetchData = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const [resPrt, resNoodle] = await Promise.all([
         fetch('/api/history?sheetName=PRT&limit=2000'),
         fetch('/api/history?sheetName=NOODLE&limit=2000'),
       ]);
 
-      const dataPrt = await resPrt.json();
-      const dataNoodle = await resNoodle.json();
+      if (resPrt.ok && resNoodle.ok) {
+        const dataPrt = await resPrt.json();
+        const dataNoodle = await resNoodle.json();
 
-      if (dataPrt.ok) setCoffeeRows(dataPrt.rows || []);
-      if (dataNoodle.ok) setNoodleRows(dataNoodle.rows || []);
-    } catch (err) {
-      console.error('Fetch error:', err);
-      setError('ไม่สามารถโหลดข้อมูลจาก Google Sheet ได้');
-    } finally {
-      setLoading(false);
+        if (dataPrt.ok && Array.isArray(dataPrt.rows) && dataPrt.rows.length > 0) {
+          setCoffeeRows(dataPrt.rows);
+        }
+        if (dataNoodle.ok && Array.isArray(dataNoodle.rows) && dataNoodle.rows.length > 0) {
+          setNoodleRows(dataNoodle.rows);
+        }
+      }
+    } catch {
+      // โหมด Static Export (GitHub Pages) หรือไม่มีเซิร์ฟเวอร์ Node.js
+      // ใช้ข้อมูลแคชที่อัปเดตล่าสุด 1,021 รายการโดยอัตโนมัติ
+      const cachedPrt = getCachedHistoryRows('PRT', 2000) as unknown as SheetRow[];
+      const cachedNoodle = getCachedHistoryRows('NOODLE', 2000) as unknown as SheetRow[];
+      if (cachedPrt.length > 0) setCoffeeRows(cachedPrt);
+      if (cachedNoodle.length > 0) setNoodleRows(cachedNoodle);
     }
   };
 
