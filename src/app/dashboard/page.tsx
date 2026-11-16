@@ -67,11 +67,11 @@ import {
   RepeatedSKUItem,
 } from '@/lib/calc';
 
-function getGoogleDriveThumbUrl(url?: string): string {
+function getGoogleDriveThumbUrl(url?: string, size: string = 'w400'): string {
   if (!url) return '';
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (match && match[1]) {
-    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=${size}`;
   }
   return url;
 }
@@ -3831,7 +3831,7 @@ export default function DashboardPage() {
             <div className="flex-1 overflow-auto p-4 bg-slate-900 flex flex-col items-center justify-center min-h-[320px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={getGoogleDriveThumbUrl(previewImage.url)}
+                src={getGoogleDriveThumbUrl(previewImage.url, 'w1200')}
                 alt="Promotion preview"
                 className="max-w-full max-h-[65vh] object-contain rounded-xl shadow-lg"
                 onError={(e) => {
