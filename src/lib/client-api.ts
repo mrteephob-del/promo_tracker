@@ -39,12 +39,13 @@ export async function extractPromotionClient(params: ExtractClientParams): Promi
   const currentCategory: PromoCategory = category === 'noodle' ? 'noodle' : 'coffee';
   const currentModelMode: AiModelMode = modelMode === 'flash' ? 'flash' : 'pro';
 
-  // เรียก Gemini Vision
+  // เรียก Gemini Vision พร้อมส่ง context ห้างที่เลือกเพื่อให้ AI ใช้เลย์เอาต์ป้ายที่ถูกต้อง
   const extractedList = await extractPromotionFromImage(
     imageBase64,
     mimeType,
     currentCategory,
-    currentModelMode
+    currentModelMode,
+    defaultStore
   );
 
   const formattedDate = recordDate || getBangkokTodayDMY();

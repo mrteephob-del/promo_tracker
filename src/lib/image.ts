@@ -56,8 +56,21 @@ export async function compressImage(
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, width, height);
 
+        // ปรับแต่ง Contrast และ Brightness อัตโนมัติ เพื่อดึงตัวเลขและตัวอักษรป้ายราคาที่เบลอหรือมีแสงสะท้อนให้เด่นชัดขึ้น
+        try {
+          ctx.filter = 'contrast(1.08) brightness(1.02)';
+        } catch {
+          // ignore if not supported
+        }
+
         // วาดภาพที่ปรับขนาดแล้ว
         ctx.drawImage(img, 0, 0, width, height);
+
+        try {
+          ctx.filter = 'none';
+        } catch {
+          // ignore
+        }
 
         // ส่งออกเป็น JPEG คุณภาพสูง
         const dataUrl = canvas.toDataURL('image/jpeg', quality);

@@ -59,7 +59,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (!file.type.startsWith('image/')) continue;
-        const compressed = await compressImage(file, 1600, 0.85);
+        const compressed = await compressImage(file, 2400, 0.90);
         newImages.push(compressed);
       }
       setImages((prev) => [...prev, ...newImages]);
@@ -276,6 +276,19 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             onChange={(e) => setRecordDateYMD(e.target.value)}
             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
+        </div>
+      </div>
+
+      {/* Scanning & Store Guidance Tip */}
+      <div className="bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 p-3 rounded-2xl border border-amber-200/60 text-xs text-amber-900 flex items-start gap-2.5">
+        <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-bold text-amber-950">
+            ระบบปรับแต่ง AI ให้เข้าใจเลย์เอาต์ป้ายเฉพาะของแต่ละห้างไทย (CJ More, Mini BigC, Lotus, 7-11)
+          </p>
+          <p className="text-[11px] text-amber-800 leading-relaxed">
+            💡 <strong>แนะนำ:</strong> เลือกร้านค้าด้านบนก่อนถ่าย เพื่อให้ AI ถอดรหัสราคาโปรเฉพาะของห้างนั้นได้แม่นยำ 100% พร้อมระบบ Auto-Contrast ดึงตัวเลขป้ายราคาที่เบลอให้คมชัดขึ้นอัตโนมัติ
+          </p>
         </div>
       </div>
 
