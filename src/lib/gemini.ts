@@ -271,46 +271,9 @@ export async function extractPromotionFromImage(
 ): Promise<GeminiExtractedItem[]> {
   const apiKeys = getGeminiApiKeys();
   if (apiKeys.length === 0) {
-    console.warn('ไม่พบ GEMINI_API_KEY ที่ถูกต้อง กำลังคืนค่าข้อมูลจำลองสำหรับการทดสอบ (Mock Demo)');
-    if (category === 'noodle') {
-      return [
-        {
-          store_guess: '7-11',
-          brand: 'มาม่า',
-          item_name: 'มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น 60 กรัม',
-          color: 'ซอง',
-          pack_size: 1,
-          bonus_sachets: null,
-          promotion_type: 'ลดราคา',
-          period_start: '06/11/2026',
-          period_end: '08/11/2026',
-          mechanic: 'มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น 60 กรัม ปกติ 7 บาท พิเศษ 2 ซอง 13 บาท ประหยัด 1 บาท',
-          retail_price: 7.0,
-          pro_price: 6.5,
-          confidence: 0.95,
-          notes: '(โหมดทดสอบจำลอง: บะหมี่กึ่งสำเร็จรูป)',
-        },
-      ];
-    }
-    return [
-      {
-        store_guess: 'Mini BigC',
-        brand: 'เนสกาแฟ',
-        item_name: 'เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ',
-        color: 'แดง,เขียว',
-        pack_size: 40,
-        bonus_sachets: 2,
-        promotion_type: 'ลดราคา',
-        period_start: '06/11/2026',
-        period_end: '08/11/2026',
-        mechanic:
-          'เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา 40+2 ซอง และ เอสเปรสโซ โรสต์ 40 ซอง ปกติ 176 บาท 155/แพ็ค ประหยัด 21 บาท ซื้อ 2 แพ็ค ฟรี 1 ซอง',
-        retail_price: 176.0,
-        pro_price: 155.0,
-        confidence: 0.95,
-        notes: '(โหมดทดสอบจำลอง: กาแฟซอง)',
-      },
-    ];
+    throw new Error(
+      'ไม่พบ Google Gemini API Key ในระบบ! กรุณากดปุ่ม "API Key" (ไอคอนรูปกุญแจ) ด้านบนขวาของหน้าเว็บ เพื่อใส่ Gemini API Key (ที่ขึ้นต้นด้วย AIzaSy...) ฟรีจาก Google AI Studio เพื่อให้ AI สแกนและอ่านข้อมูลจริงจากรูปภาพ'
+    );
   }
 
   let cleanBase64 = imageBase64;

@@ -13,7 +13,9 @@ import {
   Share2,
   AlertCircle,
   Loader2,
+  KeyRound,
 } from 'lucide-react';
+import ApiKeyModal from '@/components/ApiKeyModal';
 import {
   TRACKED_STORES,
   TRACKED_CHANNELS,
@@ -44,6 +46,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
   const [analyzing, setAnalyzing] = useState<boolean>(false);
   const [analysisProgress, setAnalysisProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -409,9 +412,21 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
       {/* Error alert */}
       {error && (
-        <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-700 text-sm">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
-          <span>{error}</span>
+        <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-rose-700 text-sm">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
+            <span>{error}</span>
+          </div>
+          {error.includes('Gemini API Key') && (
+            <button
+              type="button"
+              onClick={() => setIsKeyModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer self-start sm:self-center shrink-0"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>ใส่ API Key ตรงนี้</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -453,6 +468,11 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           <span>กรอกข้อมูลเอง (Manual)</span>
         </button>
       </div>
+
+      <ApiKeyModal
+        isOpen={isKeyModalOpen}
+        onClose={() => setIsKeyModalOpen(false)}
+      />
     </div>
   );
 }

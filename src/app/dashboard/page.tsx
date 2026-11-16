@@ -940,8 +940,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setViewMode('overview')}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'overview'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 <BarChart3 className="w-4 h-4 text-amber-600" />
@@ -952,8 +952,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setViewMode('monthly')}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'monthly'
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
-                    : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
+                  : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 <CalendarDays className="w-4 h-4" />
@@ -968,8 +968,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setViewMode('frequency')}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'frequency'
-                    ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs shadow-indigo-500/20'
-                    : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs shadow-indigo-500/20'
+                  : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 <Zap className="w-4 h-4" />
@@ -984,8 +984,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setViewMode('comparison')}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'comparison'
-                    ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs shadow-rose-500/20'
-                    : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs shadow-rose-500/20'
+                  : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
                 <Swords className="w-4 h-4" />
@@ -1020,8 +1020,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setSelectedStore('all')}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer ${selectedStore === 'all'
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                   }`}
               >
                 ทุกห้าง <span className="opacity-70 font-normal">({rawList.length})</span>
@@ -1032,8 +1032,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setSelectedStore('CJ More')}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === 'CJ More'
-                    ? 'bg-orange-500 text-white shadow-xs shadow-orange-500/30'
-                    : 'bg-orange-50/70 text-orange-800 hover:bg-orange-100 border border-orange-200/60'
+                  ? 'bg-orange-500 text-white shadow-xs shadow-orange-500/30'
+                  : 'bg-orange-50/70 text-orange-800 hover:bg-orange-100 border border-orange-200/60'
                   }`}
               >
                 <span className="w-2 h-2 rounded-full bg-orange-400 shrink-0" />
@@ -1046,8 +1046,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setSelectedStore('Mini BigC')}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === 'Mini BigC'
-                    ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30'
-                    : 'bg-emerald-50/70 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
+                  ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30'
+                  : 'bg-emerald-50/70 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
                   }`}
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
@@ -1060,8 +1060,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setSelectedStore("Lotus's")}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === "Lotus's"
-                    ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/30'
-                    : 'bg-sky-50/70 text-sky-800 hover:bg-sky-100 border border-sky-200/60'
+                  ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/30'
+                  : 'bg-sky-50/70 text-sky-800 hover:bg-sky-100 border border-sky-200/60'
                   }`}
               >
                 <span className="w-2 h-2 rounded-full bg-sky-400 shrink-0" />
@@ -1096,8 +1096,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedCategory === 'all' && selectedSubCategory === 'all'
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
               >
                 ทุกหมวดหมู่ ({coffeeRows.length + noodleRows.length})
@@ -1107,8 +1107,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => { setSelectedCategory('coffee'); setSelectedSubCategory('all'); }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${selectedCategory === 'coffee'
-                    ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/20'
-                    : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
+                  ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/20'
+                  : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
                   }`}
               >
                 <Coffee className="w-3.5 h-3.5" />
@@ -1119,8 +1119,8 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => { setSelectedCategory('noodle'); setSelectedSubCategory('all'); }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${selectedCategory === 'noodle'
-                    ? 'bg-orange-500 text-white shadow-xs shadow-orange-500/20'
-                    : 'bg-orange-50 text-orange-800 hover:bg-orange-100'
+                  ? 'bg-orange-500 text-white shadow-xs shadow-orange-500/20'
+                  : 'bg-orange-50 text-orange-800 hover:bg-orange-100'
                   }`}
               >
                 <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -1143,8 +1143,8 @@ export default function DashboardPage() {
                         type="button"
                         onClick={() => setSelectedSubCategory(active ? 'all' : (sc.id as any))}
                         className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${active
-                            ? 'bg-slate-800 text-white shadow-2xs'
-                            : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60'
+                          ? 'bg-slate-800 text-white shadow-2xs'
+                          : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60'
                           }`}
                       >
                         <span>{sc.label}</span>
@@ -1428,12 +1428,12 @@ export default function DashboardPage() {
                           <div
                             style={{ height: `${heightPct}%` }}
                             className={`w-full rounded-xl transition-all duration-500 shadow-2xs ${isPeak
-                                ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
-                                : isRunnerUp
-                                  ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
-                                  : m.count > 0
-                                    ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
-                                    : 'bg-slate-200'
+                              ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
+                              : isRunnerUp
+                                ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
+                                : m.count > 0
+                                  ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
+                                  : 'bg-slate-200'
                               }`}
                           />
                         </div>
@@ -1442,10 +1442,10 @@ export default function DashboardPage() {
                         <div className="mt-2 text-center">
                           <span
                             className={`text-xs font-black block ${isPeak
-                                ? 'text-amber-600 font-black'
-                                : isRunnerUp
-                                  ? 'text-orange-600 font-black'
-                                  : 'text-slate-700 group-hover:text-slate-900'
+                              ? 'text-amber-600 font-black'
+                              : isRunnerUp
+                                ? 'text-orange-600 font-black'
+                                : 'text-slate-700 group-hover:text-slate-900'
                               }`}
                           >
                             {m.name}
@@ -2003,12 +2003,12 @@ export default function DashboardPage() {
                         <div className="mt-2 text-center w-full">
                           <span
                             className={`text-xs font-black block ${isSelected
-                                ? 'text-amber-700 underline font-black'
-                                : isPeak
-                                  ? 'text-amber-600 font-black'
-                                  : isRunnerUp
-                                    ? 'text-orange-600 font-black'
-                                    : 'text-slate-700'
+                              ? 'text-amber-700 underline font-black'
+                              : isPeak
+                                ? 'text-amber-600 font-black'
+                                : isRunnerUp
+                                  ? 'text-orange-600 font-black'
+                                  : 'text-slate-700'
                               }`}
                           >
                             {m.name}
@@ -2029,8 +2029,8 @@ export default function DashboardPage() {
                   type="button"
                   onClick={() => setSelectedMonth(null)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${selectedMonth === null
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                 >
                   ทั้งหมด 12 เดือน
@@ -2046,8 +2046,8 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setSelectedMonth(isSelected ? null : m.month)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 ${isSelected
-                          ? 'bg-amber-600 text-white shadow-xs'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-amber-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                         }`}
                     >
                       {isPeak && <span>👑</span>}
@@ -2328,8 +2328,8 @@ export default function DashboardPage() {
                           {/* Avg Discount */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
                             <span className={`px-2 py-1 rounded-lg text-xs font-black ${m.avgDiscount >= 20
-                                ? 'bg-rose-50 text-rose-600 border border-rose-200'
-                                : 'bg-slate-100 text-slate-700'
+                              ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                              : 'bg-slate-100 text-slate-700'
                               }`}>
                               {m.avgDiscount > 0 ? `-${m.avgDiscount}%` : '-'}
                             </span>
@@ -2576,10 +2576,10 @@ export default function DashboardPage() {
                                   >
                                     <div
                                       className={`w-full rounded-xs transition-all ${cnt === 0
-                                          ? 'bg-slate-200/60'
-                                          : isPeak
-                                            ? 'bg-gradient-to-t from-orange-600 to-amber-500 shadow-2xs'
-                                            : 'bg-amber-400/80'
+                                        ? 'bg-slate-200/60'
+                                        : isPeak
+                                          ? 'bg-gradient-to-t from-orange-600 to-amber-500 shadow-2xs'
+                                          : 'bg-amber-400/80'
                                         }`}
                                       style={{ height: `${heightPercent}%` }}
                                     />
@@ -3042,10 +3042,10 @@ export default function DashboardPage() {
                               <div
                                 key={sName}
                                 className={`p-3.5 rounded-2xl border transition-all ${!storeData
-                                    ? 'bg-slate-50/50 border-slate-100 opacity-40'
-                                    : isCheapest
-                                      ? 'bg-emerald-50/70 border-emerald-300 ring-2 ring-emerald-500/20 shadow-2xs'
-                                      : 'bg-white border-slate-200'
+                                  ? 'bg-slate-50/50 border-slate-100 opacity-40'
+                                  : isCheapest
+                                    ? 'bg-emerald-50/70 border-emerald-300 ring-2 ring-emerald-500/20 shadow-2xs'
+                                    : 'bg-white border-slate-200'
                                   }`}
                               >
                                 <div className="flex items-center justify-between text-xs mb-1.5">
@@ -3205,8 +3205,8 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setMechanicStoreFilter(s)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${active
-                          ? 'bg-slate-900 text-white shadow-2xs'
-                          : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+                        ? 'bg-slate-900 text-white shadow-2xs'
+                        : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
                         }`}
                     >
                       <span>{s === 'all' ? 'ทุกห้าง' : s}</span>
@@ -3256,8 +3256,8 @@ export default function DashboardPage() {
                     type="button"
                     onClick={() => setMechanicViewMode('list')}
                     className={`p-1.5 rounded-lg transition-colors cursor-pointer ${mechanicViewMode === 'list'
-                        ? 'bg-slate-900 text-white'
-                        : 'text-slate-400 hover:text-slate-700'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-400 hover:text-slate-700'
                       }`}
                     title="มุมมองแบบรายการ (List View)"
                   >
@@ -3267,8 +3267,8 @@ export default function DashboardPage() {
                     type="button"
                     onClick={() => setMechanicViewMode('grid')}
                     className={`p-1.5 rounded-lg transition-colors cursor-pointer ${mechanicViewMode === 'grid'
-                        ? 'bg-slate-900 text-white'
-                        : 'text-slate-400 hover:text-slate-700'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-400 hover:text-slate-700'
                       }`}
                     title="มุมมองแบบการ์ดรูปภาพ (Grid View)"
                   >
@@ -3334,10 +3334,10 @@ export default function DashboardPage() {
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span
                                 className={`px-2 py-0.5 rounded-md text-[10px] font-black ${r.store === 'CJ More'
-                                    ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                                    : r.store === 'Mini BigC'
-                                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                      : 'bg-sky-100 text-sky-800 border border-sky-200'
+                                  ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                                  : r.store === 'Mini BigC'
+                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                    : 'bg-sky-100 text-sky-800 border border-sky-200'
                                   }`}
                               >
                                 {r.store}
@@ -3464,10 +3464,10 @@ export default function DashboardPage() {
                           <div className="absolute top-2 left-2">
                             <span
                               className={`px-2 py-0.5 rounded-md text-[10px] font-black shadow-xs ${r.store === 'CJ More'
-                                  ? 'bg-orange-600 text-white'
-                                  : r.store === 'Mini BigC'
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-sky-600 text-white'
+                                ? 'bg-orange-600 text-white'
+                                : r.store === 'Mini BigC'
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-sky-600 text-white'
                                 }`}
                             >
                               {r.store}
