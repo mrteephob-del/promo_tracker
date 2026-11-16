@@ -45,6 +45,14 @@ export const COMMON_NOODLE_BRANDS = [
   'อื่นๆ',
 ] as const;
 
+export const NOODLE_SUB_CATEGORIES = [
+  'บะหมี่กึ่งสำเร็จรูป',
+  'โจ๊ก',
+  'ข้าวต้ม',
+  'มันบด',
+] as const;
+export type NoodleSubCategory = 'all' | (typeof NOODLE_SUB_CATEGORIES)[number];
+
 export const NOODLE_PACKAGE_TYPES = ['ซอง', 'ถ้วย/คัพ', 'ชาม', 'แพ็ค'] as const;
 
 export const TRACKED_STORES = ['7-11', 'CJ More', 'Mini BigC', 'Lotus', 'Top'] as const;
@@ -111,6 +119,7 @@ export interface PromotionItem {
   promotion: string;
   channel: string;
   freqWeek: number;
+  freqMonth?: number;
   period: string; // "dd/mm/yyyy - dd/mm/yyyy"
   machanic: string;
   retailPrice: number | null;
@@ -120,6 +129,8 @@ export interface PromotionItem {
   notes?: string | null;
 
   // สถานะและค่าคำนวณประกอบการตรวจ
+  subCategory?: string; // บะหมี่กึ่งสำเร็จรูป | โจ๊ก | ข้าวต้ม | มันบด
+  isPredictedPeriod?: boolean;
   isDuplicate?: boolean;
   duplicateReason?: string;
   isUntrackedBrand?: boolean;
@@ -137,12 +148,15 @@ export interface SheetRowData {
   packSize: number | null; // F: Pack Size
   promotion: string; // G: Promotion
   channel: string; // H: Channel
-  freqWeek: number; // I: Freq/Week
+  freqWeek: number; // I: Freq/Week (legacy)
+  freqMonth?: number; // I: Freq/Month (ความถี่ต่อเดือน)
   period: string; // J: Period
   machanic: string; // K: Machanic
   retailPrice: number | null; // L: Retail Price
   proPrice: number | null; // M: Pro Price
   imageUrl?: string; // N: Hyperlink target
+  subCategory?: string; // O: Sub-Category (บะหมี่กึ่งสำเร็จรูป, โจ๊ก, ข้าวต้ม, มันบด)
+  isPredictedPeriod?: boolean; // มาร์คว่าเป็นช่วงเวลาที่คาดการณ์หรือไม่
   imageId?: string;
 }
 

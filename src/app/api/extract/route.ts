@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractPromotionFromImage } from '@/lib/gemini';
 import { PromotionItem, PromoCategory, AiModelMode } from '@/types';
-import { isTrackedBrand, getBangkokTodayDMY } from '@/lib/calc';
+import { isTrackedBrand, getBangkokTodayDMY, classifyNoodleSubCategory } from '@/lib/calc';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,20 +42,29 @@ export async function POST(req: NextRequest) {
       const channel = defaultChannel || 'หน้าร้าน';
 
       let period = '';
-      if (item.period_start && item.period_end) {
-        period = `${item.period_start} - ${item.period_end}`;
-      } else if (item.period_start) {
-        period = item.period_start;
-      } else if (item.period_end) {
-        period = item.period_end;
+      const s = (item.period_start || '').trim();
+      const e = (item.period_end || '').trim();
+      const validS = s && s !== 'null' && s !== 'undefined' ? s : '';
+      const validE = e && e !== 'null' && e !== 'undefined' ? e : '';
+
+      if (validS && validE) {
+        period = `${validS} - ${validE}`;
+      } else if (validE) {
+        period = `ถึง ${validE}`;
+      } else if (validS) {
+        period = `ตั้งแต่ ${validS}`;
       }
 
       // ตรวจสอบแบรนด์: สำหรับกาแฟเช็ค 4 แบรนด์หลัก, สำหรับบะหมี่รับทุกแบรนด์
       const isUntracked = currentCategory === 'coffee' ? !isTrackedBrand(item.brand) : false;
+      const subCat = currentCategory === 'noodle'
+        ? classifyNoodleSubCategory(item.brand, item.item_name, item.mechanic)
+        : 'กาแฟซอง';
 
       return {
         id: `extracted-${Date.now()}-${index}`,
         category: currentCategory,
+        subCategory: subCat,
         selected: !isUntracked,
         date: formattedDate,
         store: store,
@@ -67,6 +76,7 @@ export async function POST(req: NextRequest) {
         promotion: item.promotion_type || 'ลดราคา',
         channel: channel,
         freqWeek: 1,
+        freqMonth: 1,
         period: period,
         machanic: item.mechanic,
         retailPrice: item.retail_price,

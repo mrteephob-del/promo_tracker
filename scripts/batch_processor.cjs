@@ -227,7 +227,16 @@ async function saveToGas(sheetName, items, imageBase64, filename) {
       promotion: item.promotion_type || 'ลดราคา',
       channel: 'หน้าร้าน',
       freqWeek: 1,
-      period: item.period_start && item.period_end ? `${item.period_start} - ${item.period_end}` : (item.period_start || ''),
+      period: (() => {
+        const s = (item.period_start || '').trim();
+        const e = (item.period_end || '').trim();
+        const validS = s && s !== 'null' && s !== 'undefined' ? s : '';
+        const validE = e && e !== 'null' && e !== 'undefined' ? e : '';
+        if (validS && validE) return `${validS} - ${validE}`;
+        if (validE) return `ถึง ${validE}`;
+        if (validS) return `ตั้งแต่ ${validS}`;
+        return '';
+      })(),
       machanic: item.mechanic || '',
       retailPrice: item.retail_price,
       proPrice: item.pro_price,

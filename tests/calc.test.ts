@@ -128,7 +128,7 @@ describe('Tracked Brands Validation', () => {
 
 describe('Categories and Sheet Mapping', () => {
   it('maps coffee to PRT tab and noodle to NOODLE tab', async () => {
-    const { CATEGORIES, COMMON_NOODLE_BRANDS } = await import('../src/types');
+    const { CATEGORIES, COMMON_NOODLE_BRANDS, NOODLE_SUB_CATEGORIES } = await import('../src/types');
     expect(CATEGORIES.coffee.sheetName).toBe('PRT');
     expect(CATEGORIES.noodle.sheetName).toBe('NOODLE');
     expect(COMMON_NOODLE_BRANDS).toContain('มาม่า');
@@ -136,6 +136,147 @@ describe('Categories and Sheet Mapping', () => {
     expect(COMMON_NOODLE_BRANDS).toContain('ยำยำ');
     expect(COMMON_NOODLE_BRANDS).toContain('นิสชิน');
     expect(COMMON_NOODLE_BRANDS).toContain('คนอร์');
+
+    expect(NOODLE_SUB_CATEGORIES).toContain('บะหมี่กึ่งสำเร็จรูป');
+    expect(NOODLE_SUB_CATEGORIES).toContain('โจ๊ก');
+    expect(NOODLE_SUB_CATEGORIES).toContain('ข้าวต้ม');
+    expect(NOODLE_SUB_CATEGORIES).toContain('มันบด');
+  });
+
+  it('correctly classifies items into 4 NOODLE sub-categories', async () => {
+    const { classifyNoodleSubCategory } = await import('../src/lib/calc');
+
+    // 1. มันบด
+    expect(classifyNoodleSubCategory('คนอร์', 'มันบดกึ่งสำเร็จรูป รสชีส')).toBe('มันบด');
+    expect(classifyNoodleSubCategory('Maggi', 'Mashed Potato Instant Cup')).toBe('มันบด');
+
+    // 2. ข้าวต้ม
+    expect(classifyNoodleSubCategory('เกษตร', 'ข้าวต้มกึ่งสำเร็จรูป รสกุ้ง')).toBe('ข้าวต้ม');
+    expect(classifyNoodleSubCategory('ไทย', 'ไทย ข้าวต้มกึ่งสำเร็จรูป 5 ซอง')).toBe('ข้าวต้ม');
+    expect(classifyNoodleSubCategory('ไวไว', 'ไวไว ข้าวต้มกึ่งสำเร็จรูป ทุกรสชาติ 72 ก.')).toBe('ข้าวต้ม');
+
+    // 3. โจ๊ก
+    expect(classifyNoodleSubCategory('คนอร์', 'คัพโจ๊ก รสหมู')).toBe('โจ๊ก');
+    expect(classifyNoodleSubCategory('มาม่า', 'โจ๊กกึ่งสำเร็จรูป คัพ')).toBe('โจ๊ก');
+    expect(classifyNoodleSubCategory('คนอร์', 'คนอร์ โจ๊ก/ข้าวต้ม 57 กรัม')).toBe('โจ๊ก');
+
+    // 4. บะหมี่กึ่งสำเร็จรูป
+    expect(classifyNoodleSubCategory('มาม่า', 'มาม่า บะหมี่กึ่งสำเร็จรูป รสหมูสับ')).toBe('บะหมี่กึ่งสำเร็จรูป');
+    expect(classifyNoodleSubCategory('ซัมยัง', 'Buldak Carbonara ราเมง')).toBe('บะหมี่กึ่งสำเร็จรูป');
+    expect(classifyNoodleSubCategory('นิสชิน', 'ยากิโซบะ รสซอสญี่ปุ่น')).toBe('บะหมี่กึ่งสำเร็จรูป');
+    expect(classifyNoodleSubCategory('ไวไว', 'ไวไว ควิก รสต้มโคล้ง')).toBe('บะหมี่กึ่งสำเร็จรูป');
+  });
+
+  it('calculates promo expiry status correctly', async () => {
+    const { getPromoStatus } = await import('../src/lib/calc');
+    const ref = new Date(Date.UTC(2026, 10, 12)); // 12 Nov 2026
+
+    expect(getPromoStatus('01/11/2026 - 30/11/2026', ref)).toBe('active');
+    expect(getPromoStatus('วันนี้ - 14/11/2026', ref)).toBe('expiring_soon');
+    expect(getPromoStatus('01/10/2026 - 05/11/2026', ref)).toBe('expired');
+    expect(getPromoStatus('', ref)).toBe('active');
+  });
+
+  it('builds cross-store price comparisons correctly', async () => {
+    const { buildCrossStoreComparisons } = await import('../src/lib/calc');
+    const sampleItems = [
+      { store: 'CJ More', brand: 'มาม่า', itemName: 'ต้มยำกุ้ง', proPrice: '6.00', packSize: 1 },
+      { store: 'Mini BigC', brand: 'มาม่า', itemName: 'ต้มยำกุ้ง 60 กรัม', proPrice: '6.50', packSize: 1 },
+      { store: "Lotus's", brand: 'มาม่า', itemName: 'ต้มยำกุ้ง แพ็ค 10', proPrice: '62.00', packSize: 10 },
+      { store: 'CJ More', brand: 'เนสกาแฟ', itemName: 'กาแฟซองเดียว', proPrice: '5.00', packSize: 1 },
+    ];
+
+    const comparisons = buildCrossStoreComparisons(sampleItems);
+    expect(comparisons.length).toBe(1);
+    expect(comparisons[0].brand).toBe('มาม่า');
+    expect(comparisons[0].storeCount).toBe(3);
+    expect(comparisons[0].minPrice).toBe(6.00);
+    expect(comparisons[0].cheapestStores).toContain('CJ More');
+  });
+
+  it('extracts promotion month and builds detailed monthly stats', async () => {
+    const { extractPromoMonth, buildMonthlyStats } = await import('../src/lib/calc');
+
+    expect(extractPromoMonth({ date: '15/01/2026' })).toBe(1);
+    expect(extractPromoMonth({ period: '01/05/2026 - 31/05/2026' })).toBe(5);
+    expect(extractPromoMonth({ period: 'ถึง 20/04/2026' })).toBe(4);
+    expect(extractPromoMonth({ period: '' })).toBe(0);
+
+    const testRows = [
+      { date: '10/01/2026', store: 'CJ More', brand: 'มาม่า', itemName: 'ต้มยำ', retailPrice: '10', proPrice: '8' },
+      { period: '15/01/2026 - 20/01/2026', store: 'Mini BigC', brand: 'มาม่า', itemName: 'หมูสับ', retailPrice: '10', proPrice: '7' },
+      { date: '01/05/2026', store: 'Lotus', brand: 'คนอร์', itemName: 'โจ๊ก', retailPrice: '20', proPrice: '15' },
+    ];
+
+    const stats = buildMonthlyStats(testRows);
+    expect(stats.length).toBe(13); // month 0 (ongoing) + 1-12
+    expect(stats[1].count).toBe(2); // 2 in January
+    expect(stats[1].fullName).toBe('มกราคม');
+    expect(stats[1].topStore).toBe('CJ More'); // CJ More and Mini BigC both 1
+    expect(stats[5].count).toBe(1); // 1 in May
+    expect(stats[5].topBrand).toBe('คนอร์');
+  });
+
+  it('predicts missing promo periods and calculates monthly frequencies', async () => {
+    const {
+      predictMissingPromoPeriods,
+      calculateMonthlyFrequencies,
+      buildFrequencyAnalytics,
+    } = await import('../src/lib/calc');
+
+    const sampleData = [
+      {
+        store: "Lotus's",
+        brand: 'เนสกาแฟ',
+        itemName: 'ริช อโรมา',
+        period: '',
+        date: '10/01/2026',
+      },
+      {
+        store: "Lotus's",
+        brand: 'เนสกาแฟ',
+        itemName: 'เอสเปรสโซ',
+        period: '08/01/2026 - 28/01/2026',
+        date: '12/01/2026',
+      },
+      {
+        store: 'Mini BigC',
+        brand: 'มาม่า',
+        itemName: 'หมูสับ',
+        period: '01/02/2026 - 15/02/2026',
+        date: '02/02/2026',
+      },
+      {
+        store: 'Mini BigC',
+        brand: 'มาม่า',
+        itemName: 'ต้มยำกุ้ง',
+        period: '',
+        date: '',
+      },
+    ];
+
+    // 1. Prediction test
+    const predicted = predictMissingPromoPeriods(sampleData);
+    expect(predicted[0].isPredictedPeriod).toBe(true);
+    expect(predicted[0].period).toBe('08/01/2026 - 28/01/2026'); // Imputed from row 1 (forward scan)
+    expect(predicted[1].isPredictedPeriod).toBe(false);
+    expect(predicted[3].isPredictedPeriod).toBe(true);
+    expect(predicted[3].period).toBe('01/02/2026 - 15/02/2026'); // Imputed from row 2 (backward scan)
+
+    // 2. Monthly frequency calculation test
+    const withFreq = calculateMonthlyFrequencies(predicted);
+    expect(withFreq[0].freqMonth).toBe(2); // Lotus's + เนสกาแฟ + Jan = 2
+    expect(withFreq[1].freqMonth).toBe(2);
+    expect(withFreq[2].freqMonth).toBe(2); // Mini BigC + มาม่า + Feb = 2
+    expect(withFreq[3].freqMonth).toBe(2);
+
+    // 3. Analytics test
+    const analytics = buildFrequencyAnalytics(withFreq);
+    expect(analytics.predictionStats.total).toBe(4);
+    expect(analytics.predictionStats.predicted).toBe(2);
+    expect(analytics.predictionStats.predictedPercent).toBe(50);
+    expect(analytics.brandFrequencyList.length).toBe(2);
+    expect(analytics.topRepeatedSKUs.length).toBeGreaterThan(0);
   });
 });
 

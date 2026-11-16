@@ -206,15 +206,15 @@ export default function PromotionCard({
             </div>
           </div>
 
-          {/* Freq/Week */}
+          {/* Freq/Month */}
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg">
+            <div className="p-1.5 bg-amber-100 text-amber-800 rounded-lg">
               <Layers className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">ความถี่ในสัปดาห์</span>
-              <span className="font-bold text-indigo-700">
-                ครั้งที่ {item.freqWeek || 1}
+              <span className="text-slate-400 block text-[10px]">ความถี่ในเดือน</span>
+              <span className="font-bold text-amber-800">
+                ครั้งที่ {item.freqMonth || item.freqWeek || 1} ของเดือน
               </span>
             </div>
           </div>
@@ -298,6 +298,25 @@ export default function PromotionCard({
             )}
           </select>
         </div>
+
+        {/* Sub-Category (For Noodle/Congee/Porridge/Mashed Potato) */}
+        {!isCoffee && (
+          <div>
+            <label className="block text-slate-600 font-semibold mb-1">
+              หมวดหมู่อาหาร <span className="text-orange-500">*</span>
+            </label>
+            <select
+              value={item.subCategory || 'บะหมี่กึ่งสำเร็จรูป'}
+              onChange={(e) => handleChange('subCategory', e.target.value)}
+              className="w-full rounded-xl px-3 py-2 border text-sm font-bold bg-orange-50/60 text-orange-950 border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="บะหมี่กึ่งสำเร็จรูป">🍜 บะหมี่กึ่งสำเร็จรูป</option>
+              <option value="โจ๊ก">🥣 โจ๊ก</option>
+              <option value="ข้าวต้ม">🍲 ข้าวต้ม</option>
+              <option value="มันบด">🥔 มันบด</option>
+            </select>
+          </div>
+        )}
 
         {/* Promotion Type */}
         <div>

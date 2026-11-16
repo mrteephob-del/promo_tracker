@@ -68,6 +68,8 @@ export default function HomePage() {
       promotion: 'ลดราคา',
       channel: channel || 'หน้าร้าน',
       freqWeek: 1,
+      freqMonth: 1,
+      subCategory: isCoffee ? 'กาแฟซอง' : 'บะหมี่กึ่งสำเร็จรูป',
       period: '',
       machanic: '',
       retailPrice: null,
@@ -96,6 +98,8 @@ export default function HomePage() {
         promotion: item.promotion,
         channel: item.channel,
         freqWeek: item.freqWeek,
+        freqMonth: item.freqMonth || item.freqWeek,
+        subCategory: item.subCategory,
         period: item.period,
         machanic: item.machanic,
         retailPrice: item.retailPrice,
@@ -120,6 +124,7 @@ export default function HomePage() {
             return {
               ...item,
               freqWeek: checkRes.freqWeek || item.freqWeek,
+              freqMonth: checkRes.freqMonth || checkRes.freqWeek || item.freqMonth || 1,
               isDuplicate: checkRes.isDuplicate,
               duplicateReason: checkRes.duplicateReason,
             };
@@ -216,10 +221,13 @@ export default function HomePage() {
         promotion: it.promotion,
         channel: it.channel,
         freqWeek: it.freqWeek || 1,
+        freqMonth: it.freqMonth || it.freqWeek || 1,
         period: it.period,
         machanic: it.machanic,
         retailPrice: it.retailPrice !== null ? Number(formatPrice(it.retailPrice)) : null,
         proPrice: it.proPrice !== null ? Number(formatPrice(it.proPrice)) : null,
+        subCategory: it.subCategory,
+        isPredictedPeriod: it.isPredictedPeriod,
         imageId: it.imageId || (imagesPayload.length > 0 ? imagesPayload[0].id : undefined),
       }));
 

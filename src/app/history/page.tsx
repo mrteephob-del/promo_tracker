@@ -10,7 +10,7 @@ import {
   PromoCategory,
   CATEGORIES,
 } from '@/types';
-import { getWeekIdentifier, getBangkokDate } from '@/lib/calc';
+import { getWeekIdentifier, getBangkokDate, classifyNoodleSubCategory } from '@/lib/calc';
 import {
   History,
   Store,
@@ -35,6 +35,7 @@ export default function HistoryPage() {
   const [storeFilter, setStoreFilter] = useState<string>('all');
   const [brandFilter, setBrandFilter] = useState<string>('all');
   const [weekFilter, setWeekFilter] = useState<string>('all');
+  const [subCategoryFilter, setSubCategoryFilter] = useState<string>('all');
 
   const sheetName = CATEGORIES[category].sheetName;
 
@@ -88,13 +89,35 @@ export default function HistoryPage() {
     }
   });
 
-  // กรองรายการตาม Store, Brand, Week
+  // คำนวณจำนวนในแต่ละ Sub-Category เมื่อเป็นหมวด Noodle
+  const subCategoryCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {
+      all: rows.length,
+      'บะหมี่กึ่งสำเร็จรูป': 0,
+      'โจ๊ก': 0,
+      'ข้าวต้ม': 0,
+      'มันบด': 0,
+    };
+    rows.forEach((r) => {
+      const sub = r.subCategory || classifyNoodleSubCategory(r.brand, r.itemName, r.machanic);
+      if (counts[sub] !== undefined) {
+        counts[sub] += 1;
+      }
+    });
+    return counts;
+  }, [rows]);
+
+  // กรองรายการตาม Store, Brand, Week, SubCategory
   const filteredRows = rows.filter((r) => {
     if (storeFilter !== 'all' && r.store.trim() !== storeFilter) return false;
     if (brandFilter !== 'all' && r.brand.trim() !== brandFilter) return false;
     if (weekFilter === 'thisWeek') {
       const rowWeekKey = getWeekIdentifier(r.date);
       if (rowWeekKey !== currentWeekKey) return false;
+    }
+    if (category === 'noodle' && subCategoryFilter !== 'all') {
+      const itemSub = r.subCategory || classifyNoodleSubCategory(r.brand, r.itemName, r.machanic);
+      if (itemSub !== subCategoryFilter) return false;
     }
     return true;
   });
@@ -143,7 +166,10 @@ export default function HistoryPage() {
         <div className="flex p-1.5 bg-slate-200/80 rounded-2xl max-w-lg shadow-inner">
           <button
             type="button"
-            onClick={() => setCategory('coffee')}
+            onClick={() => {
+              setCategory('coffee');
+              setSubCategoryFilter('all');
+            }}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'coffee'
                 ? 'bg-white text-amber-900 shadow-md shadow-slate-300'
@@ -158,7 +184,10 @@ export default function HistoryPage() {
 
           <button
             type="button"
-            onClick={() => setCategory('noodle')}
+            onClick={() => {
+              setCategory('noodle');
+              setSubCategoryFilter('all');
+            }}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'noodle'
                 ? 'bg-white text-orange-900 shadow-md shadow-slate-300'
@@ -296,6 +325,47 @@ export default function HistoryPage() {
               </select>
             </div>
           </div>
+
+          {/* Sub-Category Pills for Noodle Category */}
+          {category === 'noodle' && (
+            <div className="pt-2 border-t border-slate-100 space-y-1.5">
+              <label className="block text-[11px] font-semibold text-slate-600">
+                หมวดหมู่อาหาร (Sub-Category):
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: 'all', label: 'ทั้งหมด', icon: '🍽️', count: rows.length },
+                  { id: 'บะหมี่กึ่งสำเร็จรูป', label: 'บะหมี่', icon: '🍜', count: subCategoryCounts['บะหมี่กึ่งสำเร็จรูป'] || 0 },
+                  { id: 'โจ๊ก', label: 'โจ๊ก', icon: '🥣', count: subCategoryCounts['โจ๊ก'] || 0 },
+                  { id: 'ข้าวต้ม', label: 'ข้าวต้ม', icon: '🍲', count: subCategoryCounts['ข้าวต้ม'] || 0 },
+                  { id: 'มันบด', label: 'มันบด', icon: '🥔', count: subCategoryCounts['มันบด'] || 0 },
+                ].map((pill) => {
+                  const active = subCategoryFilter === pill.id;
+                  return (
+                    <button
+                      key={pill.id}
+                      type="button"
+                      onClick={() => setSubCategoryFilter(pill.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        active
+                          ? 'bg-amber-600 text-white shadow-sm'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                      }`}
+                    >
+                      <span>{pill.icon} {pill.label}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
+                          active ? 'bg-amber-700 text-amber-100' : 'bg-slate-200 text-slate-600'
+                        }`}
+                      >
+                        {pill.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Rows List */}
@@ -324,6 +394,11 @@ export default function HistoryPage() {
                     <span className="px-2 py-0.5 bg-slate-100 text-slate-700 font-medium rounded-lg text-xs">
                       {r.store}
                     </span>
+                    {category === 'noodle' && (
+                      <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-orange-50 text-orange-800 border border-orange-200">
+                        {r.subCategory || classifyNoodleSubCategory(r.brand, r.itemName, r.machanic)}
+                      </span>
+                    )}
                     <span
                       className={`px-2 py-0.5 rounded-lg text-xs font-medium ${
                         r.color.includes('แดง') && r.color.includes('เขียว')
@@ -339,13 +414,11 @@ export default function HistoryPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-slate-400 text-xs">
+                  <div className="flex items-center gap-2 text-slate-500 text-xs">
                     <span>{r.date}</span>
-                    {r.freqWeek && (
-                      <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md font-medium">
-                        ครั้งที่ {r.freqWeek}
-                      </span>
-                    )}
+                    <span className="px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-200/80 rounded-md font-semibold">
+                      {r.freqMonth || r.freqWeek || 1} ครั้ง/เดือน
+                    </span>
                   </div>
                 </div>
 
@@ -381,9 +454,14 @@ export default function HistoryPage() {
 
                   <div className="flex items-center gap-3">
                     {r.period && (
-                      <span className="text-slate-500 flex items-center gap-1">
+                      <span className="text-slate-600 flex items-center gap-1.5 flex-wrap">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         <span>{r.period}</span>
+                        {r.isPredictedPeriod && (
+                          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                            🔮 คาดการณ์
+                          </span>
+                        )}
                       </span>
                     )}
 
