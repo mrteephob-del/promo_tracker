@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import {
   TrendingUp,
-  Award,
   DollarSign,
   Store,
   Layers,
@@ -176,7 +175,6 @@ export default function DashboardPage() {
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortBy, setSortBy] = useState<'discountPercent' | 'proPrice' | 'unitPrice'>('discountPercent');
 
   // Modal ดูรูปภาพขยายใหญ่
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string; store: string } | null>(null);
@@ -425,23 +423,6 @@ export default function DashboardPage() {
     if (selectedMonth === null) return [];
     return filteredList.filter((r) => extractPromoMonth(r) === selectedMonth);
   }, [filteredList, selectedMonth]);
-  // การเรียงลำดับ
-  const sortedList = useMemo(() => {
-    return [...filteredList].sort((a, b) => {
-      if (sortBy === 'discountPercent') return b.discPercent - a.discPercent;
-      if (sortBy === 'proPrice') {
-        const pA = parseFloat(a.proPrice) || 0;
-        const pB = parseFloat(b.proPrice) || 0;
-        return pA - pB;
-      }
-      if (sortBy === 'unitPrice') {
-        const uA = a.unitPrice || 9999;
-        const uB = b.unitPrice || 9999;
-        return uA - uB;
-      }
-      return a.brand.localeCompare(b.brand);
-    });
-  }, [filteredList, sortBy]);
 
   // สถิติ KPI หลัก
   const kpis = useMemo(() => {
@@ -1168,17 +1149,6 @@ export default function DashboardPage() {
                 ))}
               </select>
 
-              {/* Sort Dropdown */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-2xs"
-              >
-                <option value="discountPercent">🔥 ลดสูงสุด (%)</option>
-                <option value="unitPrice">💡 ราคา/หน่วยถูกสุด</option>
-                <option value="proPrice">💰 ราคาโปรถูกสุด</option>
-              </select>
-
               {/* Search Box */}
               <div className="relative flex-1 sm:w-44">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
@@ -1726,200 +1696,6 @@ export default function DashboardPage() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
               <span>โปรโมชั่นส่วนใหญ่ของร้านสะดวกซื้อเป็น <strong>ลดราคาป้ายเหลืองตรงๆ</strong> รองลงมาคือ <strong>ซื้อคู่ถูกกว่า</strong></span>
             </div>
-          </div>
-        </div>
-
-        {/* 10 TOP BEST DEALS WITH IMAGE THUMBNAILS */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Award className="w-5 h-5 text-amber-500" />
-                <span>10 ดีลโปรโมชั่นสุดคุ้ม (Top Best Deals)</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                สินค้าที่มอบส่วนลดสูงสุดและราคาเฉลี่ยต่อหน่วยคุ้มค่าที่สุด พร้อมรูปถ่ายจากชั้นวาง
-              </p>
-            </div>
-            <span className="text-xs font-bold text-slate-500">
-              แสดง 10 จากทั้งหมด {filteredList.length} รายการ
-            </span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-                  <th className="py-3.5 px-3.5 text-center w-12">#</th>
-                  <th className="py-3.5 px-3.5">สินค้า & รายละเอียด</th>
-                  <th className="py-3.5 px-3.5 text-center w-28">ห้าง</th>
-                  <th className="py-3.5 px-3.5 w-48">ระยะเวลา & ความถี่</th>
-                  <th className="py-3.5 px-3.5 text-right w-44">ราคา & ส่วนลด</th>
-                  <th className="py-3.5 px-3.5 text-center w-20">รูปภาพ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {sortedList.slice(0, 10).map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                    {/* 1. Rank */}
-                    <td className="py-3.5 px-3.5 text-center">
-                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-black ${
-                        idx === 0
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                          : idx === 1
-                          ? 'bg-slate-200 text-slate-800'
-                          : idx === 2
-                          ? 'bg-orange-100 text-orange-900'
-                          : 'text-slate-400'
-                      }`}>
-                        {idx + 1}
-                      </span>
-                    </td>
-
-                    {/* 2. Product Thumbnail + Details */}
-                    <td className="py-3.5 px-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 relative text-slate-400">
-                          {item.imageUrl ? (
-                            <button
-                              type="button"
-                              onClick={() => setPreviewImage({ url: item.imageUrl!, title: `${item.brand} - ${item.itemName}`, store: item.store })}
-                              className="w-full h-full cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center relative group"
-                              title="คลิกเพื่อดูรูปโปรโมชั่น"
-                            >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={getGoogleDriveThumbUrl(item.imageUrl)}
-                                alt=""
-                                className="w-full h-full object-cover z-10"
-                                loading="lazy"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                              <ImageIcon className="w-4 h-4 text-slate-300 absolute" />
-                            </button>
-                          ) : (
-                            <span className="text-[9px] text-slate-300">ไม่มีรูป</span>
-                          )}
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="px-1.5 py-0.2 rounded text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-200 shrink-0">
-                              {item.brand}
-                            </span>
-                            <span className="font-black text-slate-900 text-xs truncate">
-                              {item.itemName}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 flex-wrap">
-                            {item.subCategory && (
-                              <span className="font-semibold text-slate-600">
-                                {item.subCategory === 'บะหมี่กึ่งสำเร็จรูป' && '🍜 บะหมี่'}
-                                {item.subCategory === 'โจ๊ก' && '🥣 โจ๊ก'}
-                                {item.subCategory === 'ข้าวต้ม' && '🍲 ข้าวต้ม'}
-                                {item.subCategory === 'มันบด' && '🥔 มันบด'}
-                                {item.category === 'coffee' && '☕ กาแฟ'}
-                              </span>
-                            )}
-                            {item.color && (
-                              <span>• {item.color}</span>
-                            )}
-                            {Number(item.packSize) > 1 && (
-                              <span className="font-bold text-slate-700">(แพ็ค {item.packSize})</span>
-                            )}
-                            {item.machanic && (
-                              <span className="text-slate-400">({item.machanic})</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* 3. Store Badge */}
-                    <td className="py-3.5 px-3.5 text-center whitespace-nowrap">
-                      <span className={`px-2.5 py-1 rounded-xl text-xs font-black border ${
-                        item.store === 'Mini BigC'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          : item.store === 'CJ More'
-                          ? 'bg-orange-50 text-orange-800 border-orange-200'
-                          : item.store === "Lotus's"
-                          ? 'bg-sky-50 text-sky-800 border-sky-200'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
-                      }`}>
-                        {item.store}
-                      </span>
-                    </td>
-
-                    {/* 4. Period & Monthly Cadence */}
-                    <td className="py-3.5 px-3.5 whitespace-nowrap">
-                      <div className="space-y-0.5">
-                        <div className="font-bold text-slate-700 text-xs flex items-center gap-1.5">
-                          <CalendarDays className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{item.period || '-'}</span>
-                          {item.isPredictedPeriod && (
-                            <span
-                              className="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-100 text-amber-900 border border-amber-200 shrink-0"
-                              title="คาดการณ์จากรอบใบปลิวของห้างในชุดเดียวกัน (มาร์คสีเหลืองใน Google Sheet)"
-                            >
-                              🔮 คาดการณ์
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-1 text-[11px] text-amber-800 font-bold">
-                          <Zap className="w-3 h-3 text-amber-600 shrink-0" />
-                          <span>ความถี่: {item.freqMonth || 1} ครั้ง/เดือน</span>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* 5. Pricing & Savings Group */}
-                    <td className="py-3.5 px-3.5 text-right whitespace-nowrap">
-                      <div className="space-y-0.5">
-                        <div className="flex items-baseline justify-end gap-1.5">
-                          <span className="text-sm font-black text-slate-900">
-                            {item.proPrice ? `${item.proPrice}.-` : '-'}
-                          </span>
-                          {item.retailPrice && (
-                            <span className="text-xs text-slate-400 line-through">
-                              {item.retailPrice}.-
-                            </span>
-                          )}
-                          {item.discPercent > 0 && (
-                            <span className="px-1.5 py-0.2 rounded-md bg-rose-50 text-rose-600 font-black text-[10px] border border-rose-200/60">
-                              -{item.discPercent}%
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="text-[11px] font-bold text-emerald-700">
-                          {item.unitPrice ? `เฉลี่ย ${item.unitPrice} ฿/${item.category === 'coffee' ? 'ซอง' : 'หน่วย'}` : ''}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* 6. Photo Button */}
-                    <td className="py-3.5 px-3.5 text-center whitespace-nowrap">
-                      {item.imageUrl ? (
-                        <button
-                          type="button"
-                          onClick={() => setPreviewImage({ url: item.imageUrl!, title: `${item.brand} - ${item.itemName}`, store: item.store })}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold rounded-xl transition-colors cursor-pointer text-xs border border-slate-200"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>ดูรูป</span>
-                        </button>
-                      ) : (
-                        <span className="text-slate-300">-</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
