@@ -30,12 +30,12 @@ import { getBangkokTodayYMD, convertYMDtoDMY } from '@/lib/calc';
 import { extractPromotionClient } from '@/lib/client-api';
 
 interface ImageUploaderProps {
-  category: PromoCategory;
+  category?: PromoCategory;
   onExtracted: (items: PromotionItem[], images: CompressedImageResult[]) => void;
   onManualEntry: (store: string, channel: string, date: string) => void;
 }
 
-export default function ImageUploader({ category, onExtracted, onManualEntry }: ImageUploaderProps) {
+export default function ImageUploader({ category = 'noodle', onExtracted, onManualEntry }: ImageUploaderProps) {
   const [selectedStore, setSelectedStore] = useState<string>('auto');
   const [selectedChannel, setSelectedChannel] = useState<string>('หน้าร้าน');
   const [recordDateYMD, setRecordDateYMD] = useState<string>(getBangkokTodayYMD());
@@ -153,7 +153,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             retailPrice: null,
             proPrice: null,
             confidence: 0,
-            notes: `AI ไม่พบรายการโปรโมชั่น${category === 'noodle' ? 'บะหมี่/โจ๊ก/ข้าวต้ม' : 'กาแฟซอง'} จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง`,
+            notes: 'AI ไม่พบรายการโปรโมชั่น จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง',
             imageId: `img-${idx}`,
             imagePreviewUrl: images[idx].dataUrl,
           });

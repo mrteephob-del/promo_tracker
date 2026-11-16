@@ -1,4 +1,4 @@
-import { TRACKED_BRANDS } from '@/types';
+import { TRACKED_BRANDS, PromoCategory } from '@/types';
 
 /**
  * ดึงวันที่ปัจจุบันตามเขตเวลา Asia/Bangkok
@@ -509,6 +509,96 @@ export function buildCrossStoreComparisons(items: any[]): CrossStoreComparisonIt
 
   return result.sort((a, b) => b.diff - a.diff);
 }
+
+/**
+ * แยกแยะหมวดหมู่สินค้าอัตโนมัติ (กาแฟ coffee vs บะหมี่/โจ๊ก noodle)
+ * รองรับกรณีรูปภาพมีทั้งกาแฟและบะหมี่ปะปนกันในภาพเดียว
+ */
+export function detectPromoCategory(
+  brand?: string,
+  itemName?: string,
+  machanic?: string
+): PromoCategory {
+  const text = `${brand || ''} ${itemName || ''} ${machanic || ''}`.toLowerCase();
+
+  // 1. หมวดกาแฟ (Coffee) - เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์, กาแฟ ฯลฯ
+  const isCoffee =
+    text.includes('กาแฟ') ||
+    text.includes('เนสกาแฟ') ||
+    text.includes('มอคโคน่า') ||
+    text.includes('เบอร์ดี้') ||
+    text.includes('ซุปเปอร์') ||
+    text.includes('coffee') ||
+    text.includes('nescafe') ||
+    text.includes('nescafé') ||
+    text.includes('moccona') ||
+    text.includes('birdy') ||
+    text.includes('espresso') ||
+    text.includes('เอสเปรสโซ') ||
+    text.includes('ลาเต้') ||
+    text.includes('latte') ||
+    text.includes('โรบัสต้า') ||
+    text.includes('robusta') ||
+    text.includes('คาปูชิโน่') ||
+    text.includes('cappuccino') ||
+    text.includes('อเมริกาโน่') ||
+    text.includes('americano');
+
+  // 2. หมวดบะหมี่ โจ๊ก ข้าวต้ม (Noodle / Porridge)
+  const isNoodle =
+    text.includes('บะหมี่') ||
+    text.includes('มาม่า') ||
+    text.includes('ไวไว') ||
+    text.includes('ยำยำ') ||
+    text.includes('นิสชิน') ||
+    text.includes('ซัมยัง') ||
+    text.includes('คนอร์') ||
+    text.includes('เกษตร') ||
+    text.includes('มังกรคู่') ||
+    text.includes('โจ๊ก') ||
+    text.includes('ข้าวต้ม') ||
+    text.includes('วุ้นเส้น') ||
+    text.includes('ก๋วยเตี๋ยว') ||
+    text.includes('เส้นหมี่') ||
+    text.includes('มันบด') ||
+    text.includes('คัพโจ๊ก') ||
+    text.includes('noodle') ||
+    text.includes('ramen') ||
+    text.includes('mama') ||
+    text.includes('waiwai') ||
+    text.includes('yumyum') ||
+    text.includes('nissin') ||
+    text.includes('samyang') ||
+    text.includes('knorr') ||
+    text.includes('porridge') ||
+    text.includes('congee');
+
+  if (isCoffee && !isNoodle) return 'coffee';
+  if (isNoodle && !isCoffee) return 'noodle';
+
+  // หากมีทั้งสองคำ ให้ดูตำแหน่งคำแรกที่ปรากฏใน itemName หรือ brand
+  if (isCoffee && isNoodle) {
+    const coffeeIndex = Math.min(
+      ...['กาแฟ', 'เนสกาแฟ', 'มอคโคน่า', 'เบอร์ดี้', 'ซุปเปอร์']
+        .map((k) => text.indexOf(k))
+        .filter((i) => i !== -1)
+    );
+    const noodleIndex = Math.min(
+      ...['บะหมี่', 'มาม่า', 'ไวไว', 'ยำยำ', 'นิสชิน', 'โจ๊ก', 'คนอร์']
+        .map((k) => text.indexOf(k))
+        .filter((i) => i !== -1)
+    );
+    if (coffeeIndex < noodleIndex) return 'coffee';
+    return 'noodle';
+  }
+
+  // ถ้าเป็นแบรนด์กาแฟที่รู้จัก
+  if (TRACKED_BRANDS.some((b) => (brand || '').includes(b))) return 'coffee';
+
+  // ดีฟอลต์ทั่วไป
+  return 'noodle';
+}
+
 export function classifyNoodleSubCategory(
   brand: string,
   itemName: string,

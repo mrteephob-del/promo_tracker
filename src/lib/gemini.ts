@@ -1,31 +1,36 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { GeminiExtractedItem, GeminiResponseSchema, PromoCategory, AiModelMode } from '@/types';
+import { detectPromoCategory } from '@/lib/calc';
 
 const geminiResponseSchemaConfig = {
   type: Type.ARRAY,
-  description: 'รายการโปรโมชั่นที่ตรวจพบในรูปภาพ',
+  description: 'รายการโปรโมชั่นที่ตรวจพบในรูปภาพ (แยกหมวดกาแฟและบะหมี่อัตโนมัติ)',
   items: {
     type: Type.OBJECT,
     properties: {
+      category: {
+        type: Type.STRING,
+        description: "หมวดหมู่สินค้า: ระบุ 'coffee' (ถ้าเป็นกาแฟซองปรุงสำเร็จ, กาแฟชง, กาแฟกระป๋อง RTD เช่น เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) หรือ 'noodle' (ถ้าเป็นบะหมี่กึ่งสำเร็จรูป, โจ๊ก, ข้าวต้ม, มันบด เช่น มาม่า, ไวไว, ยำยำ, นิสชิน, ซัมยัง, คนอร์, เกษตร, มังกรคู่ ฯลฯ)",
+      },
       store_guess: {
         type: Type.STRING,
         description: 'ชื่อร้านค้าที่สังเกตได้จากโลโก้หรือข้อความ เช่น 7-11, CJ More, Mini BigC, Lotus, Top',
       },
       brand: {
         type: Type.STRING,
-        description: 'ชื่อแบรนด์ เช่น มาม่า, ไวไว, ยำยำ, นิสชิน, คนอร์ หรือ เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์',
+        description: 'ชื่อแบรนด์ เช่น มาม่า, ไวไว, ยำยำ, นิสชิน, ซัมยัง, คนอร์ หรือ เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์',
       },
       item_name: {
         type: Type.STRING,
-        description: 'ชื่อสินค้าและรสชาติเต็มตามที่เห็นในรูป เช่น มาม่า รสต้มยำกุ้งน้ำข้น, เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา',
+        description: 'ชื่อสินค้าและรสชาติเต็มตามที่เห็นในรูป เช่น ยำยำ ช้างน้อย รสข้าวโพด, มาม่า รสต้มยำกุ้งน้ำข้น, เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา',
       },
       color: {
         type: Type.STRING,
-        description: 'กาแฟ: แดง หรือ เขียว หรือ แดง,เขียว | บะหมี่/โจ๊ก/ข้าวต้ม: ซอง หรือ ถ้วย/คัพ',
+        description: 'กาแฟ: แดง หรือ เขียว หรือ แดง,เขียว | บะหมี่/โจ๊ก/ข้าวต้ม: ซอง หรือ ถ้วย/คัพ หรือ ชาม หรือ แพ็ค',
       },
       pack_size: {
         type: Type.INTEGER,
-        description: 'จำนวนซอง/ถ้วย/ชิ้น ต่อแพ็ค เช่น 1 (ถ้าขายเดี่ยว) หรือ 4, 5, 6, 10, 40 (ถ้าเป็นแพ็ค)',
+        description: 'จำนวนซอง/ถ้วย/ชิ้น ต่อแพ็ค เช่น 1 (ถ้าขายเดี่ยว) หรือ 4, 5, 6, 10, 12, 30, 40 (ถ้าเป็นแพ็ค/ลัง)',
       },
       bonus_sachets: {
         type: Type.INTEGER,
@@ -64,7 +69,7 @@ const geminiResponseSchemaConfig = {
         description: 'หมายเหตุเพิ่มเติม เช่น ราคาต่อชิ้นที่เฉลี่ยมาจากซื้อหลายชิ้น หรือระบุว่าเป็นราคาที่คำนวณจากประหยัด X บาท',
       },
     },
-    required: ['store_guess', 'brand', 'item_name', 'color', 'mechanic', 'confidence'],
+    required: ['category', 'store_guess', 'brand', 'item_name', 'color', 'mechanic', 'confidence'],
   },
 };
 
@@ -139,37 +144,37 @@ const STORE_DECODING_RULES = `
    - ป้ายเบลอมากจนไม่เห็นตัวเลขราคาเลย -> retail_price = null, pro_price = null, confidence < 0.5 (ห้ามเดาตัวเลขขึ้นมาเอง)
 `;
 
-const COFFEE_SYSTEM_PROMPT = `
+const UNIFIED_PROMO_SYSTEM_PROMPT = `
 คุณเป็นผู้เชี่ยวชาญระดับสูงในการอ่านและถอดรหัสป้ายราคาและโบรชัวร์โปรโมชั่นของร้านสะดวกซื้อและห้างสรรพสินค้าในไทย (เช่น 7-11, CJ More, Mini BigC, Lotus, Top)
-เป้าหมายของคุณคือ สกัดข้อมูลโปรโมชั่นของ "กาแฟซองปรุงสำเร็จ (Instant Coffee Sachets)" และ "กาแฟพร้อมดื่ม (RTD Canned Coffee)" โดยเน้น 4 แบรนด์หลัก:
-1. เนสกาแฟ (Nescafé) - สูตรสีแดง: ริช อโรมา / สูตรสีเขียว: เอสเปรสโซ โรสต์
-2. มอคโคน่า (Moccona) - สูตรสีแดง: ริช แอนด์ สมูท / สูตรสีเขียว: เอสเปรสโซ
-3. เบอร์ดี้ (Birdy) - สูตรสีแดง: โรบัสต้า / สูตรสีเขียว: เอสเปรสโซ / กาแฟกระป๋องพร้อมดื่ม
-4. ซุปเปอร์ (Super) - สูตรสีแดง: ออริจินัล / สูตรสีเขียว: เอสเปรสโซ
+เป้าหมายของคุณคือ สกัดข้อมูลโปรโมชั่นของสินค้าทั้งหมดในภาพ ไม่ว่าจะเป็น:
+
+1. [หมวดกาแฟ (category: "coffee")]:
+   - กาแฟซองปรุงสำเร็จ (Instant Coffee Sachets): เนสกาแฟ (Nescafé), มอคโคน่า (Moccona), เบอร์ดี้ (Birdy), ซุปเปอร์ (Super)
+     * ฟิลด์ color สำหรับกาแฟ: ระบุ "แดง", "เขียว", หรือ "แดง,เขียว" (ตามสีซอง/สูตร)
+   - กาแฟพร้อมดื่ม (RTD Canned Coffee / Bottle): เช่น เบอร์ดี้กระป๋อง, เนสกาแฟกระป๋อง
+   - ป้าย "ซื้อ 2 แพ็ค ฟรี 1 ซอง" หรือ "40+2 ซอง": pack_size = 40 (นับเฉพาะซองหลัก), bonus_sachets = 2
+
+2. [หมวดบะหมี่ โจ๊ก ข้าวต้ม (category: "noodle")]:
+   - บะหมี่กึ่งสำเร็จรูป (Instant Noodles) - ทุกแบรนด์ (มาม่า, ไวไว, ยำยำ, นิสชิน, ซัมยัง ฯลฯ) ทั้ง "แบบซอง" และ "แบบถ้วย/คัพ"
+   - โจ๊กกึ่งสำเร็จรูป (Instant Congee/Porridge) - ทุกแบรนด์ (คนอร์, มาม่า, เกษตร ฯลฯ) ทั้ง "แบบซอง" และ "แบบถ้วย"
+   - ข้าวต้มกึ่งสำเร็จรูป (Instant Rice Soup) - ทุกแบรนด์ "แบบถ้วย"
+   - มันบดสำเร็จรูป (Mashed Potato)
+   - ฟิลด์ color สำหรับหมวดนี้: ระบุชนิดบรรจุภัณฑ์ให้ชัดเจน เช่น "ซอง", "ถ้วย/คัพ", "ชาม", "แพ็ค"
+   - สังเกตตัวเลขจำนวนซองในแพ็ค เช่น "แพ็ค 5 ซอง", "แพ็ค 10 ซอง", "แพ็ค/12" -> ให้ใส่ pack_size เป็นจำนวนนั้น หากเป็นซองหรือถ้วยเดี่ยว -> pack_size = 1
+
+*** กฎสำคัญที่สุดสำหรับการแยกแยะสินค้า (Multi-Category Auto-Separation): ***
+- ใน 1 ภาพ อาจมีทั้งสินค้ากาแฟ และ สินค้าบะหมี่/โจ๊ก อยู่ร่วมกันในใบปลิวหรือชั้นวางเดียวกัน
+- ให้คุณสกัดสินค้าทุกชิ้นที่พบออกมาเป็นแต่ละ Object ใน Array ให้ครบถ้วน
+- ระบุฟิลด์ "category" ให้ตรงกับประเภทของสินค้านั้นๆ อย่างถูกต้อง:
+  * หากเป็น กาแฟ (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์ ฯลฯ) -> "category": "coffee"
+  * หากเป็น บะหมี่, โจ๊ก, ข้าวต้ม, มันบด (มาม่า, ไวไว, ยำยำ, นิสชิน, ซัมยัง, คนอร์ ฯลฯ) -> "category": "noodle"
 
 ${STORE_DECODING_RULES}
 
 กฎทั่วไปเพิ่มเติม:
-1. ป้าย "ซื้อ 2 แพ็ค ฟรี 1 ซอง" หรือ "40+2 ซอง": pack_size = 40 (นับเฉพาะซองหลัก), bonus_sachets = 2
-2. แปลงปี พ.ศ. เป็น ค.ศ. เสมอ (เช่น 2569 -> 2026, 69 -> 2026) หากวันที่ไม่มีปี ให้ใช้ปี 2026 ในรูปแบบ dd/mm/yyyy
-3. หากในภาพมีสินค้ากาแฟหลายตัว ให้แยกออกเป็นแต่ละ Object ใน Array ให้ครบถ้วน
-`;
-
-const NOODLE_SYSTEM_PROMPT = `
-คุณเป็นผู้เชี่ยวชาญระดับสูงในการอ่านและถอดรหัสป้ายราคาและโบรชัวร์โปรโมชั่นของร้านสะดวกซื้อและห้างสรรพสินค้าในไทย (เช่น 7-11, CJ More, Mini BigC, Lotus, Top)
-เป้าหมายของคุณคือ สกัดข้อมูลโปรโมชั่นของกลุ่มสินค้าดังต่อไปนี้ ทุกแบรนด์:
-1. บะหมี่กึ่งสำเร็จรูป (Instant Noodles) - ทุกแบรนด์ (มาม่า, ไวไว, ยำยำ, นิสชิน, ซัมยัง ฯลฯ) ทั้ง "แบบซอง" และ "แบบถ้วย/คัพ"
-2. โจ๊กกึ่งสำเร็จรูป (Instant Congee/Porridge) - ทุกแบรนด์ (คนอร์, มาม่า, เกษตร ฯลฯ) ทั้ง "แบบซอง" และ "แบบถ้วย"
-3. ข้าวต้มกึ่งสำเร็จรูป (Instant Rice Soup) - ทุกแบรนด์ "แบบถ้วย"
-
-${STORE_DECODING_RULES}
-
-กฎทั่วไปเพิ่มเติม:
-1. สังเกตตัวเลขจำนวนซองในแพ็ค เช่น "แพ็ค 5 ซอง", "แพ็ค 6 ถ้วย", "แพ็ค 10 ซอง" -> ให้ใส่ pack_size เป็นจำนวนนั้น หากเป็นซองหรือถ้วยเดี่ยว -> pack_size = 1
-2. บรรจุภัณฑ์ (ฟิลด์ color): ระบุชัดเจนว่า "ซอง" หรือ "ถ้วย/คัพ"
-3. ชื่อสินค้าและรสชาติ: สกัดชื่อรสชาติให้ครบถ้วน เช่น "มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น", "คนอร์ คัพโจ๊ก รสหมู", "ไวไว บะหมี่กึ่งสำเร็จรูป รสหมูสับต้มยำ"
-4. แปลงปี พ.ศ. เป็น ค.ศ. เสมอ (เช่น 2569 -> 2026) หากวันที่ไม่มีปี ให้ใช้ปี 2026 ในรูปแบบ dd/mm/yyyy
-5. สกัดสินค้าทุกรายการในหมวดบะหมี่ โจ๊ก ข้าวต้ม ที่ปรากฏในภาพออกมาให้ครบถ้วน
+1. แปลงปี พ.ศ. เป็น ค.ศ. เสมอ (เช่น 2569 -> 2026, 69 -> 2026) หากวันที่ไม่มีปี ให้ใช้ปี 2026 ในรูปแบบ dd/mm/yyyy
+2. ชื่อสินค้าและรสชาติ: สกัดชื่อรสชาติให้ครบถ้วน เช่น "ยำยำ ช้างน้อย รสข้าวโพด", "มาม่า บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้งน้ำข้น", "คนอร์ คัพโจ๊ก รสหมู", "เนสกาแฟ เบลนด์ แอนด์ บรู ริช อโรมา"
+3. สกัดสินค้าทุกรายการในหมวดกาแฟและหมวดบะหมี่/โจ๊ก/ข้าวต้ม ที่ปรากฏในภาพออกมาให้ครบถ้วนที่สุด
 `;
 
 export function getGeminiApiKeys(): string[] {
@@ -209,6 +214,12 @@ export function sanitizePromotionPricing(item: GeminiExtractedItem): GeminiExtra
   let pro = item.pro_price;
   let mechanic = item.mechanic || '';
   let notes = item.notes || '';
+
+  // ตรวจสอบและระบุ category หาก AI ไม่ได้ระบุมาหรือระบุผิด
+  let cat = item.category as PromoCategory | undefined;
+  if (cat !== 'coffee' && cat !== 'noodle') {
+    cat = detectPromoCategory(item.brand, item.item_name, item.mechanic);
+  }
 
   // 1. ตรวจสอบกรณีสลับช่อง: ราคาปกติ (retail_price) ต้องมากกว่าราคาโปรโมชั่น (pro_price) เสมอ
   if (retail !== null && pro !== null && retail > 0 && pro > 0 && retail < pro) {
@@ -255,6 +266,7 @@ export function sanitizePromotionPricing(item: GeminiExtractedItem): GeminiExtra
 
   return {
     ...item,
+    category: cat,
     retail_price: retail !== null ? Number(retail.toFixed(2)) : null,
     pro_price: pro !== null ? Number(pro.toFixed(2)) : null,
     mechanic,
@@ -265,7 +277,7 @@ export function sanitizePromotionPricing(item: GeminiExtractedItem): GeminiExtra
 export async function extractPromotionFromImage(
   imageBase64: string,
   mimeType: string = 'image/jpeg',
-  category: PromoCategory = 'coffee',
+  category?: PromoCategory | 'auto',
   modelMode: AiModelMode = 'flash',
   targetStore?: string
 ): Promise<GeminiExtractedItem[]> {
@@ -281,10 +293,10 @@ export async function extractPromotionFromImage(
     cleanBase64 = cleanBase64.split(',')[1];
   }
 
-  const promptText = category === 'noodle' ? NOODLE_SYSTEM_PROMPT : COFFEE_SYSTEM_PROMPT;
+  const promptText = UNIFIED_PROMO_SYSTEM_PROMPT;
   const candidateModels = [
-    'gemini-3-flash-preview',
     'gemini-2.5-flash',
+    'gemini-3-flash-preview',
   ];
 
   let lastError: unknown = null;
@@ -306,9 +318,7 @@ export async function extractPromotionFromImage(
               parts: [
                 { text: promptText },
                 {
-                  text: `โปรดวิเคราะห์รูปโปรโมชั่นนี้ในหมวด "${
-                    category === 'noodle' ? 'บะหมี่ โจ๊ก ข้าวต้ม' : 'กาแฟซอง'
-                  }" อย่างละเอียด โดยถอดรหัสป้ายราคา รสชาติ บรรจุภัณฑ์ และกลไกโปรโมชั่นให้ถูกต้องแม่นยำที่สุดตามกฎเฉพาะของห้าง แล้วส่งคืนเฉพาะ JSON Array ตามสกีมาที่กำหนด${
+                  text: `โปรดวิเคราะห์รูปโปรโมชั่นนี้อย่างละเอียด สกัดสินค้าโปรโมชั่นทั้งหมดที่พบในภาพ ทั้งหมวดกาแฟ ('coffee') และหมวดบะหมี่/โจ๊ก/ข้าวต้ม ('noodle') โดยแยกแยะหมวดหมู่ ถอดรหัสป้ายราคา รสชาติ บรรจุภัณฑ์ และกลไกโปรโมชั่นให้ถูกต้องแม่นยำที่สุดตามกฎเฉพาะของห้าง แล้วส่งคืนเฉพาะ JSON Array ตามสกีมาที่กำหนด${
                     targetStore && targetStore !== 'auto'
                       ? `\n\n[คำแนะนำเน้นพิเศษ: ผู้ใช้งานระบุว่าป้ายราคาหรือโบรชัวร์นี้มาจากห้าง "${targetStore}" โปรดใช้กฎการถอดรหัสและรูปแบบป้ายของ ${targetStore} เป็นหลัก]`
                       : ''
