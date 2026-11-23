@@ -77,6 +77,15 @@ function getGoogleDriveThumbUrl(url?: string, size: string = 'w400'): string {
   return url;
 }
 
+function formatShortPeriod(period: string): string {
+  if (!period) return '';
+  const cleaned = formatPeriodDisplay(period);
+  return cleaned
+    .replace(/\/2026/g, '')
+    .replace(/\/2569/g, '')
+    .replace('วันนี้ - ', 'ถึง ');
+}
+
 interface SheetRow {
   date: string;
   store: string;
@@ -1349,28 +1358,44 @@ export default function DashboardPage() {
 
               {/* Quick Highlight Pills */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="p-3 bg-gradient-to-br from-amber-50 to-orange-50/70 rounded-2xl border border-amber-100/90">
-                  <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1">
-                    <span>🏆 อันดับ 1 จัดโปรเยอะสุด</span>
+                <div className="p-3 bg-gradient-to-br from-amber-50 to-orange-50/70 rounded-2xl border border-amber-100/90 flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1">
+                      <span>🏆 อันดับ 1 จัดโปรเยอะสุด</span>
+                    </div>
+                    <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                      {monthlyInsights.peakMonth?.fullName || '-'}
+                    </div>
+                    <div className="text-[11px] text-amber-700 font-semibold">
+                      {monthlyInsights.peakMonth?.count || 0} ดีล ({monthlyInsights.peakMonth?.percent || 0}% ของทั้งปี)
+                    </div>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    {monthlyInsights.peakMonth?.fullName || '-'}
-                  </div>
-                  <div className="text-[11px] text-amber-700 font-semibold">
-                    {monthlyInsights.peakMonth?.count || 0} ดีล ({monthlyInsights.peakMonth?.percent || 0}% ของทั้งปี)
-                  </div>
+                  {monthlyInsights.peakMonth?.topPeriod && (
+                    <div className="mt-1.5 text-[10px] font-bold text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded-lg border border-amber-200/80 truncate flex items-center gap-1" title={`ช่วงเวลาโปรโมชั่น: ${monthlyInsights.peakMonth.topPeriod}`}>
+                      <CalendarDays className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span className="truncate">{monthlyInsights.peakMonth.topPeriod}</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
-                    <span>🔥 อันดับ 2 รองแชมป์</span>
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
+                      <span>🔥 อันดับ 2 รองแชมป์</span>
+                    </div>
+                    <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                      {monthlyInsights.runnerUpMonth?.fullName || '-'}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-semibold">
+                      {monthlyInsights.runnerUpMonth?.count || 0} ดีล ({monthlyInsights.runnerUpMonth?.percent || 0}% ของทั้งปี)
+                    </div>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    {monthlyInsights.runnerUpMonth?.fullName || '-'}
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-semibold">
-                    {monthlyInsights.runnerUpMonth?.count || 0} ดีล ({monthlyInsights.runnerUpMonth?.percent || 0}% ของทั้งปี)
-                  </div>
+                  {monthlyInsights.runnerUpMonth?.topPeriod && (
+                    <div className="mt-1.5 text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded-lg border border-slate-200 truncate flex items-center gap-1" title={`ช่วงเวลาโปรโมชั่น: ${monthlyInsights.runnerUpMonth.topPeriod}`}>
+                      <CalendarDays className="w-3 h-3 text-slate-500 shrink-0" />
+                      <span className="truncate">{monthlyInsights.runnerUpMonth.topPeriod}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-3 bg-rose-50/60 rounded-2xl border border-rose-100">
@@ -1414,7 +1439,7 @@ export default function DashboardPage() {
                           setViewMode('monthly');
                         }}
                         className="group flex flex-col items-center justify-end h-full cursor-pointer"
-                        title={`${m.fullName}: ${m.count} ดีล (${m.percent}%) ห้างเด่น: ${m.topStore} ลดเฉลี่ย: ${m.avgDiscount}%`}
+                        title={`${m.fullName}: ${m.count} ดีล (${m.percent}%) | ช่วงโปร: ${m.topPeriod || 'ไม่ระบุ'} | ห้างเด่น: ${m.topStore} | ลดเฉลี่ย: ${m.avgDiscount}%`}
                       >
                         {/* Top Indicator / Badge */}
                         <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
@@ -1449,8 +1474,8 @@ export default function DashboardPage() {
                           />
                         </div>
 
-                        {/* Month Label */}
-                        <div className="mt-2 text-center">
+                        {/* Month Label & Period */}
+                        <div className="mt-2 text-center w-full flex flex-col items-center">
                           <span
                             className={`text-xs font-black block ${isPeak
                               ? 'text-amber-600 font-black'
@@ -1461,9 +1486,17 @@ export default function DashboardPage() {
                           >
                             {m.name}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-semibold block truncate max-w-[42px]">
+                          <span className="text-[10px] text-slate-400 font-semibold block truncate max-w-[42px] sm:max-w-[56px]">
                             {m.topStore !== '-' ? m.topStore.replace(' More', '').replace(' daily', '') : ''}
                           </span>
+                          {m.topPeriod && (
+                            <span
+                              className="mt-1 inline-block px-1.5 py-0.5 rounded bg-amber-50 text-[9px] font-bold text-amber-800 border border-amber-200/70 truncate max-w-[56px] sm:max-w-[76px]"
+                              title={`ช่วงโปรโมชั่นหลัก: ${m.topPeriod}${m.periods.length > 1 ? ` (มี ${m.periods.length} แคมเปญ)` : ''}`}
+                            >
+                              {formatShortPeriod(m.topPeriod)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -1956,7 +1989,7 @@ export default function DashboardPage() {
                         onClick={() => setSelectedMonth(isSelected ? null : m.month)}
                         className={`group flex flex-col items-center justify-end h-full cursor-pointer p-1 rounded-2xl transition-all ${isSelected ? 'bg-amber-50 ring-2 ring-amber-500 shadow-xs' : 'hover:bg-slate-50'
                           }`}
-                        title={`${m.fullName}: รวม ${m.count} ดีล (CJ: ${cjCount}, Mini BigC: ${bigcCount}, Lotus: ${lotusCount})`}
+                        title={`${m.fullName}: รวม ${m.count} ดีล (CJ: ${cjCount}, Mini BigC: ${bigcCount}, Lotus: ${lotusCount}) | ช่วงโปร: ${m.topPeriod || 'ไม่ระบุ'}`}
                       >
                         {/* Top Indicator Badge */}
                         <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
@@ -2011,7 +2044,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Month Label & Discount */}
-                        <div className="mt-2 text-center w-full">
+                        <div className="mt-2 text-center w-full flex flex-col items-center">
                           <span
                             className={`text-xs font-black block ${isSelected
                               ? 'text-amber-700 underline font-black'
@@ -2027,6 +2060,14 @@ export default function DashboardPage() {
                           <span className="text-[10px] text-slate-400 font-semibold block">
                             {m.avgDiscount > 0 ? `-${m.avgDiscount}%` : '-'}
                           </span>
+                          {m.topPeriod && (
+                            <span
+                              className="mt-1 inline-block px-1.5 py-0.5 rounded bg-amber-50 text-[9px] font-bold text-amber-800 border border-amber-200/70 truncate max-w-[56px] sm:max-w-[76px]"
+                              title={`ช่วงโปรโมชั่นหลัก: ${m.topPeriod}${m.periods.length > 1 ? ` (มี ${m.periods.length} แคมเปญ)` : ''}`}
+                            >
+                              {formatShortPeriod(m.topPeriod)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -2242,6 +2283,7 @@ export default function DashboardPage() {
                   <thead className="bg-slate-50/80 text-slate-500 font-black border-b border-slate-100">
                     <tr>
                       <th className="py-3 px-3.5">เดือน</th>
+                      <th className="py-3 px-3.5">ช่วงเวลาโปรโมชั่น (Period)</th>
                       <th className="py-3 px-3.5">จำนวนโปรโมชั่น</th>
                       <th className="py-3 px-3.5">สัดส่วนทั้งปี (%)</th>
                       <th className="py-3 px-3.5">ห้างที่จัดโปรมากสุด</th>
@@ -2293,6 +2335,25 @@ export default function DashboardPage() {
                                 </span>
                               )}
                             </div>
+                          </td>
+
+                          {/* Promo Period */}
+                          <td className="py-3.5 px-3.5 whitespace-nowrap">
+                            {m.topPeriod ? (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200/80 inline-flex items-center gap-1.5 w-fit">
+                                  <CalendarDays className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                  <span>{m.topPeriod}</span>
+                                </span>
+                                {m.periods.length > 1 && (
+                                  <span className="text-[10px] text-slate-400 pl-1 font-medium">
+                                    + อีก {m.periods.length - 1} ช่วงเวลาแคมเปญ
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-slate-300">-</span>
+                            )}
                           </td>
 
                           {/* Deals count */}

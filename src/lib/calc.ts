@@ -299,19 +299,29 @@ export const MONTH_NAMES_FULL = [
 
 /**
  * สกัดเดือนที่จัดโปรโมชั่น (1-12 หรือ 0 สำหรับโปรต่อเนื่อง/ไม่ระบุวัน)
+ * ให้ความสำคัญกับช่วงเวลาโปรโมชั่นจริง (period) ก่อนวันที่บันทึก (date)
  */
 export function extractPromoMonth(row: { date?: string; period?: string }): number {
+  if (row.period) {
+    const str = String(row.period).trim();
+    const matches = Array.from(str.matchAll(/(\d{1,2})\/(\d{1,2})\/(\d{4})/g));
+    if (matches.length > 0) {
+      const startDay = parseInt(matches[0][1], 10);
+      const startMonth = parseInt(matches[0][2], 10);
+      if (matches.length > 1) {
+        const endMonth = parseInt(matches[1][2], 10);
+        // หากโปรโมชั่นเริ่มปลายเดือน เช่น 29/01 - 25/02 แคมเปญหลักส่วนใหญ่คือ กุมภาพันธ์
+        if (startMonth !== endMonth && startDay >= 25 && endMonth >= 1 && endMonth <= 12) {
+          return endMonth;
+        }
+      }
+      if (startMonth >= 1 && startMonth <= 12) return startMonth;
+    }
+  }
   if (row.date) {
     const parts = String(row.date).trim().split('/');
     if (parts.length === 3) {
       const m = parseInt(parts[1], 10);
-      if (m >= 1 && m <= 12) return m;
-    }
-  }
-  if (row.period) {
-    const matches = Array.from(String(row.period).matchAll(/(\d{1,2})\/(\d{1,2})\/(\d{4})/g));
-    if (matches.length > 0) {
-      const m = parseInt(matches[0][2], 10);
       if (m >= 1 && m <= 12) return m;
     }
   }
@@ -330,6 +340,8 @@ export interface MonthlyStatsItem {
   topBrand: string;
   topBrandCount: number;
   avgDiscount: number;
+  topPeriod: string;
+  periods: string[];
   bestDeal: {
     brand: string;
     itemName: string;
@@ -352,6 +364,7 @@ export function buildMonthlyStats(items: any[]): MonthlyStatsItem[] {
       percent: 0,
       stores: {} as Record<string, number>,
       brands: {} as Record<string, number>,
+      periods: {} as Record<string, number>,
       sumDisc: 0,
       discCount: 0,
       bestDeal: null as MonthlyStatsItem['bestDeal'],
@@ -365,6 +378,12 @@ export function buildMonthlyStats(items: any[]): MonthlyStatsItem[] {
     b.count++;
     if (r.store) b.stores[r.store] = (b.stores[r.store] || 0) + 1;
     if (r.brand) b.brands[r.brand] = (b.brands[r.brand] || 0) + 1;
+    if (r.period) {
+      const p = String(r.period).trim();
+      if (p && p !== '-' && p !== 'ไม่ระบุ') {
+        b.periods[p] = (b.periods[p] || 0) + 1;
+      }
+    }
 
     const retail = parseFloat(r.retailPrice) || 0;
     const pro = parseFloat(r.proPrice) || 0;
@@ -386,6 +405,10 @@ export function buildMonthlyStats(items: any[]): MonthlyStatsItem[] {
   return buckets.map((b) => {
     const sortedStores = Object.entries(b.stores).sort((x, y) => y[1] - x[1]);
     const sortedBrands = Object.entries(b.brands).sort((x, y) => y[1] - x[1]);
+    const sortedPeriods = Object.entries(b.periods).sort((x, y) => y[1] - x[1]);
+    const topPeriod = sortedPeriods[0] ? sortedPeriods[0][0] : '';
+    const periods = sortedPeriods.map((p) => p[0]);
+
     return {
       month: b.month,
       name: b.name,
@@ -398,6 +421,8 @@ export function buildMonthlyStats(items: any[]): MonthlyStatsItem[] {
       topBrand: sortedBrands[0] ? sortedBrands[0][0] : '-',
       topBrandCount: sortedBrands[0] ? sortedBrands[0][1] : 0,
       avgDiscount: b.discCount > 0 ? Number((b.sumDisc / b.discCount).toFixed(1)) : 0,
+      topPeriod,
+      periods,
       bestDeal: b.bestDeal,
     };
   });
