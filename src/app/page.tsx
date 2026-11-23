@@ -220,6 +220,7 @@ export default function HomePage() {
         proPrice: it.proPrice !== null ? Number(formatPrice(it.proPrice)) : null,
         subCategory: it.subCategory,
         isPredictedPeriod: it.isPredictedPeriod,
+        imageUrl: it.imageUrl,
         imageId: it.imageId || (imagesPayload.length > 0 ? imagesPayload[0].id : undefined),
       }));
 

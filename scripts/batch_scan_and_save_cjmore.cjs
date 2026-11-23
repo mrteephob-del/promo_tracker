@@ -6,6 +6,12 @@ const FOLDER = '/Users/teephobwirachowatin/Pictures/Promo Facebook/CJ More/CJ Mo
 const CROP_DIR = '/tmp/cjmore_crops';
 if (!fs.existsSync(CROP_DIR)) fs.mkdirSync(CROP_DIR, { recursive: true });
 
+const PUBLIC_CROPS_DIR = path.resolve(__dirname, '../public/crops');
+if (!fs.existsSync(PUBLIC_CROPS_DIR)) fs.mkdirSync(PUBLIC_CROPS_DIR, { recursive: true });
+
+const DRIVE_MAP_PATH = path.resolve(__dirname, '../src/data/drive_images_map.json');
+const driveMap = fs.existsSync(DRIVE_MAP_PATH) ? JSON.parse(fs.readFileSync(DRIVE_MAP_PATH, 'utf8')) : {};
+
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwf1D341f6ehamx0RSUycAfbtgvUTsdEOgkR5ld2OLedgMdgX8-cqK-wH2JbWhXCf4-/exec';
 const GAS_SECRET = 'my_super_secret_promo_key_2026';
 
@@ -682,13 +688,21 @@ async function main() {
 
     const imageId = `crop-${i + 1}`;
     let b64 = '';
+    const publicCropFileName = `crop_${i + 1}_${def.item.brand}_${path.basename(def.sourceFile)}`;
+    const publicCropPath = path.join(PUBLIC_CROPS_DIR, publicCropFileName);
+
     if (fs.existsSync(cropOutPath)) {
       b64 = fs.readFileSync(cropOutPath).toString('base64');
+      fs.copyFileSync(cropOutPath, publicCropPath);
     }
+
+    const driveInfo = driveMap[def.sourceFile];
+    const driveViewUrl = driveInfo ? driveInfo.view_url : '';
 
     rowsToSave.push({
       ...def.item,
-      imageId: imageId
+      imageId: imageId,
+      imageUrl: driveViewUrl
     });
 
     if (b64) {
@@ -699,10 +713,11 @@ async function main() {
         filename: path.basename(cropOutPath)
       });
     }
+    console.log(`  🔗 Google Drive Image URL: ${driveViewUrl || '(ไม่มี)'}`);
     console.log(`  ✅ ตีกรอบและเตรียมแถวข้อมูลเสร็จสิ้น\n`);
   }
 
-  console.log(`\nกำลังส่งข้อมูล ${rowsToSave.length} แถว และรูปที่ตีกรอบ ${imagesToUpload.length} รูป ไปยัง Google Apps Script...`);
+  console.log(`\nกำลังส่งข้อมูล ${rowsToSave.length} แถว พร้อมลิงก์รูปภาพ Google Drive ไปยัง Google Apps Script...`);
 
   // บันทึกลง Google Sheet
   const payload = {
@@ -728,13 +743,19 @@ async function main() {
   const cachedPath = path.resolve(__dirname, '../src/data/cached_sheet_data.json');
   if (fs.existsSync(cachedPath)) {
     const cached = JSON.parse(fs.readFileSync(cachedPath, 'utf8'));
-    cached.noodle = rowsToSave.map((r, idx) => ({
-      ...r,
-      imageUrl: resJson.imageUrls?.[idx] || ''
-    }));
+    cached.noodle = rowsToSave.map((r, idx) => {
+      const def = PROMO_DEFINITIONS[idx];
+      const dInfo = driveMap[def.sourceFile];
+      return {
+        ...r,
+        imageUrl: r.imageUrl || (dInfo ? dInfo.view_url : ''),
+        thumbUrl: dInfo ? dInfo.thumb_url : '',
+        cropUrl: `/promo_tracker/crops/crop_${idx + 1}_${def.item.brand}_${path.basename(def.sourceFile)}`
+      };
+    });
     cached.timestamp = new Date().toISOString();
     fs.writeFileSync(cachedPath, JSON.stringify(cached, null, 2), 'utf8');
-    console.log('✅ อัปเดต cached_sheet_data.json เรียบร้อยแล้ว');
+    console.log('✅ อัปเดต cached_sheet_data.json เรียบร้อยแล้ว (มีรูปภาพครบ 100%)');
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-23T04:12:37.397Z",
+  "timestamp": "2026-11-23T04:27:49.280Z",
   "prt": [],
   "noodle": [
     {
@@ -19,7 +19,9 @@
       "proPrice": 32,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-1",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1IIlRsTnmceKBiUNOlS_lrdwOTWM3EcFU/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1IIlRsTnmceKBiUNOlS_lrdwOTWM3EcFU=w800",
+      "cropUrl": "/promo_tracker/crops/crop_1_ยำยำ_IMG_8694.JPG"
     },
     {
       "date": "23/11/2026",
@@ -38,7 +40,9 @@
       "proPrice": 12.5,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-2",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1ZneHZDSTmysLVTuBHGbjsEyyGxGdpqAa/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1ZneHZDSTmysLVTuBHGbjsEyyGxGdpqAa=w800",
+      "cropUrl": "/promo_tracker/crops/crop_2_ลิตเติ้ลกุ๊ก_IMG_8695.JPG"
     },
     {
       "date": "23/11/2026",
@@ -57,7 +61,9 @@
       "proPrice": 17.5,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-3",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1ZneHZDSTmysLVTuBHGbjsEyyGxGdpqAa/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1ZneHZDSTmysLVTuBHGbjsEyyGxGdpqAa=w800",
+      "cropUrl": "/promo_tracker/crops/crop_3_ต้มจั๊บอุบล_IMG_8695.JPG"
     },
     {
       "date": "23/11/2026",
@@ -76,7 +82,9 @@
       "proPrice": 30,
       "subCategory": "โจ๊ก",
       "imageId": "crop-4",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/11URLEjLrW0RiSjuk-CV88Rmcqji2f_9O/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/11URLEjLrW0RiSjuk-CV88Rmcqji2f_9O=w800",
+      "cropUrl": "/promo_tracker/crops/crop_4_คนอร์_IMG_8696.JPG"
     },
     {
       "date": "23/11/2026",
@@ -95,7 +103,9 @@
       "proPrice": 18,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-5",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/11URLEjLrW0RiSjuk-CV88Rmcqji2f_9O/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/11URLEjLrW0RiSjuk-CV88Rmcqji2f_9O=w800",
+      "cropUrl": "/promo_tracker/crops/crop_5_พาลโด_IMG_8696.JPG"
     },
     {
       "date": "23/11/2026",
@@ -114,7 +124,9 @@
       "proPrice": 61,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-6",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/11URLEjLrW0RiSjuk-CV88Rmcqji2f_9O/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/11URLEjLrW0RiSjuk-CV88Rmcqji2f_9O=w800",
+      "cropUrl": "/promo_tracker/crops/crop_6_มาม่า_IMG_8696.JPG"
     },
     {
       "date": "23/11/2026",
@@ -133,7 +145,9 @@
       "proPrice": 32,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-7",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1NwNRBaTOTteOll5GZIkhbt7CJe9J0V-C/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1NwNRBaTOTteOll5GZIkhbt7CJe9J0V-C=w800",
+      "cropUrl": "/promo_tracker/crops/crop_7_มาม่า_IMG_8697.JPG"
     },
     {
       "date": "23/11/2026",
@@ -152,7 +166,9 @@
       "proPrice": 69,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-8",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1vCvdtXQdgdeZmvw4pDq2cijGo2VYtqZs/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1vCvdtXQdgdeZmvw4pDq2cijGo2VYtqZs=w800",
+      "cropUrl": "/promo_tracker/crops/crop_8_มาสเตอร์ไล_IMG_8698.JPG"
     },
     {
       "date": "23/11/2026",
@@ -171,7 +187,9 @@
       "proPrice": 12,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-9",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1blKgYYB_G9VCDzpH_sA9BH7q0Jp3h0zP/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1blKgYYB_G9VCDzpH_sA9BH7q0Jp3h0zP=w800",
+      "cropUrl": "/promo_tracker/crops/crop_9_มาม่า_IMG_8699.JPG"
     },
     {
       "date": "23/11/2026",
@@ -190,7 +208,9 @@
       "proPrice": 33,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-10",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1blKgYYB_G9VCDzpH_sA9BH7q0Jp3h0zP/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1blKgYYB_G9VCDzpH_sA9BH7q0Jp3h0zP=w800",
+      "cropUrl": "/promo_tracker/crops/crop_10_มาเฟีย_IMG_8699.JPG"
     },
     {
       "date": "23/11/2026",
@@ -209,7 +229,9 @@
       "proPrice": 42,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-11",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1blKgYYB_G9VCDzpH_sA9BH7q0Jp3h0zP/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1blKgYYB_G9VCDzpH_sA9BH7q0Jp3h0zP=w800",
+      "cropUrl": "/promo_tracker/crops/crop_11_ซัมยัง_IMG_8699.JPG"
     },
     {
       "date": "23/11/2026",
@@ -228,7 +250,9 @@
       "proPrice": 12,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-12",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1_1MVFoXP_TbBkuZ2M6j85aWgjHoWOehZ/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1_1MVFoXP_TbBkuZ2M6j85aWgjHoWOehZ=w800",
+      "cropUrl": "/promo_tracker/crops/crop_12_ยำยำ_IMG_8700.JPG"
     },
     {
       "date": "23/11/2026",
@@ -247,7 +271,9 @@
       "proPrice": 12.5,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-13",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1T1McKMGYMM6qK74Sf7kt0lekayrRO45T/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1T1McKMGYMM6qK74Sf7kt0lekayrRO45T=w800",
+      "cropUrl": "/promo_tracker/crops/crop_13_มาม่า_IMG_8701.JPG"
     },
     {
       "date": "23/11/2026",
@@ -266,7 +292,9 @@
       "proPrice": 48,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-14",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1T1McKMGYMM6qK74Sf7kt0lekayrRO45T/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1T1McKMGYMM6qK74Sf7kt0lekayrRO45T=w800",
+      "cropUrl": "/promo_tracker/crops/crop_14_ยำยำ_IMG_8701.JPG"
     },
     {
       "date": "23/11/2026",
@@ -285,7 +313,9 @@
       "proPrice": 42,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-15",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/15jBkY-MZ-uprBaEv3CinLicj2G5YsVCB/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/15jBkY-MZ-uprBaEv3CinLicj2G5YsVCB=w800",
+      "cropUrl": "/promo_tracker/crops/crop_15_มาม่า_IMG_8702.JPG"
     },
     {
       "date": "23/11/2026",
@@ -304,7 +334,9 @@
       "proPrice": 34.5,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-16",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1jmf54BUTHeweTnn8Q5GMd073cq2p4Emi/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1jmf54BUTHeweTnn8Q5GMd073cq2p4Emi=w800",
+      "cropUrl": "/promo_tracker/crops/crop_16_มาสเตอร์ไล_IMG_8703.JPG"
     },
     {
       "date": "23/11/2026",
@@ -323,7 +355,9 @@
       "proPrice": 48,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-17",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1jmf54BUTHeweTnn8Q5GMd073cq2p4Emi/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1jmf54BUTHeweTnn8Q5GMd073cq2p4Emi=w800",
+      "cropUrl": "/promo_tracker/crops/crop_17_ไฮตี่เหลา_IMG_8703.JPG"
     },
     {
       "date": "23/11/2026",
@@ -342,7 +376,9 @@
       "proPrice": 14,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-18",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/182GtYaJGQh7jynzxxMVgUXzpo41on3ir/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/182GtYaJGQh7jynzxxMVgUXzpo41on3ir=w800",
+      "cropUrl": "/promo_tracker/crops/crop_18_ไวไว_IMG_8704.JPG"
     },
     {
       "date": "23/11/2026",
@@ -361,7 +397,9 @@
       "proPrice": 31,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-19",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/182GtYaJGQh7jynzxxMVgUXzpo41on3ir/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/182GtYaJGQh7jynzxxMVgUXzpo41on3ir=w800",
+      "cropUrl": "/promo_tracker/crops/crop_19_กระต่าย_IMG_8704.JPG"
     },
     {
       "date": "23/11/2026",
@@ -380,7 +418,9 @@
       "proPrice": 41,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-20",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/182GtYaJGQh7jynzxxMVgUXzpo41on3ir/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/182GtYaJGQh7jynzxxMVgUXzpo41on3ir=w800",
+      "cropUrl": "/promo_tracker/crops/crop_20_มาม่า_IMG_8704.JPG"
     },
     {
       "date": "23/11/2026",
@@ -399,7 +439,9 @@
       "proPrice": 18,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-21",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe=w800",
+      "cropUrl": "/promo_tracker/crops/crop_21_พาลโด_IMG_8705.JPG"
     },
     {
       "date": "23/11/2026",
@@ -418,7 +460,9 @@
       "proPrice": 37,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-22",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe=w800",
+      "cropUrl": "/promo_tracker/crops/crop_22_ซัมยัง_IMG_8705.JPG"
     },
     {
       "date": "23/11/2026",
@@ -437,7 +481,9 @@
       "proPrice": 45,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-23",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe=w800",
+      "cropUrl": "/promo_tracker/crops/crop_23_ไวไว_IMG_8705.JPG"
     },
     {
       "date": "23/11/2026",
@@ -456,7 +502,9 @@
       "proPrice": 62,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-24",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1crUdL6BnA2HveTe7cm4Agcs85a1rqqTe=w800",
+      "cropUrl": "/promo_tracker/crops/crop_24_มาม่า_IMG_8705.JPG"
     },
     {
       "date": "23/11/2026",
@@ -475,7 +523,9 @@
       "proPrice": 14,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-25",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1M52_ZieJY0UoaSvO3owXcUSVEBqYbFeh/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1M52_ZieJY0UoaSvO3owXcUSVEBqYbFeh=w800",
+      "cropUrl": "/promo_tracker/crops/crop_25_ไวไว_IMG_8706.JPG"
     },
     {
       "date": "23/11/2026",
@@ -494,7 +544,9 @@
       "proPrice": 31,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-26",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1M52_ZieJY0UoaSvO3owXcUSVEBqYbFeh/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1M52_ZieJY0UoaSvO3owXcUSVEBqYbFeh=w800",
+      "cropUrl": "/promo_tracker/crops/crop_26_กระต่าย_IMG_8706.JPG"
     },
     {
       "date": "23/11/2026",
@@ -513,7 +565,9 @@
       "proPrice": 41,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-27",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1M52_ZieJY0UoaSvO3owXcUSVEBqYbFeh/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1M52_ZieJY0UoaSvO3owXcUSVEBqYbFeh=w800",
+      "cropUrl": "/promo_tracker/crops/crop_27_มาม่า_IMG_8706.JPG"
     },
     {
       "date": "23/11/2026",
@@ -532,7 +586,9 @@
       "proPrice": 41,
       "subCategory": "บะหมี่กึ่งสำเร็จรูป",
       "imageId": "crop-28",
-      "imageUrl": ""
+      "imageUrl": "https://drive.google.com/file/d/1GtI1GdHDZvm9JLzxq7D3ya7vulDXLM2D/view?usp=drivesdk",
+      "thumbUrl": "https://lh3.googleusercontent.com/d/1GtI1GdHDZvm9JLzxq7D3ya7vulDXLM2D=w800",
+      "cropUrl": "/promo_tracker/crops/crop_28_มาม่า_IMG_8707.JPG"
     }
   ]
 }

@@ -107,10 +107,10 @@ export default function PromotionCard({
 
         {/* Thumbnail and Delete button */}
         <div className="flex items-center gap-2">
-          {item.imagePreviewUrl && (
+          {(item.imagePreviewUrl || item.imageUrl) && (
             <button
               type="button"
-              onClick={() => onViewImage(item.imagePreviewUrl!)}
+              onClick={() => onViewImage((item.imagePreviewUrl || item.imageUrl)!)}
               className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded-xl transition-colors cursor-pointer"
               title="ดูรูปภาพต้นฉบับ"
             >

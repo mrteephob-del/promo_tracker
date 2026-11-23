@@ -107,6 +107,7 @@ export interface PromotionItem {
   category: PromoCategory;
   imageId?: string; // id อ้างอิงรูปภาพ
   imagePreviewUrl?: string; // Data URL หรือ blob URL สำหรับพรีวิวใน UI
+  imageUrl?: string; // Google Drive หรือ Web URL ของรูปภาพ
   selected: boolean; // เลือกบันทึกลง Sheet หรือไม่
 
   date: string; // dd/mm/yyyy

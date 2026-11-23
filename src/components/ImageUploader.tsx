@@ -239,22 +239,20 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           <button
             type="button"
             onClick={() => setModelMode('pro')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              modelMode === 'pro'
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${modelMode === 'pro'
+              ? 'bg-amber-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+              }`}
           >
             <span>🎯 แม่นยำสูง (Pro)</span>
           </button>
           <button
             type="button"
             onClick={() => setModelMode('flash')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              modelMode === 'flash'
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${modelMode === 'flash'
+              ? 'bg-amber-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+              }`}
           >
             <span>⚡ ปกติ (Flash)</span>
           </button>
@@ -442,11 +440,10 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
                     e.stopPropagation();
                     openCropModal(idx);
                   }}
-                  className={`absolute top-1.5 left-1.5 px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold shadow-xs backdrop-blur-xs ${
-                    img.isCropped
-                      ? 'bg-amber-500 text-slate-950 font-black'
-                      : 'bg-black/60 hover:bg-amber-600 text-white'
-                  }`}
+                  className={`absolute top-1.5 left-1.5 px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold shadow-xs backdrop-blur-xs ${img.isCropped
+                    ? 'bg-amber-500 text-slate-950 font-black'
+                    : 'bg-black/60 hover:bg-amber-600 text-white'
+                    }`}
                   title="ตีกรอบเลือกเฉพาะสินค้า"
                 >
                   <Crop className="w-3 h-3" />
