@@ -199,6 +199,9 @@ export default function DashboardPage() {
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string; store: string } | null>(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
+  // Modal ดูรายละเอียดสินค้าและโปรโมชั่น (Product Detail Modal)
+  const [selectedProductModal, setSelectedProductModal] = useState<any | null>(null);
+
   // Modal ดูรายการแยกตามกลไกโปรโมชั่น (Promotional Mechanics Drilldown Modal)
   const [selectedMechanicModal, setSelectedMechanicModal] = useState<string | null>(null);
   const [mechanicSearchQuery, setMechanicSearchQuery] = useState<string>('');
@@ -323,12 +326,14 @@ export default function DashboardPage() {
           setPreviewImage(null);
         } else if (selectedMechanicModal) {
           setSelectedMechanicModal(null);
+        } else if (selectedProductModal) {
+          setSelectedProductModal(null);
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [previewImage, selectedMechanicModal]);
+  }, [previewImage, selectedMechanicModal, selectedProductModal]);
 
   // แปลงและคำนวณข้อมูล
   const rawList = useMemo(() => {
@@ -1711,15 +1716,27 @@ export default function DashboardPage() {
               </div>
 
               {/* Card 2: Deepest Discount Deal */}
-              <div className="bg-gradient-to-br from-rose-50/70 via-white to-pink-50/40 rounded-3xl p-5 border border-rose-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div
+                onClick={() => kpis.maxDisc && setSelectedProductModal(kpis.maxDisc)}
+                className="bg-gradient-to-br from-rose-50/70 via-white to-pink-50/40 rounded-3xl p-5 border border-rose-100/80 shadow-xs hover:shadow-md hover:border-rose-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                role="button"
+                tabIndex={0}
+                title="คลิกเพื่อดูรายละเอียดสินค้าและโปรโมชั่น"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-rose-900/60 uppercase tracking-wider flex items-center gap-1">
                     <Flame className="w-4 h-4 text-rose-500" />
                     <span>ดีลลดแรงที่สุด</span>
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-lg bg-rose-600 text-white text-[11px] font-black shadow-xs">
-                    {kpis.maxDisc?.store || '-'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-rose-600 text-white text-[11px] font-black shadow-xs">
+                      {kpis.maxDisc?.store || '-'}
+                    </span>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-rose-600 bg-rose-100/80 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <span>ดูรายละเอียด</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-3">
                   <div className="flex items-baseline gap-2">
@@ -1732,20 +1749,33 @@ export default function DashboardPage() {
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-xs text-slate-700 truncate mt-1.5 font-bold">
-                    {kpis.maxDisc ? `${kpis.maxDisc.brand} - ${kpis.maxDisc.itemName}` : 'ไม่มีข้อมูล'}
+                  <p className="text-xs text-slate-700 truncate mt-1.5 font-bold group-hover:text-rose-600 transition-colors flex items-center justify-between">
+                    <span className="truncate">{kpis.maxDisc ? `${kpis.maxDisc.brand} - ${kpis.maxDisc.itemName}` : 'ไม่มีข้อมูล'}</span>
+                    <span className="text-[10px] text-rose-500 font-bold shrink-0 ml-1 underline underline-offset-2">ดูรายละเอียด &gt;</span>
                   </p>
                 </div>
               </div>
 
               {/* Card 3: Lowest Unit Price */}
-              <div className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 rounded-3xl p-5 border border-emerald-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div
+                onClick={() => kpis.minUnit && setSelectedProductModal(kpis.minUnit)}
+                className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 rounded-3xl p-5 border border-emerald-100/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                role="button"
+                tabIndex={0}
+                title="คลิกเพื่อดูรายละเอียดสินค้าและโปรโมชั่น"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-900/60 uppercase tracking-wider">
                     ราคาเฉลี่ยต่อหน่วยถูกสุด
                   </span>
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xs shadow-emerald-500/20">
-                    <DollarSign className="w-5 h-5" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <span>ดูรายละเอียด</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xs shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                      <DollarSign className="w-5 h-5" />
+                    </div>
                   </div>
                 </div>
                 <div className="mt-3">
@@ -1757,8 +1787,9 @@ export default function DashboardPage() {
                       /{selectedCategory === 'coffee' ? 'ซอง' : 'หน่วย'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 truncate mt-1.5 font-medium">
-                    {kpis.minUnit ? `${kpis.minUnit.brand} (${kpis.minUnit.store})` : 'ไม่มีข้อมูล'}
+                  <p className="text-xs text-slate-600 truncate mt-1.5 font-medium group-hover:text-emerald-700 transition-colors flex items-center justify-between">
+                    <span className="truncate">{kpis.minUnit ? `${kpis.minUnit.brand} (${kpis.minUnit.store})` : 'ไม่มีข้อมูล'}</span>
+                    <span className="text-[10px] text-emerald-600 font-bold shrink-0 ml-1 underline underline-offset-2">ดูรายละเอียด &gt;</span>
                   </p>
                 </div>
               </div>
@@ -4957,6 +4988,230 @@ export default function DashboardPage() {
               >
                 ปิดหน้าต่าง
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Detail Modal (ป๊อปอัปแสดงรายละเอียดของสินค้า) */}
+      {selectedProductModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setSelectedProductModal(null)}
+        >
+          <div
+            className="bg-white rounded-3xl overflow-hidden max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150 my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`px-2.5 py-1 rounded-lg text-xs font-black text-white shadow-xs ${
+                  selectedProductModal.store === 'CJ More'
+                    ? 'bg-orange-500'
+                    : selectedProductModal.store === 'Mini BigC'
+                      ? 'bg-emerald-600'
+                      : 'bg-sky-600'
+                }`}>
+                  {selectedProductModal.store}
+                </span>
+                <span className="px-2 py-0.5 rounded-lg text-xs font-black bg-slate-100 text-slate-800">
+                  {selectedProductModal.brand}
+                </span>
+                {selectedProductModal.subCategory && (
+                  <span className="text-xs text-slate-400 font-medium">
+                    {selectedProductModal.subCategory}
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedProductModal(null)}
+                className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                title="ปิด"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {/* Product Hero Image + Name */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                {selectedProductModal.imageUrl ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const item = selectedProductModal;
+                      setSelectedProductModal(null);
+                      setPreviewImage({
+                        url: item.imageUrl || '',
+                        title: `${item.brand} - ${item.itemName}`,
+                        store: item.store,
+                      });
+                    }}
+                    className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shrink-0 group relative hover:ring-2 hover:ring-rose-500 transition-all cursor-pointer shadow-sm"
+                    title="คลิกเพื่อดูภาพขยายใหญ่"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getGoogleDriveThumbUrl(selectedProductModal.imageUrl, 'w600')}
+                      alt={selectedProductModal.itemName}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                    <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-bold gap-1">
+                      <ZoomIn className="w-4 h-4" />
+                      <span>ขยาย</span>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center shrink-0 text-slate-400">
+                    <ImageIcon className="w-8 h-8 opacity-40" />
+                    <span className="text-[10px] mt-1">ไม่มีรูปภาพ</span>
+                  </div>
+                )}
+
+                <div className="flex-1 text-center sm:text-left space-y-2">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                    {selectedProductModal.itemName}
+                  </h3>
+
+                  {/* Highlights Pill */}
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    {selectedProductModal.discPercent > 0 && (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-black bg-rose-500 text-white shadow-xs">
+                        ลด {selectedProductModal.discPercent}%
+                      </span>
+                    )}
+                    {selectedProductModal.discAmount > 0 && (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        ประหยัด ฿{selectedProductModal.discAmount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Cards Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                    ราคาโปรโมชั่น
+                  </span>
+                  <div className="flex items-baseline gap-1.5 mt-1">
+                    <span className="text-2xl font-black text-slate-900">
+                      ฿{selectedProductModal.proPrice}
+                    </span>
+                    {selectedProductModal.retailPrice && (
+                      <span className="text-xs text-slate-400 line-through">
+                        ฿{selectedProductModal.retailPrice}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-slate-500 font-medium block mt-1">
+                    ขนาดแพ็ค: {selectedProductModal.packSize} ชิ้น/ซอง
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/80 to-orange-50/50 border border-amber-200/80">
+                  <span className="text-[11px] font-bold text-amber-900/70 block uppercase">
+                    ราคาเฉลี่ยต่อหน่วย
+                  </span>
+                  <div className="flex items-baseline gap-1 mt-1">
+                    <span className="text-2xl font-black text-amber-700">
+                      ฿{selectedProductModal.unitPrice ? selectedProductModal.unitPrice.toFixed(2) : selectedProductModal.proPrice}
+                    </span>
+                    <span className="text-xs font-bold text-amber-800">
+                      /{selectedProductModal.category === 'coffee' ? 'ซอง' : 'หน่วย'}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-amber-900/80 font-medium block mt-1">
+                    คำนวณราคาเฉลี่ยสุทธิ
+                  </span>
+                </div>
+              </div>
+
+              {/* Detailed Specs List */}
+              <div className="rounded-2xl border border-slate-200/80 divide-y divide-slate-100 text-xs overflow-hidden">
+                <div className="p-3 flex items-center justify-between bg-slate-50/50">
+                  <span className="text-slate-500 font-bold flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>ระยะเวลาโปรโมชั่น</span>
+                  </span>
+                  <span className="font-black text-slate-800">
+                    {selectedProductModal.period || '-'}
+                  </span>
+                </div>
+
+                {selectedProductModal.machanic && (
+                  <div className="p-3 flex items-start justify-between gap-3">
+                    <span className="text-slate-500 font-bold shrink-0 flex items-center gap-1.5">
+                      <Tag className="w-3.5 h-3.5 text-slate-400" />
+                      <span>เงื่อนไข / กลไกโปร</span>
+                    </span>
+                    <span className="font-bold text-slate-800 text-right bg-amber-50 text-amber-900 px-2 py-0.5 rounded-md border border-amber-200/60">
+                      {selectedProductModal.machanic}
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-3 flex items-center justify-between">
+                  <span className="text-slate-500 font-bold">หมวดหมู่สินค้า</span>
+                  <span className="font-bold text-slate-800">
+                    {selectedProductModal.category === 'coffee' ? '☕ กาแฟ' : '🍜 บะหมี่กึ่งสำเร็จรูป/โจ๊ก'} {selectedProductModal.subCategory ? `(${selectedProductModal.subCategory})` : ''}
+                  </span>
+                </div>
+
+                <div className="p-3 flex items-center justify-between">
+                  <span className="text-slate-500 font-bold">ห้างสรรพสินค้า</span>
+                  <span className="font-black text-slate-800">
+                    {selectedProductModal.store}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode('comparison');
+                    setComparisonSubTab('custom');
+                    if (selectedProductModal.store) {
+                      setStoreA(selectedProductModal.store);
+                    }
+                    if (selectedProductModal.id) {
+                      setSelectedItemAId(selectedProductModal.id);
+                    }
+                    setSelectedProductModal(null);
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                >
+                  <Swords className="w-4 h-4 text-amber-400" />
+                  <span>นำไปเทียบราคากับห้างอื่น</span>
+                </button>
+
+                {selectedProductModal.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const item = selectedProductModal;
+                      setSelectedProductModal(null);
+                      setPreviewImage({
+                        url: item.imageUrl || '',
+                        title: `${item.brand} - ${item.itemName}`,
+                        store: item.store,
+                      });
+                    }}
+                    className="py-2.5 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    title="ดูรูปภาพขยายใหญ่"
+                  >
+                    <ZoomIn className="w-4 h-4 text-slate-500" />
+                    <span>ดูรูป</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
