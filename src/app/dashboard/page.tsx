@@ -1178,7 +1178,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 text-slate-800 pb-20 font-sans">
+    <div className="min-h-screen bg-slate-50/70 text-slate-800 pb-28 sm:pb-20 font-sans">
       <Header />
 
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col lg:flex-row gap-6 items-start">
@@ -1593,40 +1593,104 @@ export default function DashboardPage() {
         </aside>
 
         {/* MAIN DASHBOARD CONTENT AREA */}
-        <main className="flex-1 min-w-0 space-y-6 w-full">
-        {/* MOBILE TOP BAR (สำหรับเปิดเมนูและตัวกรองบนมือถือ) */}
-        <div className="lg:hidden flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => setIsMobileSidebarOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer"
-          >
-            <PanelLeft className="w-4 h-4" />
-            <span>เมนู &amp; ตัวกรอง</span>
-            {isAnyFilterActive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-          </button>
-
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold text-slate-500 mr-1">
-              พบ {filteredList.length} รายการ
-            </span>
+        <main className="flex-1 min-w-0 space-y-5 sm:space-y-6 w-full">
+        {/* MOBILE TOP CONTROLS (สำหรับหน้าจอมือถือ) */}
+        <div className="lg:hidden space-y-2.5">
+          {/* Row 1: Filter Drawer Toggle, Deal Count & Action Buttons */}
+          <div className="flex items-center justify-between p-2.5 sm:p-3 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
             <button
               type="button"
-              onClick={fetchData}
-              disabled={loading}
-              className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
-              title="รีเฟรชข้อมูล"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-600' : ''}`} />
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>ตัวกรอง</span>
+              {isAnyFilterActive ? (
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              ) : (
+                <span className="text-[10px] bg-white/20 px-1 rounded">
+                  {filteredList.length}
+                </span>
+              )}
             </button>
+
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-bold text-slate-500 mr-1">
+                {isAnyFilterActive ? 'กำลังกรอง' : `พบ ${filteredList.length} รายการ`}
+              </span>
+              <button
+                type="button"
+                onClick={fetchData}
+                disabled={loading}
+                className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+                title="รีเฟรชข้อมูล"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-600' : ''}`} />
+              </button>
+              <button
+                type="button"
+                onClick={handleExportCSV}
+                disabled={filteredList.length === 0}
+                className="p-2 rounded-xl bg-slate-900 text-white hover:bg-black transition-colors cursor-pointer"
+                title="Export CSV"
+              >
+                <Download className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Row 2: Swipeable Horizontal Segmented View Switcher */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
             <button
               type="button"
-              onClick={handleExportCSV}
-              disabled={filteredList.length === 0}
-              className="p-2 rounded-xl bg-slate-900 text-white hover:bg-black transition-colors cursor-pointer"
-              title="Export CSV"
+              onClick={() => setViewMode('overview')}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                viewMode === 'overview'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
             >
-              <Download className="w-3.5 h-3.5" />
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>ภาพรวม</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('monthly')}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                viewMode === 'monthly'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
+            >
+              <CalendarDays className="w-3.5 h-3.5" />
+              <span>สถิติ 12 เดือน</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('frequency')}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                viewMode === 'frequency'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>ความถี่โปร</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('comparison')}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                viewMode === 'comparison'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
+            >
+              <Swords className="w-3.5 h-3.5" />
+              <span>เทียบราคา</span>
             </button>
           </div>
         </div>
@@ -1635,26 +1699,26 @@ export default function DashboardPage() {
         {viewMode === 'overview' && (
           <div className="space-y-6">
             {/* Executive KPI Cards (Vibrant Minimalist Style) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
               {/* Card 1: Total Deals */}
-              <div className="bg-gradient-to-br from-indigo-50/70 via-white to-blue-50/40 rounded-3xl p-5 border border-indigo-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div className="bg-gradient-to-br from-indigo-50/70 via-white to-blue-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-indigo-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-indigo-900/60 uppercase tracking-wider">
+                  <span className="text-[11px] sm:text-xs font-bold text-indigo-900/60 uppercase tracking-wider">
                     จำนวนโปรโมชั่น
                   </span>
-                  <div className="w-10 h-10 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-xs shadow-indigo-500/20">
-                    <Layers className="w-5 h-5" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-xs shadow-indigo-500/20">
+                    <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
-                <div className="mt-3">
+                <div className="mt-2 sm:mt-3">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-black text-slate-900 tracking-tight">
+                    <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       {kpis.total.toLocaleString()}
                     </span>
                     <span className="text-xs font-bold text-slate-500">ดีล</span>
                   </div>
-                  <div className="mt-2 flex items-center gap-1.5">
-                    <span className="text-[11px] px-2 py-0.5 rounded-md font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <div className="mt-1.5 sm:mt-2 flex items-center gap-1.5">
+                    <span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-md font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                       ส่วนลดเฉลี่ย -{kpis.avgDisc}%
                     </span>
                   </div>
@@ -1664,40 +1728,36 @@ export default function DashboardPage() {
               {/* Card 2: Deepest Discount Deal */}
               <div
                 onClick={() => kpis.maxDisc && setSelectedProductModal(kpis.maxDisc)}
-                className="bg-gradient-to-br from-rose-50/70 via-white to-pink-50/40 rounded-3xl p-5 border border-rose-100/80 shadow-xs hover:shadow-md hover:border-rose-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                className="bg-gradient-to-br from-rose-50/70 via-white to-pink-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-rose-100/80 shadow-xs hover:shadow-md hover:border-rose-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
                 role="button"
                 tabIndex={0}
                 title="คลิกเพื่อดูรายละเอียดสินค้าและโปรโมชั่น"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-rose-900/60 uppercase tracking-wider flex items-center gap-1">
-                    <Flame className="w-4 h-4 text-rose-500" />
-                    <span>ดีลลดแรงที่สุด</span>
+                  <span className="text-[11px] sm:text-xs font-bold text-rose-900/60 uppercase tracking-wider flex items-center gap-1">
+                    <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500" />
+                    <span className="truncate">ลดแรงสุด</span>
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-2.5 py-0.5 rounded-lg bg-rose-600 text-white text-[11px] font-black shadow-xs">
+                  <div className="flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-lg bg-rose-600 text-white text-[10px] sm:text-[11px] font-black shadow-xs">
                       {kpis.maxDisc?.store || '-'}
-                    </span>
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-rose-600 bg-rose-100/80 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                      <span>ดูรายละเอียด</span>
-                      <ChevronRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
-                <div className="mt-3">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-rose-600 tracking-tight">
+                <div className="mt-2 sm:mt-3">
+                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                    <span className="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight">
                       {kpis.maxDisc ? `-${kpis.maxDisc.discPercent}%` : '-'}
                     </span>
                     {kpis.maxDisc?.discAmount ? (
-                      <span className="text-xs font-bold text-slate-500">
+                      <span className="text-[11px] sm:text-xs font-bold text-slate-500">
                         (ประหยัด {kpis.maxDisc.discAmount} บ.)
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-xs text-slate-700 truncate mt-1.5 font-bold group-hover:text-rose-600 transition-colors flex items-center justify-between">
+                  <p className="text-xs text-slate-700 truncate mt-1 sm:mt-1.5 font-bold group-hover:text-rose-600 transition-colors flex items-center justify-between">
                     <span className="truncate">{kpis.maxDisc ? `${kpis.maxDisc.brand} - ${kpis.maxDisc.itemName}` : 'ไม่มีข้อมูล'}</span>
-                    <span className="text-[10px] text-rose-500 font-bold shrink-0 ml-1 underline underline-offset-2">ดูรายละเอียด &gt;</span>
+                    <span className="text-[10px] text-rose-500 font-bold shrink-0 ml-1 underline underline-offset-2 hidden sm:inline">ดูรายละเอียด &gt;</span>
                   </p>
                 </div>
               </div>
@@ -1705,62 +1765,56 @@ export default function DashboardPage() {
               {/* Card 3: Lowest Unit Price */}
               <div
                 onClick={() => kpis.minUnit && setSelectedProductModal(kpis.minUnit)}
-                className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 rounded-3xl p-5 border border-emerald-100/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-emerald-100/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
                 role="button"
                 tabIndex={0}
                 title="คลิกเพื่อดูรายละเอียดสินค้าและโปรโมชั่น"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-900/60 uppercase tracking-wider">
-                    ราคาเฉลี่ยต่อหน่วยถูกสุด
+                  <span className="text-[11px] sm:text-xs font-bold text-emerald-900/60 uppercase tracking-wider truncate">
+                    ราคาต่อหน่วยถูกสุด
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                      <span>ดูรายละเอียด</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xs shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                      <DollarSign className="w-5 h-5" />
-                    </div>
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xs shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0">
+                    <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
-                <div className="mt-3">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-black text-emerald-700 tracking-tight">
+                <div className="mt-2 sm:mt-3">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
                       {kpis.minUnit?.unitPrice ? `฿${kpis.minUnit.unitPrice}` : '-'}
                     </span>
                     <span className="text-xs font-bold text-slate-500">
                       /{selectedCategory === 'coffee' ? 'ซอง' : 'หน่วย'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 truncate mt-1.5 font-medium group-hover:text-emerald-700 transition-colors flex items-center justify-between">
+                  <p className="text-xs text-slate-600 truncate mt-1 sm:mt-1.5 font-medium group-hover:text-emerald-700 transition-colors flex items-center justify-between">
                     <span className="truncate">{kpis.minUnit ? `${kpis.minUnit.brand} (${kpis.minUnit.store})` : 'ไม่มีข้อมูล'}</span>
-                    <span className="text-[10px] text-emerald-600 font-bold shrink-0 ml-1 underline underline-offset-2">ดูรายละเอียด &gt;</span>
+                    <span className="text-[10px] text-emerald-600 font-bold shrink-0 ml-1 underline underline-offset-2 hidden sm:inline">ดูรายละเอียด &gt;</span>
                   </p>
                 </div>
               </div>
 
               {/* Card 4: Top Promo Store */}
-              <div className="bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 rounded-3xl p-5 border border-amber-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div className="bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-amber-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-900/60 uppercase tracking-wider">
-                    ห้างที่จัดโปรมากสุด
+                  <span className="text-[11px] sm:text-xs font-bold text-amber-900/60 uppercase tracking-wider truncate">
+                    ห้างจัดโปรมากสุด
                   </span>
-                  <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs shadow-amber-500/20">
-                    <Store className="w-5 h-5" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs shadow-amber-500/20 shrink-0">
+                    <Store className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
-                <div className="mt-3">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-3xl font-black text-amber-800 tracking-tight truncate">
+                <div className="mt-2 sm:mt-3">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl sm:text-3xl font-black text-amber-800 tracking-tight truncate">
                       {kpis.topStore}
                     </span>
-                    <span className="text-xs font-bold text-slate-500 shrink-0">
-                      ({kpis.topStoreCount} ดีล)
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-500 shrink-0">
+                      ({kpis.topStoreCount})
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 mt-1.5 font-medium">
-                    ครองสัดส่วน {((kpis.topStoreCount / (filteredList.length || 1)) * 100).toFixed(0)}% ของโปรทั้งหมด
+                  <p className="text-[11px] sm:text-xs text-slate-600 mt-1 sm:mt-1.5 font-medium truncate">
+                    ครองสัดส่วน {((kpis.topStoreCount / (filteredList.length || 1)) * 100).toFixed(0)}% ของโปร
                   </p>
                 </div>
               </div>
@@ -1868,82 +1922,84 @@ export default function DashboardPage() {
 
               {/* 12-Month Bar Chart */}
               <div className="pt-2">
-                <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 sm:gap-2.5 items-end h-56 pt-6 pb-2">
-                  {monthlyStats.slice(1).map((m) => {
-                    const isPeak = m.month === monthlyInsights.peakMonth?.month;
-                    const isRunnerUp = m.month === monthlyInsights.runnerUpMonth?.month;
-                    const heightPct = Math.max(8, (m.count / monthlyInsights.maxCount) * 100);
+                <div className="overflow-x-auto pb-2 scrollbar-thin">
+                  <div className="min-w-[580px] sm:min-w-0 grid grid-cols-12 gap-2 sm:gap-2.5 items-end h-56 pt-6 pb-2">
+                    {monthlyStats.slice(1).map((m) => {
+                      const isPeak = m.month === monthlyInsights.peakMonth?.month;
+                      const isRunnerUp = m.month === monthlyInsights.runnerUpMonth?.month;
+                      const heightPct = Math.max(8, (m.count / monthlyInsights.maxCount) * 100);
 
-                    return (
-                      <div
-                        key={m.month}
-                        onClick={() => {
-                          setSelectedMonth(m.month);
-                          setViewMode('monthly');
-                        }}
-                        className="group flex flex-col items-center justify-end h-full cursor-pointer"
-                        title={`${m.fullName}: ${m.count} ดีล (${m.percent}%) | ช่วงโปร: ${m.topPeriod || 'ไม่ระบุ'} | ห้างเด่น: ${m.topStore} | ลดเฉลี่ย: ${m.avgDiscount}%`}
-                      >
-                        {/* Top Indicator / Badge */}
-                        <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
-                          {isPeak ? (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-xs">
-                              <Crown className="w-2.5 h-2.5" />
-                              <span>{m.count}</span>
-                            </span>
-                          ) : isRunnerUp ? (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-xs">
-                              <span>🔥{m.count}</span>
-                            </span>
-                          ) : (
-                            <span className="text-[11px] font-black text-slate-700 group-hover:text-amber-600">
-                              {m.count}
-                            </span>
-                          )}
-                        </div>
+                      return (
+                        <div
+                          key={m.month}
+                          onClick={() => {
+                            setSelectedMonth(m.month);
+                            setViewMode('monthly');
+                          }}
+                          className="group flex flex-col items-center justify-end h-full cursor-pointer"
+                          title={`${m.fullName}: ${m.count} ดีล (${m.percent}%) | ช่วงโปร: ${m.topPeriod || 'ไม่ระบุ'} | ห้างเด่น: ${m.topStore} | ลดเฉลี่ย: ${m.avgDiscount}%`}
+                        >
+                          {/* Top Indicator / Badge */}
+                          <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
+                            {isPeak ? (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-xs">
+                                <Crown className="w-2.5 h-2.5" />
+                                <span>{m.count}</span>
+                              </span>
+                            ) : isRunnerUp ? (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-xs">
+                                <span>🔥{m.count}</span>
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-black text-slate-700 group-hover:text-amber-600">
+                                {m.count}
+                              </span>
+                            )}
+                          </div>
 
-                        {/* Vertical Bar */}
-                        <div className="w-full max-w-[42px] bg-slate-100 rounded-2xl p-1 flex flex-col justify-end h-full">
-                          <div
-                            style={{ height: `${heightPct}%` }}
-                            className={`w-full rounded-xl transition-all duration-500 shadow-2xs ${isPeak
-                              ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
-                              : isRunnerUp
-                                ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
-                                : m.count > 0
-                                  ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
-                                  : 'bg-slate-200'
-                              }`}
-                          />
-                        </div>
+                          {/* Vertical Bar */}
+                          <div className="w-full max-w-[42px] bg-slate-100 rounded-2xl p-1 flex flex-col justify-end h-full">
+                            <div
+                              style={{ height: `${heightPct}%` }}
+                              className={`w-full rounded-xl transition-all duration-500 shadow-2xs ${isPeak
+                                ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
+                                : isRunnerUp
+                                  ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
+                                  : m.count > 0
+                                    ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
+                                    : 'bg-slate-200'
+                                }`}
+                            />
+                          </div>
 
-                        {/* Month Label & Period */}
-                        <div className="mt-2 text-center w-full flex flex-col items-center">
-                          <span
-                            className={`text-xs font-black block ${isPeak
-                              ? 'text-amber-600 font-black'
-                              : isRunnerUp
-                                ? 'text-orange-600 font-black'
-                                : 'text-slate-700 group-hover:text-slate-900'
-                              }`}
-                          >
-                            {m.name}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-semibold block truncate max-w-[42px] sm:max-w-[56px]">
-                            {m.topStore !== '-' ? m.topStore.replace(' More', '').replace(' daily', '') : ''}
-                          </span>
-                          {m.topPeriod && (
+                          {/* Month Label & Period */}
+                          <div className="mt-2 text-center w-full flex flex-col items-center">
                             <span
-                              className="mt-1 inline-block px-1.5 py-0.5 rounded bg-amber-50 text-[9px] font-bold text-amber-800 border border-amber-200/70 truncate max-w-[56px] sm:max-w-[76px]"
-                              title={`ช่วงโปรโมชั่นหลัก: ${m.topPeriod}${m.periods.length > 1 ? ` (มี ${m.periods.length} แคมเปญ)` : ''}`}
+                              className={`text-xs font-black block ${isPeak
+                                ? 'text-amber-600 font-black'
+                                : isRunnerUp
+                                  ? 'text-orange-600 font-black'
+                                  : 'text-slate-700 group-hover:text-slate-900'
+                                }`}
                             >
-                              {formatShortPeriod(m.topPeriod)}
+                              {m.name}
                             </span>
-                          )}
+                            <span className="text-[10px] text-slate-400 font-semibold block truncate max-w-[42px] sm:max-w-[56px]">
+                              {m.topStore !== '-' ? m.topStore.replace(' More', '').replace(' daily', '') : ''}
+                            </span>
+                            {m.topPeriod && (
+                              <span
+                                className="mt-1 inline-block px-1.5 py-0.5 rounded bg-amber-50 text-[9px] font-bold text-amber-800 border border-amber-200/70 truncate max-w-[56px] sm:max-w-[76px]"
+                                title={`ช่วงโปรโมชั่นหลัก: ${m.topPeriod}${m.periods.length > 1 ? ` (มี ${m.periods.length} แคมเปญ)` : ''}`}
+                              >
+                                {formatShortPeriod(m.topPeriod)}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Footer notice / Undated deals */}
@@ -2963,108 +3019,108 @@ export default function DashboardPage() {
         {viewMode === 'frequency' && (
           <div className="space-y-6">
             {/* Executive KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
               {/* Card 1: Top Brand Frequency */}
-              <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Zap className="w-4 h-4 text-amber-600" />
-                      <span>แบรนด์จัดโปรถี่สุด</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                      <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0" />
+                      <span className="truncate">แบรนด์โปรถี่สุด</span>
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-800 text-[10px] font-black border border-amber-200/60">
+                    <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 text-[10px] font-black border border-amber-200/60 shrink-0">
                       ผู้นำความถี่
                     </span>
                   </div>
-                  <div className="mt-3">
-                    <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight block">
+                  <div className="mt-2 sm:mt-3">
+                    <span className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight block truncate">
                       {frequencyAnalytics.topBrand?.brand || '-'}
                     </span>
-                    <span className="text-xs font-bold text-amber-700 mt-1 block">
-                      เฉลี่ย {frequencyAnalytics.topBrand?.avgMonthlyFreq || 0} ครั้ง/เดือน
+                    <span className="text-[11px] sm:text-xs font-bold text-amber-700 mt-1 block">
+                      เฉลี่ย {frequencyAnalytics.topBrand?.avgMonthlyFreq || 0} ครั้ง/ด.
                     </span>
                   </div>
                 </div>
-                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-                  จัดโปรทั้งหมด <strong>{frequencyAnalytics.topBrand?.totalDeals || 0} ดีล</strong> (พีค {frequencyAnalytics.topBrand?.peakMonthName}: {frequencyAnalytics.topBrand?.peakMonthCount} ดีล)
+                <div className="mt-3 pt-2.5 sm:mt-4 sm:pt-3 border-t border-slate-100 text-[10px] sm:text-[11px] text-slate-500 truncate">
+                  จัดโปร <strong>{frequencyAnalytics.topBrand?.totalDeals || 0} ดีล</strong>
                 </div>
               </div>
 
               {/* Card 2: Top Store Frequency */}
-              <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Store className="w-4 h-4 text-amber-600" />
-                      <span>ห้างอัดโปรถี่สุด</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                      <Store className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0" />
+                      <span className="truncate">ห้างอัดโปรถี่สุด</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-black">
-                      ปริมาณโปรสูงสุด
+                    <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-black shrink-0">
+                      มากสุด
                     </span>
                   </div>
-                  <div className="mt-3">
-                    <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight block">
+                  <div className="mt-2 sm:mt-3">
+                    <span className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight block truncate">
                       {frequencyAnalytics.topStore?.store || '-'}
                     </span>
-                    <span className="text-xs font-bold text-amber-700 mt-1 block">
-                      เฉลี่ย {frequencyAnalytics.topStore?.avgMonthlyFreq || 0} ดีล/เดือน
+                    <span className="text-[11px] sm:text-xs font-bold text-amber-700 mt-1 block">
+                      เฉลี่ย {frequencyAnalytics.topStore?.avgMonthlyFreq || 0} ดีล/ด.
                     </span>
                   </div>
                 </div>
-                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-                  จัดโปรทั้งหมด <strong>{frequencyAnalytics.topStore?.totalDeals || 0} ดีล</strong> (แบรนด์หลัก: {frequencyAnalytics.topStore?.topBrand})
+                <div className="mt-3 pt-2.5 sm:mt-4 sm:pt-3 border-t border-slate-100 text-[10px] sm:text-[11px] text-slate-500 truncate">
+                  รวม <strong>{frequencyAnalytics.topStore?.totalDeals || 0} ดีล</strong>
                 </div>
               </div>
 
               {/* Card 3: Top Repeated SKU */}
-              <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Repeat className="w-4 h-4 text-orange-600" />
-                      <span>สินค้าจัดโปรซ้ำบ่อยสุด</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                      <Repeat className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600 shrink-0" />
+                      <span className="truncate">โปรซ้ำบ่อยสุด</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-orange-50 text-orange-800 border border-orange-200 text-[10px] font-black">
+                    <span className="px-2 py-0.5 rounded-lg bg-orange-50 text-orange-800 border border-orange-200 text-[10px] font-black shrink-0">
                       Hero SKU
                     </span>
                   </div>
-                  <div className="mt-3">
-                    <span className="text-lg font-black text-slate-900 tracking-tight block truncate" title={frequencyAnalytics.topRepeatedSKUs[0]?.name}>
+                  <div className="mt-2 sm:mt-3">
+                    <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight block truncate" title={frequencyAnalytics.topRepeatedSKUs[0]?.name}>
                       {frequencyAnalytics.topRepeatedSKUs[0]?.name || '-'}
                     </span>
-                    <span className="text-xs font-bold text-orange-600 mt-1 block">
-                      จัดโปรซ้ำ {frequencyAnalytics.topRepeatedSKUs[0]?.totalDeals || 0} ครั้ง ({frequencyAnalytics.topRepeatedSKUs[0]?.avgMonthlyFreq || 0} ครั้ง/ด.)
+                    <span className="text-[11px] sm:text-xs font-bold text-orange-600 mt-1 block">
+                      ซ้ำ {frequencyAnalytics.topRepeatedSKUs[0]?.totalDeals || 0} ครั้ง ({frequencyAnalytics.topRepeatedSKUs[0]?.avgMonthlyFreq || 0} ครั้ง/ด.)
                     </span>
                   </div>
                 </div>
-                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-                  พบใน <strong>{frequencyAnalytics.topRepeatedSKUs[0]?.stores.length || 0} ห้าง</strong> ({frequencyAnalytics.topRepeatedSKUs[0]?.stores.join(', ')})
+                <div className="mt-3 pt-2.5 sm:mt-4 sm:pt-3 border-t border-slate-100 text-[10px] sm:text-[11px] text-slate-500 truncate">
+                  พบใน <strong>{frequencyAnalytics.topRepeatedSKUs[0]?.stores.length || 0} ห้าง</strong>
                 </div>
               </div>
 
               {/* Card 4: Prediction & Imputation Stats */}
-              <div className="bg-amber-50/60 rounded-3xl p-5 border border-amber-200/80 shadow-xs flex flex-col justify-between">
+              <div className="bg-amber-50/60 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-amber-200/80 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
-                      <span>คาดการณ์ระยะเวลาโปร</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                      <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0" />
+                      <span className="truncate">คาดการณ์ระยะเวลา</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-amber-200/70 text-amber-950 text-[10px] font-black">
-                      มาร์คสีเหลืองในชีต
+                    <span className="px-2 py-0.5 rounded-lg bg-amber-200/70 text-amber-950 text-[10px] font-black shrink-0">
+                      สีเหลืองในชีต
                     </span>
                   </div>
-                  <div className="mt-3">
-                    <span className="text-2xl sm:text-3xl font-black text-amber-950 tracking-tight block">
+                  <div className="mt-2 sm:mt-3">
+                    <span className="text-xl sm:text-3xl font-black text-amber-950 tracking-tight block">
                       {frequencyAnalytics.predictionStats.predicted} ดีล
                     </span>
-                    <span className="text-xs font-bold text-amber-800 mt-1 block">
-                      คิดเป็น {frequencyAnalytics.predictionStats.predictedPercent}% ของข้อมูลทั้งหมด
+                    <span className="text-[11px] sm:text-xs font-bold text-amber-800 mt-1 block">
+                      คิดเป็น {frequencyAnalytics.predictionStats.predictedPercent}% ของข้อมูล
                     </span>
                   </div>
                 </div>
-                <div className="mt-4 pt-3 border-t border-amber-200/60 text-[11px] text-amber-900">
-                  อ้างอิงจากรอบใบปลิว 14 วันของห้างชุดเดียวกัน (ไฮไลต์ <strong>#FFF9C4</strong> ในชีต)
+                <div className="mt-3 pt-2.5 sm:mt-4 sm:pt-3 border-t border-amber-200/60 text-[10px] sm:text-[11px] text-amber-900 truncate">
+                  อ้างอิงรอบ 14 วัน (#FFF9C4)
                 </div>
               </div>
             </div>
@@ -3536,19 +3592,20 @@ export default function DashboardPage() {
 
             {/* COMPARISON SUB-TABS (CUSTOM BATTLE vs AUTO-MATCHED DEALS) */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2.5 rounded-2xl border border-slate-200/80 shadow-2xs">
-              <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+              <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1 bg-slate-100 rounded-xl w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setComparisonSubTab('custom')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
                     comparisonSubTab === 'custom'
                       ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Swords className="w-4 h-4" />
-                  <span>⚡ เลือกเทียบราคาเอง (Custom Battle)</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                  <Swords className="w-4 h-4 shrink-0" />
+                  <span className="hidden sm:inline">⚡ เลือกเทียบราคาเอง (Custom Battle)</span>
+                  <span className="sm:hidden">⚡ เทียบราคาเอง</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold hidden sm:inline ${
                     comparisonSubTab === 'custom' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700'
                   }`}>
                     ใหม่
@@ -3558,16 +3615,17 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setComparisonSubTab('auto')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
                     comparisonSubTab === 'auto'
                       ? 'bg-slate-900 text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Layers className="w-4 h-4 text-amber-400" />
-                  <span>🤖 ดีลที่ตรงกันอัตโนมัติ</span>
+                  <Layers className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="hidden sm:inline">🤖 ดีลที่ตรงกันอัตโนมัติ</span>
+                  <span className="sm:hidden">🤖 ดีลตรงกัน</span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">
-                    {crossStoreList.length} ดีล
+                    {crossStoreList.length}
                   </span>
                 </button>
               </div>
