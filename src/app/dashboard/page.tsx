@@ -1103,7 +1103,7 @@ export default function DashboardPage() {
         {/* DASHBOARD UNIFIED HEADER WITH INTEGRATED VIEW TABS */}
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
           {/* Top Tier: Title, Dynamic Context Subtitle & Actions */}
-          <div className="p-5 sm:p-6 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <button
                 type="button"
@@ -1168,77 +1168,6 @@ export default function DashboardPage() {
                 <Download className="w-3.5 h-3.5" />
                 <span>Export CSV</span>
               </button>
-            </div>
-          </div>
-
-          {/* Bottom Tier: Integrated View Mode Navigation Tabs */}
-          <div className="px-4 sm:px-6 py-2.5 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 p-1 bg-slate-200/50 rounded-2xl w-full sm:w-auto overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => setViewMode('overview')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'overview'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                <BarChart3 className="w-4 h-4 text-amber-600" />
-                <span>ภาพรวมและชาร์ต</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewMode('monthly')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'monthly'
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
-                  : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                <CalendarDays className="w-4 h-4" />
-                <span>สถิติรายเดือน</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === 'monthly' ? 'bg-amber-700/60 text-white' : 'bg-amber-100 text-amber-900'
-                  }`}>
-                  12 เดือน
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewMode('frequency')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'frequency'
-                  ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs shadow-indigo-500/20'
-                  : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                <Zap className="w-4 h-4" />
-                <span>ความถี่จัดโปร</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === 'frequency' ? 'bg-indigo-800/60 text-white' : 'bg-indigo-100 text-indigo-900'
-                  }`}>
-                  {frequencyAnalytics.overallAvgMonthlyFreq} ดีล/ด.
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewMode('comparison')}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer whitespace-nowrap ${viewMode === 'comparison'
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs shadow-rose-500/20'
-                  : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                <Swords className="w-4 h-4" />
-                <span>เทียบราคาข้ามห้าง</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${viewMode === 'comparison' ? 'bg-rose-800/60 text-white' : 'bg-rose-100 text-rose-900'
-                  }`}>
-                  {crossStoreList.length} ดีล
-                </span>
-              </button>
-            </div>
-
-            {/* Quick status pill on right */}
-            <div className="hidden lg:flex items-center gap-2 text-xs text-slate-500 font-bold shrink-0">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>แสดง {filteredList.length} รายการ</span>
             </div>
           </div>
         </div>
