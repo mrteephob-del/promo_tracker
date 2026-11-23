@@ -1698,28 +1698,29 @@ export default function DashboardPage() {
         {/* VIEW 1: OVERVIEW & CHARTS */}
         {viewMode === 'overview' && (
           <div className="space-y-6">
-            {/* Executive KPI Cards (Vibrant Minimalist Style) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+            {/* Executive KPI Cards (Clean Modern Apple-Style Cards) */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Card 1: Total Deals */}
-              <div className="bg-gradient-to-br from-indigo-50/70 via-white to-blue-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-indigo-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] sm:text-xs font-bold text-indigo-900/60 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                     จำนวนโปรโมชั่น
                   </span>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-xs shadow-indigo-500/20">
-                    <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+                    <Layers className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="mt-2 sm:mt-3">
+                <div className="mt-3">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       {kpis.total.toLocaleString()}
                     </span>
-                    <span className="text-xs font-bold text-slate-500">ดีล</span>
+                    <span className="text-xs font-bold text-slate-400">ดีล</span>
                   </div>
-                  <div className="mt-1.5 sm:mt-2 flex items-center gap-1.5">
-                    <span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-md font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      ส่วนลดเฉลี่ย -{kpis.avgDisc}%
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-lg font-bold bg-slate-100 text-slate-700 border border-slate-200/60 inline-flex items-center gap-1">
+                      <span>ส่วนลดเฉลี่ย</span>
+                      <strong className="text-rose-600 font-black">-{kpis.avgDisc}%</strong>
                     </span>
                   </div>
                 </div>
@@ -1728,94 +1729,100 @@ export default function DashboardPage() {
               {/* Card 2: Deepest Discount Deal */}
               <div
                 onClick={() => kpis.maxDisc && setSelectedProductModal(kpis.maxDisc)}
-                className="bg-gradient-to-br from-rose-50/70 via-white to-pink-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-rose-100/80 shadow-xs hover:shadow-md hover:border-rose-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 hover:border-rose-300 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
                 role="button"
                 tabIndex={0}
                 title="คลิกเพื่อดูรายละเอียดสินค้าและโปรโมชั่น"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] sm:text-xs font-bold text-rose-900/60 uppercase tracking-wider flex items-center gap-1">
-                    <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500" />
-                    <span className="truncate">ลดแรงสุด</span>
+                  <span className="text-xs font-bold text-rose-600 uppercase tracking-wider flex items-center gap-1">
+                    <Flame className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>ลดแรงที่สุด</span>
                   </span>
-                  <div className="flex items-center gap-1">
-                    <span className="px-2 py-0.5 rounded-lg bg-rose-600 text-white text-[10px] sm:text-[11px] font-black shadow-xs">
-                      {kpis.maxDisc?.store || '-'}
-                    </span>
-                  </div>
+                  <span className="px-2 py-0.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200/80 text-[11px] font-black">
+                    {kpis.maxDisc?.store || '-'}
+                  </span>
                 </div>
-                <div className="mt-2 sm:mt-3">
+                <div className="mt-3">
                   <div className="flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight">
                       {kpis.maxDisc ? `-${kpis.maxDisc.discPercent}%` : '-'}
                     </span>
                     {kpis.maxDisc?.discAmount ? (
-                      <span className="text-[11px] sm:text-xs font-bold text-slate-500">
-                        (ประหยัด {kpis.maxDisc.discAmount} บ.)
+                      <span className="text-xs font-bold text-slate-400">
+                        (ประหยัด ฿{kpis.maxDisc.discAmount})
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-xs text-slate-700 truncate mt-1 sm:mt-1.5 font-bold group-hover:text-rose-600 transition-colors flex items-center justify-between">
-                    <span className="truncate">{kpis.maxDisc ? `${kpis.maxDisc.brand} - ${kpis.maxDisc.itemName}` : 'ไม่มีข้อมูล'}</span>
-                    <span className="text-[10px] text-rose-500 font-bold shrink-0 ml-1 underline underline-offset-2 hidden sm:inline">ดูรายละเอียด &gt;</span>
-                  </p>
+                  <div className="mt-2 text-xs text-slate-700 group-hover:text-rose-600 transition-colors flex items-center justify-between gap-1">
+                    <span className="truncate font-bold">{kpis.maxDisc ? `${kpis.maxDisc.brand} - ${kpis.maxDisc.itemName}` : 'ไม่มีข้อมูล'}</span>
+                    <span className="text-[10px] text-rose-500 font-bold shrink-0 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/60">
+                      ดูข้อมูล ↗
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Card 3: Lowest Unit Price */}
               <div
                 onClick={() => kpis.minUnit && setSelectedProductModal(kpis.minUnit)}
-                className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-emerald-100/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 hover:border-emerald-300 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
                 role="button"
                 tabIndex={0}
                 title="คลิกเพื่อดูรายละเอียดสินค้าและโปรโมชั่น"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] sm:text-xs font-bold text-emerald-900/60 uppercase tracking-wider truncate">
-                    ราคาต่อหน่วยถูกสุด
+                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider truncate flex items-center gap-1">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>ราคาต่อหน่วยถูกสุด</span>
                   </span>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xs shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0">
-                    <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
+                  <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-black">
+                    {kpis.minUnit?.store || '-'}
+                  </span>
                 </div>
-                <div className="mt-2 sm:mt-3">
+                <div className="mt-3">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+                    <span className="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight">
                       {kpis.minUnit?.unitPrice ? `฿${kpis.minUnit.unitPrice}` : '-'}
                     </span>
-                    <span className="text-xs font-bold text-slate-500">
+                    <span className="text-xs font-bold text-slate-400">
                       /{selectedCategory === 'coffee' ? 'ซอง' : 'หน่วย'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 truncate mt-1 sm:mt-1.5 font-medium group-hover:text-emerald-700 transition-colors flex items-center justify-between">
-                    <span className="truncate">{kpis.minUnit ? `${kpis.minUnit.brand} (${kpis.minUnit.store})` : 'ไม่มีข้อมูล'}</span>
-                    <span className="text-[10px] text-emerald-600 font-bold shrink-0 ml-1 underline underline-offset-2 hidden sm:inline">ดูรายละเอียด &gt;</span>
-                  </p>
+                  <div className="mt-2 text-xs text-slate-700 group-hover:text-emerald-700 transition-colors flex items-center justify-between gap-1">
+                    <span className="truncate font-bold">{kpis.minUnit ? `${kpis.minUnit.brand} (${kpis.minUnit.itemName})` : 'ไม่มีข้อมูล'}</span>
+                    <span className="text-[10px] text-emerald-600 font-bold shrink-0 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60">
+                      ดูข้อมูล ↗
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Card 4: Top Promo Store */}
-              <div className="bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-amber-100/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] sm:text-xs font-bold text-amber-900/60 uppercase tracking-wider truncate">
-                    ห้างจัดโปรมากสุด
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider truncate flex items-center gap-1">
+                    <Store className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    <span>ห้างจัดโปรมากสุด</span>
                   </span>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs shadow-amber-500/20 shrink-0">
-                    <Store className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/80 text-[11px] font-black">
+                    อันดับ 1
+                  </span>
                 </div>
-                <div className="mt-2 sm:mt-3">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl sm:text-3xl font-black text-amber-800 tracking-tight truncate">
+                <div className="mt-3">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight truncate">
                       {kpis.topStore}
                     </span>
-                    <span className="text-[11px] sm:text-xs font-bold text-slate-500 shrink-0">
-                      ({kpis.topStoreCount})
+                    <span className="text-xs font-bold text-slate-400 shrink-0">
+                      ({kpis.topStoreCount} ดีล)
                     </span>
                   </div>
-                  <p className="text-[11px] sm:text-xs text-slate-600 mt-1 sm:mt-1.5 font-medium truncate">
-                    ครองสัดส่วน {((kpis.topStoreCount / (filteredList.length || 1)) * 100).toFixed(0)}% ของโปร
-                  </p>
+                  <div className="mt-2">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-lg font-bold bg-slate-100 text-slate-600 inline-block">
+                      สัดส่วน {((kpis.topStoreCount / (filteredList.length || 1)) * 100).toFixed(0)}% ของตลาดโปร
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1853,69 +1860,83 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              {/* Quick Highlight Pills */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="p-3 bg-gradient-to-br from-amber-50 to-orange-50/70 rounded-2xl border border-amber-100/90 flex flex-col justify-between">
+              {/* Quick Highlight Pills (Clean Modern Cards) */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                {/* 1. Peak Month */}
+                <div className="p-3.5 bg-slate-50/80 hover:bg-slate-50 rounded-2xl border border-slate-200/70 transition-colors flex flex-col justify-between">
                   <div>
-                    <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1">
+                    <div className="text-[11px] font-bold text-amber-700 flex items-center gap-1">
                       <span>🏆 อันดับ 1 จัดโปรเยอะสุด</span>
                     </div>
-                    <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                    <div className="text-base sm:text-lg font-black text-slate-900 mt-1">
                       {monthlyInsights.peakMonth?.fullName || '-'}
                     </div>
-                    <div className="text-[11px] text-amber-700 font-semibold">
-                      {monthlyInsights.peakMonth?.count || 0} ดีล ({monthlyInsights.peakMonth?.percent || 0}% ของทั้งปี)
+                    <div className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                      <strong className="text-slate-800 font-black">{monthlyInsights.peakMonth?.count || 0} ดีล</strong> ({monthlyInsights.peakMonth?.percent || 0}% ของทั้งปี)
                     </div>
                   </div>
                   {monthlyInsights.peakMonth?.topPeriod && (
-                    <div className="mt-1.5 text-[10px] font-bold text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded-lg border border-amber-200/80 truncate flex items-center gap-1" title={`ช่วงเวลาโปรโมชั่น: ${monthlyInsights.peakMonth.topPeriod}`}>
+                    <div className="mt-2 text-[10px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/70 truncate flex items-center gap-1" title={`ช่วงเวลาโปรโมชั่น: ${monthlyInsights.peakMonth.topPeriod}`}>
                       <CalendarDays className="w-3 h-3 text-amber-600 shrink-0" />
                       <span className="truncate">{monthlyInsights.peakMonth.topPeriod}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                {/* 2. Runner Up */}
+                <div className="p-3.5 bg-slate-50/80 hover:bg-slate-50 rounded-2xl border border-slate-200/70 transition-colors flex flex-col justify-between">
                   <div>
                     <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
                       <span>🔥 อันดับ 2 รองแชมป์</span>
                     </div>
-                    <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                    <div className="text-base sm:text-lg font-black text-slate-900 mt-1">
                       {monthlyInsights.runnerUpMonth?.fullName || '-'}
                     </div>
-                    <div className="text-[11px] text-slate-500 font-semibold">
-                      {monthlyInsights.runnerUpMonth?.count || 0} ดีล ({monthlyInsights.runnerUpMonth?.percent || 0}% ของทั้งปี)
+                    <div className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                      <strong className="text-slate-800 font-black">{monthlyInsights.runnerUpMonth?.count || 0} ดีล</strong> ({monthlyInsights.runnerUpMonth?.percent || 0}% ของทั้งปี)
                     </div>
                   </div>
                   {monthlyInsights.runnerUpMonth?.topPeriod && (
-                    <div className="mt-1.5 text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded-lg border border-slate-200 truncate flex items-center gap-1" title={`ช่วงเวลาโปรโมชั่น: ${monthlyInsights.runnerUpMonth.topPeriod}`}>
+                    <div className="mt-2 text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded-lg border border-slate-200 truncate flex items-center gap-1" title={`ช่วงเวลาโปรโมชั่น: ${monthlyInsights.runnerUpMonth.topPeriod}`}>
                       <CalendarDays className="w-3 h-3 text-slate-500 shrink-0" />
                       <span className="truncate">{monthlyInsights.runnerUpMonth.topPeriod}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="p-3 bg-rose-50/60 rounded-2xl border border-rose-100">
-                  <div className="text-[11px] font-bold text-rose-800 flex items-center gap-1">
-                    <span>🏷️ ลดราคาเฉลี่ยลึกสุด</span>
+                {/* 3. Deepest Discount */}
+                <div className="p-3.5 bg-slate-50/80 hover:bg-slate-50 rounded-2xl border border-slate-200/70 transition-colors flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] font-bold text-rose-700 flex items-center gap-1">
+                      <span>🏷️ ส่วนลดเฉลี่ยลึกสุด</span>
+                    </div>
+                    <div className="text-base sm:text-lg font-black text-slate-900 mt-1">
+                      {monthlyInsights.deepestDiscMonth?.fullName || '-'}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                      ส่วนลดเฉลี่ย <strong className="text-rose-600 font-black">-{monthlyInsights.deepestDiscMonth?.avgDiscount || 0}%</strong>
+                    </div>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    {monthlyInsights.deepestDiscMonth?.fullName || '-'}
-                  </div>
-                  <div className="text-[11px] text-rose-700 font-semibold">
-                    ส่วนลดเฉลี่ย -{monthlyInsights.deepestDiscMonth?.avgDiscount || 0}%
+                  <div className="mt-2 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200/70 truncate flex items-center gap-1">
+                    <span>ลดคุ้มค่าที่สุดในรอบปี</span>
                   </div>
                 </div>
 
-                <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100">
-                  <div className="text-[11px] font-bold text-blue-800 flex items-center gap-1">
-                    <span>📊 ครึ่งปีแรก (H1 Peak)</span>
+                {/* 4. H1 Volume */}
+                <div className="p-3.5 bg-slate-50/80 hover:bg-slate-50 rounded-2xl border border-slate-200/70 transition-colors flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] font-bold text-blue-700 flex items-center gap-1">
+                      <span>📊 ครึ่งปีแรก (H1 Peak)</span>
+                    </div>
+                    <div className="text-base sm:text-lg font-black text-slate-900 mt-1">
+                      {monthlyInsights.h1Percent}%
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                      <strong className="text-slate-800 font-black">{monthlyInsights.h1Count}</strong> จาก {monthlyInsights.totalDated} ดีล
+                    </div>
                   </div>
-                  <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                    {monthlyInsights.h1Percent}%
-                  </div>
-                  <div className="text-[11px] text-blue-700 font-semibold">
-                    {monthlyInsights.h1Count} จาก {monthlyInsights.totalDated} ดีล
+                  <div className="mt-2 text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200/70 truncate flex items-center gap-1">
+                    <span>มกราคม - มิถุนายน</span>
                   </div>
                 </div>
               </div>
@@ -1947,11 +1968,11 @@ export default function DashboardPage() {
                                 <span>{m.count}</span>
                               </span>
                             ) : isRunnerUp ? (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-xs">
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-amber-950 text-[10px] font-black shadow-xs">
                                 <span>🔥{m.count}</span>
                               </span>
                             ) : (
-                              <span className="text-[11px] font-black text-slate-700 group-hover:text-amber-600">
+                              <span className="text-[11px] font-bold text-slate-600 group-hover:text-amber-600">
                                 {m.count}
                               </span>
                             )}
@@ -1962,12 +1983,12 @@ export default function DashboardPage() {
                             <div
                               style={{ height: `${heightPct}%` }}
                               className={`w-full rounded-xl transition-all duration-500 shadow-2xs ${isPeak
-                                ? 'bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 group-hover:brightness-110 ring-2 ring-amber-400/50'
+                                ? 'bg-amber-500 group-hover:bg-amber-400 ring-2 ring-amber-400/50'
                                 : isRunnerUp
-                                  ? 'bg-gradient-to-t from-orange-600 to-amber-500 group-hover:brightness-110'
+                                  ? 'bg-amber-400 group-hover:bg-amber-300'
                                   : m.count > 0
-                                    ? 'bg-gradient-to-t from-slate-400 to-amber-400/80 group-hover:from-amber-500 group-hover:to-amber-400'
-                                    : 'bg-slate-200'
+                                    ? 'bg-slate-300 group-hover:bg-amber-300'
+                                    : 'bg-slate-200/70'
                                 }`}
                             />
                           </div>
@@ -1975,11 +1996,11 @@ export default function DashboardPage() {
                           {/* Month Label & Period */}
                           <div className="mt-2 text-center w-full flex flex-col items-center">
                             <span
-                              className={`text-xs font-black block ${isPeak
-                                ? 'text-amber-600 font-black'
+                              className={`text-xs block ${isPeak
+                                ? 'text-amber-700 font-black'
                                 : isRunnerUp
-                                  ? 'text-orange-600 font-black'
-                                  : 'text-slate-700 group-hover:text-slate-900'
+                                  ? 'text-amber-600 font-black'
+                                  : 'text-slate-700 font-bold group-hover:text-slate-900'
                                 }`}
                             >
                               {m.name}
@@ -1989,7 +2010,7 @@ export default function DashboardPage() {
                             </span>
                             {m.topPeriod && (
                               <span
-                                className="mt-1 inline-block px-1.5 py-0.5 rounded bg-amber-50 text-[9px] font-bold text-amber-800 border border-amber-200/70 truncate max-w-[56px] sm:max-w-[76px]"
+                                className="mt-1 inline-block px-1.5 py-0.5 rounded bg-slate-100 text-[9px] font-bold text-slate-600 border border-slate-200 truncate max-w-[56px] sm:max-w-[76px]"
                                 title={`ช่วงโปรโมชั่นหลัก: ${m.topPeriod}${m.periods.length > 1 ? ` (มี ${m.periods.length} แคมเปญ)` : ''}`}
                               >
                                 {formatShortPeriod(m.topPeriod)}
@@ -2166,29 +2187,41 @@ export default function DashboardPage() {
                   จำนวนโปรโมชั่นและส่วนลดเฉลี่ยของแต่ละห้าง
                 </p>
 
-                <div className="space-y-4">
-                  {storeComparison.map((s, idx) => (
-                    <div key={idx} className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-black text-slate-900 text-sm">{s.store}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[11px] font-black">
-                            {s.count} รายการ
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 text-[11px] font-black border border-rose-200">
-                            ลดเฉลี่ย -{s.avgDisc}%
-                          </span>
+                <div className="space-y-3.5">
+                  {storeComparison.map((s, idx) => {
+                    const storeBarColor =
+                      s.store.includes('CJ') ? 'bg-orange-500' :
+                      s.store.includes('BigC') ? 'bg-emerald-600' :
+                      s.store.includes('Lotus') ? 'bg-sky-500' : 'bg-amber-500';
+
+                    const storeBadgeColor =
+                      s.store.includes('CJ') ? 'bg-orange-50 text-orange-850 border-orange-200' :
+                      s.store.includes('BigC') ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                      s.store.includes('Lotus') ? 'bg-sky-50 text-sky-850 border-sky-200' : 'bg-amber-50 text-amber-800 border-amber-200';
+
+                    return (
+                      <div key={idx} className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/60 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-black text-slate-900 text-sm">{s.store}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded-md text-[11px] font-black border ${storeBadgeColor}`}>
+                              {s.count} รายการ
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 text-[11px] font-black border border-rose-200">
+                              ลดเฉลี่ย -{s.avgDisc}%
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${storeBarColor} rounded-full transition-all duration-700`}
+                            style={{ width: `${s.percentOfMax}%` }}
+                          />
                         </div>
                       </div>
-
-                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-amber-600 rounded-full transition-all duration-700"
-                          style={{ width: `${s.percentOfMax}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -2305,41 +2338,41 @@ export default function DashboardPage() {
 
             {/* 3 Executive Seasonality KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Card 1: Peak Promotion Volume */}
-              <div className="bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-3xl p-5 shadow-lg shadow-orange-500/20 flex flex-col justify-between">
+              {/* Card 1: Peak Promotion Volume (Clean White Card) */}
+              <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
-                      <Crown className="w-4 h-4 text-amber-200" />
+                    <span className="text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
+                      <Crown className="w-4 h-4 text-amber-500" />
                       <span>เดือนที่จัดโปรโมชั่นเยอะที่สุด</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-white/20 text-white text-[11px] font-black">
+                    <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-black">
                       อันดับ 1
                     </span>
                   </div>
                   <div className="mt-4">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl sm:text-4xl font-black tracking-tight">
+                      <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                         {monthlyInsights.peakMonth?.fullName || '-'}
                       </span>
-                      <span className="text-lg font-bold text-amber-100">
+                      <span className="text-lg font-black text-amber-600">
                         {monthlyInsights.peakMonth?.count || 0} ดีล
                       </span>
                     </div>
-                    <p className="text-xs text-white/90 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       คิดเป็น <strong>{monthlyInsights.peakMonth?.percent || 0}%</strong> ของโปรโมชั่นทั้งปี
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-4 mt-3 border-t border-white/20 text-xs text-white/90 space-y-1">
+                <div className="pt-4 mt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
                   <div className="flex items-center justify-between">
                     <span>ห้างที่จัดมากสุด:</span>
-                    <span className="font-black text-white">{monthlyInsights.peakMonth?.topStore || '-'} ({monthlyInsights.peakMonth?.topStoreCount} ดีล)</span>
+                    <span className="font-bold text-slate-800">{monthlyInsights.peakMonth?.topStore || '-'} ({monthlyInsights.peakMonth?.topStoreCount} ดีล)</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>รองชนะเลิศอันดับ 2:</span>
-                    <span className="font-bold text-amber-100">{monthlyInsights.runnerUpMonth?.fullName || '-'} ({monthlyInsights.runnerUpMonth?.count} ดีล)</span>
+                    <span className="font-medium text-slate-600">{monthlyInsights.runnerUpMonth?.fullName || '-'} ({monthlyInsights.runnerUpMonth?.count} ดีล)</span>
                   </div>
                 </div>
               </div>
@@ -3513,30 +3546,30 @@ export default function DashboardPage() {
           <div className="space-y-6">
             {/* Price War Champion Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Card 1: Overall Price Champion */}
-              <div className="bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-3xl p-5 shadow-lg shadow-orange-500/20 flex flex-col justify-between">
+              {/* Card 1: Overall Price Champion (Clean White Card) */}
+              <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
-                    <Crown className="w-4 h-4 text-amber-200" />
+                  <span className="text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <Crown className="w-4 h-4 text-amber-500" />
                     <span>แชมป์ราคาถูกที่สุด</span>
                   </span>
-                  <span className="px-2 py-0.5 rounded-lg bg-white/20 text-white text-[11px] font-black">
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-black">
                     {priceWarSummary.topWinnerPercent}% ของดีลชนกัน
                   </span>
                 </div>
                 <div className="mt-3">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black tracking-tight">
+                    <span className="text-3xl font-black text-slate-900 tracking-tight">
                       {priceWarSummary.topWinner}
                     </span>
-                    <span className="text-xs font-bold text-white/90">
+                    <span className="text-xs font-bold text-slate-500">
                       (ชนะ {priceWarSummary.topWinnerWins} รายการ)
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/20 text-xs flex-wrap">
+                  <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-100 text-xs flex-wrap">
                     {priceWarSummary.sortedWins.map(([s, w]) => (
-                      <span key={s} className="text-white/90 font-medium">
-                        {s}: <strong>{w}</strong>
+                      <span key={s} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
+                        {s}: <strong className="text-slate-900 font-bold">{w}</strong>
                       </span>
                     ))}
                   </div>
