@@ -275,7 +275,7 @@ export default function HomePage() {
     <>
       <Header />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 pb-24 space-y-6">
+      <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:px-8 pb-24 space-y-6">
         {/* Category Switcher Tabs */}
         <div className="flex p-1.5 bg-slate-200/80 rounded-2xl max-w-lg mx-auto sm:mx-0 shadow-inner">
           <button

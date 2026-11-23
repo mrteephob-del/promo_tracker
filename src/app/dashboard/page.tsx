@@ -352,7 +352,13 @@ export default function DashboardPage() {
   const filteredList = useMemo(() => {
     return rawList.filter((item) => {
       if (selectedSubCategory !== 'all' && item.subCategory !== selectedSubCategory) return false;
-      if (selectedStore !== 'all' && item.store !== selectedStore) return false;
+      if (selectedStore !== 'all') {
+        if (selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's") {
+          if (!item.store || !item.store.includes('Lotus')) return false;
+        } else if (item.store !== selectedStore) {
+          return false;
+        }
+      }
       if (selectedBrand !== 'all' && item.brand !== selectedBrand) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -640,12 +646,17 @@ export default function DashboardPage() {
 
   // สรุปจำนวนดีลแยกตามห้าง (สำหรับ Store Filter Pills)
   const storeCounts = useMemo(() => {
-    const counts: Record<string, number> = { 'CJ More': 0, 'Mini BigC': 0, "Lotus's": 0 };
+    const counts: Record<string, number> = { 'CJ More': 0, 'Mini BigC': 0, 'Lotus Go Fresh': 0, "Lotus's": 0 };
     rawList.forEach((r) => {
       if (selectedCategory !== 'all' && r.category !== selectedCategory) return;
       if (selectedSubCategory !== 'all' && r.subCategory !== selectedSubCategory) return;
-      if (counts[r.store] !== undefined) {
+      if (r.store && r.store.includes('Lotus')) {
+        counts['Lotus Go Fresh'] = (counts['Lotus Go Fresh'] || 0) + 1;
+        counts["Lotus's"] = (counts["Lotus's"] || 0) + 1;
+      } else if (counts[r.store] !== undefined) {
         counts[r.store]++;
+      } else if (r.store) {
+        counts[r.store] = 1;
       }
     });
     return counts;
@@ -869,7 +880,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50/70 text-slate-800 pb-20 font-sans">
       <Header />
 
-      <main className="max-w-6xl mx-auto px-4 pt-6 space-y-6">
+      <main className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         {/* DASHBOARD UNIFIED HEADER WITH INTEGRATED VIEW TABS */}
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
           {/* Top Tier: Title, Dynamic Context Subtitle & Actions */}
@@ -891,7 +902,7 @@ export default function DashboardPage() {
                 <p className="text-xs sm:text-sm text-slate-500 mt-0.5 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   <span>
-                    {viewMode === 'overview' && 'ภาพรวมโปรโมชั่น ส่วนลด และดีลสุดคุ้มข้ามห้าง (CJ More • Mini BigC • Lotus\'s)'}
+                    {viewMode === 'overview' && 'ภาพรวมโปรโมชั่น ส่วนลด และดีลสุดคุ้มข้ามห้าง (CJ More • Mini BigC • Lotus Go Fresh)'}
                     {viewMode === 'monthly' && 'วิเคราะห์แนวโน้มและวงรอบการจัดโปรโมชั่น 12 เดือนแบบละเอียด'}
                     {viewMode === 'frequency' && 'วิเคราะห์ความถี่โปรโมชั่นรายเดือนตามแบรนด์ ห้าง และสินค้าที่จัดโปรซ้ำบ่อยสุด'}
                     {viewMode === 'comparison' && 'เทียบราคาต่อหน่วย Apple-to-Apple เพื่อค้นหาห้างที่ถูกสุด'}
@@ -1055,18 +1066,18 @@ export default function DashboardPage() {
                 <span className="text-[10px] opacity-80">({storeCounts['Mini BigC'] || 0})</span>
               </button>
 
-              {/* Lotus's Pill - Vibrant Blue */}
+              {/* Lotus Go Fresh Pill - Vibrant Blue */}
               <button
                 type="button"
-                onClick={() => setSelectedStore("Lotus's")}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === "Lotus's"
+                onClick={() => setSelectedStore(selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'all' : 'Lotus Go Fresh')}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's"
                   ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/30'
                   : 'bg-sky-50/70 text-sky-800 hover:bg-sky-100 border border-sky-200/60'
                   }`}
               >
                 <span className="w-2 h-2 rounded-full bg-sky-400 shrink-0" />
-                <span>Lotus's</span>
-                <span className="text-[10px] opacity-80">({storeCounts["Lotus's"] || 0})</span>
+                <span>Lotus Go Fresh</span>
+                <span className="text-[10px] opacity-80">({storeCounts['Lotus Go Fresh'] || storeCounts["Lotus's"] || 0})</span>
               </button>
             </div>
 
@@ -1916,7 +1927,7 @@ export default function DashboardPage() {
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="w-3 h-3 rounded-md bg-rose-500" />
-                    <span>Lotus's</span>
+                    <span>Lotus Go Fresh</span>
                   </span>
                 </div>
               </div>
@@ -1932,7 +1943,7 @@ export default function DashboardPage() {
 
                     const cjCount = m.stores['CJ More'] || 0;
                     const bigcCount = m.stores['Mini BigC'] || 0;
-                    const lotusCount = m.stores["Lotus's"] || 0;
+                    const lotusCount = (m.stores['Lotus Go Fresh'] || 0) + (m.stores["Lotus's"] || 0);
                     const totalMonth = m.count || 1;
 
                     const cjPct = (cjCount / totalMonth) * 100;
@@ -1945,7 +1956,7 @@ export default function DashboardPage() {
                         onClick={() => setSelectedMonth(isSelected ? null : m.month)}
                         className={`group flex flex-col items-center justify-end h-full cursor-pointer p-1 rounded-2xl transition-all ${isSelected ? 'bg-amber-50 ring-2 ring-amber-500 shadow-xs' : 'hover:bg-slate-50'
                           }`}
-                        title={`${m.fullName}: รวม ${m.count} ดีล (CJ: ${cjCount}, Mini BigC: ${bigcCount}, Lotus's: ${lotusCount})`}
+                        title={`${m.fullName}: รวม ${m.count} ดีล (CJ: ${cjCount}, Mini BigC: ${bigcCount}, Lotus: ${lotusCount})`}
                       >
                         {/* Top Indicator Badge */}
                         <div className="text-center mb-1.5 transition-transform group-hover:-translate-y-1">
@@ -1988,12 +1999,12 @@ export default function DashboardPage() {
                                 title={`Mini BigC: ${bigcCount} ดีล`}
                               />
                             )}
-                            {/* Lotus's segment */}
+                            {/* Lotus segment */}
                             {lotusCount > 0 && (
                               <div
                                 style={{ height: `${lotusPct}%` }}
                                 className="bg-rose-500 w-full hover:brightness-110 transition-all"
-                                title={`Lotus's: ${lotusCount} ดีล`}
+                                title={`Lotus Go Fresh: ${lotusCount} ดีล`}
                               />
                             )}
                           </div>
@@ -2802,12 +2813,12 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Lotus's */}
+                {/* Lotus Go Fresh */}
                 <div className="bg-gradient-to-br from-sky-50/70 to-blue-50/40 rounded-2xl p-4 border border-sky-200/80 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black px-2.5 py-1 rounded-xl bg-sky-100 text-sky-900 border border-sky-200">
-                        Lotus&apos;s
+                        Lotus Go Fresh
                       </span>
                       <span className="text-xs font-black text-sky-700">
                         เน้นแพ็คประหยัด
@@ -2985,7 +2996,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="divide-y divide-slate-100">
                   {crossStoreList.map((item, idx) => {
-                    const storeNames = ['CJ More', 'Mini BigC', "Lotus's"];
+                    const storeNames = ['CJ More', 'Mini BigC', 'Lotus Go Fresh'];
                     return (
                       <div key={idx} className="p-4 sm:p-5 hover:bg-slate-50/60 transition-colors space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -2993,17 +3004,17 @@ export default function DashboardPage() {
                             <span className="w-7 h-7 rounded-xl bg-slate-100 text-slate-500 text-xs font-black flex items-center justify-center flex-shrink-0">
                               {idx + 1}
                             </span>
-                            {item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores["Lotus's"]?.imageUrl ? (
+                            {item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores['Lotus Go Fresh']?.imageUrl || item.stores["Lotus's"]?.imageUrl ? (
                               <button
                                 type="button"
                                 onClick={() => {
-                                  const img = item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores["Lotus's"]?.imageUrl;
+                                  const img = item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores['Lotus Go Fresh']?.imageUrl || item.stores["Lotus's"]?.imageUrl;
                                   if (img) setPreviewImage({ url: img, title: `${item.brand} - ${item.name}`, store: item.cheapestStores[0] || '' });
                                 }}
                                 className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-amber-500 flex-shrink-0 shadow-2xs group relative"
                               >
                                 <img
-                                  src={getGoogleDriveThumbUrl(item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores["Lotus's"]?.imageUrl)}
+                                  src={getGoogleDriveThumbUrl(item.stores['CJ More']?.imageUrl || item.stores['Mini BigC']?.imageUrl || item.stores['Lotus Go Fresh']?.imageUrl || item.stores["Lotus's"]?.imageUrl)}
                                   alt=""
                                   className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                                   loading="lazy"
@@ -3028,7 +3039,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <span className="px-3 py-1 rounded-xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
                               <Crown className="w-3.5 h-3.5 text-amber-500" />
-                              <span>ซื้อที่ <strong>{item.cheapestStores.join(', ')}</strong> ถูกกว่า {item.diff} ฿ (-{item.diffPercent}%)</span>
+                              <span>ซื้อที่ <strong>{item.cheapestStores.map((s: string) => s === "Lotus's" ? 'Lotus Go Fresh' : s).join(', ')}</strong> ถูกกว่า {item.diff} ฿ (-{item.diffPercent}%)</span>
                             </span>
                           </div>
                         </div>
@@ -3036,8 +3047,8 @@ export default function DashboardPage() {
                         {/* Stores Price Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
                           {storeNames.map((sName) => {
-                            const storeData = item.stores[sName];
-                            const isCheapest = storeData && item.cheapestStores.includes(sName);
+                            const storeData = item.stores[sName] || (sName.includes('Lotus') ? (item.stores['Lotus Go Fresh'] || item.stores["Lotus's"]) : undefined);
+                            const isCheapest = storeData && item.cheapestStores.some((cs: string) => cs === sName || (cs.includes('Lotus') && sName.includes('Lotus')));
                             return (
                               <div
                                 key={sName}
@@ -3192,12 +3203,12 @@ export default function DashboardPage() {
             <div className="p-3 sm:px-5 sm:py-3.5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
               {/* Store pills */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-                {['all', 'CJ More', 'Mini BigC', "Lotus's"].map((s) => {
+                {['all', 'CJ More', 'Mini BigC', 'Lotus Go Fresh'].map((s) => {
                   const active = mechanicStoreFilter === s;
                   const count = filteredList.filter(
                     (r) =>
                       getMechanicType(r.machanic, r.promotion) === selectedMechanicModal &&
-                      (s === 'all' || r.store === s)
+                      (s === 'all' || r.store === s || (s.includes('Lotus') && r.store?.includes('Lotus')))
                   ).length;
                   return (
                     <button
