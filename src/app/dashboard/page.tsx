@@ -43,6 +43,7 @@ import {
   List,
   SlidersHorizontal,
   ArrowDownAZ,
+  PanelLeft,
 } from 'lucide-react';
 import { PromoCategory } from '@/types';
 import { getCachedHistoryRows } from '@/lib/client-api';
@@ -189,6 +190,7 @@ export default function DashboardPage() {
 
   // Modal ดูรูปภาพขยายใหญ่
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string; store: string } | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
   // Modal ดูรายการแยกตามกลไกโปรโมชั่น (Promotional Mechanics Drilldown Modal)
   const [selectedMechanicModal, setSelectedMechanicModal] = useState<string | null>(null);
@@ -889,12 +891,228 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50/70 text-slate-800 pb-20 font-sans">
       <Header />
 
-      <main className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col lg:flex-row gap-6 items-start">
+        {/* DESKTOP SIDEBAR MENU */}
+        <aside className="w-64 xl:w-72 shrink-0 hidden lg:block sticky top-20 self-start space-y-4">
+          {/* Main Navigation Card */}
+          <div className="bg-white rounded-3xl p-3 border border-slate-200/90 shadow-xs space-y-1">
+            <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100 mb-1">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                เมนูวิเคราะห์
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Live Data
+              </span>
+            </div>
+
+            {/* Menu 1: ภาพรวมและชาร์ต */}
+            <button
+              type="button"
+              onClick={() => setViewMode('overview')}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                viewMode === 'overview'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
+                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <BarChart3 className={`w-4 h-4 ${viewMode === 'overview' ? 'text-white' : 'text-amber-600'}`} />
+                <span>ภาพรวมและชาร์ต</span>
+              </div>
+              <ChevronRight className={`w-3.5 h-3.5 transition-transform ${viewMode === 'overview' ? 'opacity-100 translate-x-0.5' : 'opacity-30'}`} />
+            </button>
+
+            {/* Menu 2: สถิติรายเดือน */}
+            <button
+              type="button"
+              onClick={() => setViewMode('monthly')}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                viewMode === 'monthly'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
+                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <CalendarDays className={`w-4 h-4 ${viewMode === 'monthly' ? 'text-white' : 'text-orange-500'}`} />
+                <span>สถิติรายเดือน</span>
+              </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                viewMode === 'monthly' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-900'
+              }`}>
+                12 เดือน
+              </span>
+            </button>
+
+            {/* Menu 3: ความถี่จัดโปร */}
+            <button
+              type="button"
+              onClick={() => setViewMode('frequency')}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                viewMode === 'frequency'
+                  ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs shadow-indigo-500/20'
+                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Zap className={`w-4 h-4 ${viewMode === 'frequency' ? 'text-white' : 'text-indigo-600'}`} />
+                <span>ความถี่จัดโปร</span>
+              </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                viewMode === 'frequency' ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-900'
+              }`}>
+                {frequencyAnalytics.overallAvgMonthlyFreq} ดีล/ด.
+              </span>
+            </button>
+
+            {/* Menu 4: เทียบราคาข้ามห้าง */}
+            <button
+              type="button"
+              onClick={() => setViewMode('comparison')}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                viewMode === 'comparison'
+                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs shadow-rose-500/20'
+                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Swords className={`w-4 h-4 ${viewMode === 'comparison' ? 'text-white' : 'text-rose-500'}`} />
+                <span>เทียบราคาข้ามห้าง</span>
+              </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                viewMode === 'comparison' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-900'
+              }`}>
+                {crossStoreList.length} ดีล
+              </span>
+            </button>
+          </div>
+
+          {/* Quick Filter Card in Sidebar */}
+          <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-xs space-y-2.5">
+            <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-400">
+              <span>ตัวกรองห้าง</span>
+              <span className="text-[10px] text-slate-400 font-bold">{filteredList.length} ดีล</span>
+            </div>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => setSelectedStore('all')}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedStore === 'all'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <span>ทุกห้าง</span>
+                <span className="text-[10px] opacity-80">{rawList.length}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedStore(selectedStore === 'CJ More' ? 'all' : 'CJ More')}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedStore === 'CJ More'
+                    ? 'bg-orange-500 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-orange-50/60'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-orange-400" />
+                  <span>CJ More</span>
+                </div>
+                <span className="text-[10px] opacity-80">{storeCounts['CJ More'] || 0}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedStore(selectedStore === 'Mini BigC' ? 'all' : 'Mini BigC')}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedStore === 'Mini BigC'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-emerald-50/60'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Mini BigC</span>
+                </div>
+                <span className="text-[10px] opacity-80">{storeCounts['Mini BigC'] || 0}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedStore(selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'all' : 'Lotus Go Fresh')}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's"
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-sky-50/60'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-sky-400" />
+                  <span>Lotus Go Fresh</span>
+                </div>
+                <span className="text-[10px] opacity-80">{storeCounts['Lotus Go Fresh'] || 0}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Actions in Sidebar */}
+          <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-xs space-y-2">
+            <div className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+              จัดการข้อมูล
+            </div>
+            <div className="space-y-1">
+              <a
+                href="https://docs.google.com/spreadsheets/d/11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4/edit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Google Sheets</span>
+                </div>
+                <ExternalLink className="w-3 h-3 text-emerald-500" />
+              </a>
+
+              <button
+                type="button"
+                onClick={fetchData}
+                disabled={loading}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-600' : 'text-slate-500'}`} />
+                <span>รีเฟรชข้อมูล</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportCSV}
+                disabled={filteredList.length === 0}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-slate-500" />
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* MAIN DASHBOARD CONTENT AREA */}
+        <main className="flex-1 min-w-0 space-y-6 w-full">
         {/* DASHBOARD UNIFIED HEADER WITH INTEGRATED VIEW TABS */}
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
           {/* Top Tier: Title, Dynamic Context Subtitle & Actions */}
           <div className="p-5 sm:p-6 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
+              <button
+                type="button"
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="lg:hidden p-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-colors cursor-pointer flex items-center justify-center shadow-xs shrink-0"
+                title="เปิดแถบเมนูข้าง (Side Bar Menu)"
+              >
+                <PanelLeft className="w-5 h-5 text-amber-600" />
+              </button>
               <span className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 via-orange-500 to-rose-500 text-white flex items-center justify-center shadow-sm shadow-orange-500/20 shrink-0">
                 <BarChart3 className="w-6 h-6" />
               </span>
@@ -3165,7 +3383,8 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
-      </main>
+        </main>
+      </div>
 
       {/* Modal เจาะลึกรายการสินค้าตามกลไกโปรโมชั่น (Promotional Mechanics Drilldown Modal) */}
       {selectedMechanicModal && (
@@ -3700,6 +3919,157 @@ export default function DashboardPage() {
                   <ExternalLink className="w-4 h-4" />
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE DRAWER SIDEBAR */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          <div className="relative w-72 max-w-[85vw] bg-white h-full p-4 overflow-y-auto z-10 shadow-2xl flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-xs">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-sm text-slate-900 block leading-tight">
+                      เมนูวิเคราะห์
+                    </span>
+                    <span className="text-[10px] text-amber-700 font-medium block">
+                      Promotion Intelligence
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                  className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Mobile View Buttons */}
+              <div className="space-y-1.5">
+                <button
+                  type="button"
+                  onClick={() => { setViewMode('overview'); setIsMobileSidebarOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all ${
+                    viewMode === 'overview'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <BarChart3 className="w-4 h-4" />
+                    <span>ภาพรวมและชาร์ต</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setViewMode('monthly'); setIsMobileSidebarOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all ${
+                    viewMode === 'monthly'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <CalendarDays className="w-4 h-4" />
+                    <span>สถิติรายเดือน</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900">
+                    12 เดือน
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setViewMode('frequency'); setIsMobileSidebarOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all ${
+                    viewMode === 'frequency'
+                      ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap className="w-4 h-4" />
+                    <span>ความถี่จัดโปร</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-indigo-100 text-indigo-900">
+                    {frequencyAnalytics.overallAvgMonthlyFreq} ดีล/ด.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setViewMode('comparison'); setIsMobileSidebarOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all ${
+                    viewMode === 'comparison'
+                      ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Swords className="w-4 h-4" />
+                    <span>เทียบราคาข้ามห้าง</span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-900">
+                    {crossStoreList.length} ดีล
+                  </span>
+                </button>
+              </div>
+
+              {/* Mobile Quick Store Filter */}
+              <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                <div className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-1">
+                  ห้างสรรพสินค้า
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedStore('all'); setIsMobileSidebarOpen(false); }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold text-center ${selectedStore === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  >
+                    ทุกห้าง ({rawList.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedStore('CJ More'); setIsMobileSidebarOpen(false); }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold text-center ${selectedStore === 'CJ More' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-900'}`}
+                  >
+                    CJ More ({storeCounts['CJ More'] || 0})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedStore('Mini BigC'); setIsMobileSidebarOpen(false); }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold text-center ${selectedStore === 'Mini BigC' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-900'}`}
+                  >
+                    Mini BigC ({storeCounts['Mini BigC'] || 0})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedStore('Lotus Go Fresh'); setIsMobileSidebarOpen(false); }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold text-center ${selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'bg-sky-600 text-white' : 'bg-sky-50 text-sky-900'}`}
+                  >
+                    Lotus Go ({storeCounts['Lotus Go Fresh'] || 0})
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 text-center">
+              <span className="text-[11px] text-slate-400">
+                Promo Tracker © 2026
+              </span>
             </div>
           </div>
         </div>
