@@ -1594,94 +1594,40 @@ export default function DashboardPage() {
 
         {/* MAIN DASHBOARD CONTENT AREA */}
         <main className="flex-1 min-w-0 space-y-6 w-full">
-        {/* DASHBOARD UNIFIED HEADER WITH INTEGRATED VIEW TABS */}
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-          {/* Top Tier: Title, Dynamic Context Subtitle & Actions */}
-          <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <button
-                type="button"
-                onClick={() => setIsMobileSidebarOpen(true)}
-                className="lg:hidden p-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-colors cursor-pointer flex items-center justify-center shadow-xs shrink-0"
-                title="เปิดแถบเมนูและตัวกรอง (Side Bar Menu & Filters)"
-              >
-                <PanelLeft className="w-5 h-5 text-amber-600" />
-              </button>
-              <span className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 via-orange-500 to-rose-500 text-white flex items-center justify-center shadow-sm shadow-orange-500/20 shrink-0">
-                <BarChart3 className="w-6 h-6" />
-              </span>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                    Promotion Intelligence
-                  </h1>
-                  <span className="text-[11px] px-2.5 py-0.5 bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 rounded-full flex items-center gap-1.5 shadow-2xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Live Data
-                  </span>
-                  <span className="text-[11px] px-2.5 py-0.5 bg-slate-100 text-slate-700 font-bold rounded-full">
-                    พบ {filteredList.length} รายการ
-                  </span>
-                  {isAnyFilterActive && (
-                    <span className="text-[11px] px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200/60 font-bold rounded-full flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      กำลังกรองข้อมูล
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span>
-                    {viewMode === 'overview' && 'ภาพรวมโปรโมชั่น ส่วนลด และดีลสุดคุ้มข้ามห้าง (CJ More • Mini BigC • Lotus Go Fresh)'}
-                    {viewMode === 'monthly' && 'วิเคราะห์แนวโน้มและวงรอบการจัดโปรโมชั่น 12 เดือนแบบละเอียด'}
-                    {viewMode === 'frequency' && 'วิเคราะห์ความถี่โปรโมชั่นรายเดือนตามแบรนด์ ห้าง และสินค้าที่จัดโปรซ้ำบ่อยสุด'}
-                    {viewMode === 'comparison' && 'เทียบราคาต่อหน่วย Apple-to-Apple เพื่อค้นหาห้างที่ถูกสุด'}
-                  </span>
-                </p>
-              </div>
-            </div>
+        {/* MOBILE TOP BAR (สำหรับเปิดเมนูและตัวกรองบนมือถือ) */}
+        <div className="lg:hidden flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+          >
+            <PanelLeft className="w-4 h-4" />
+            <span>เมนู &amp; ตัวกรอง</span>
+            {isAnyFilterActive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+          </button>
 
-            <div className="flex items-center gap-2 self-start md:self-center shrink-0 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setIsMobileSidebarOpen(true)}
-                className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer"
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span>ตัวกรอง</span>
-                {isAnyFilterActive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-              </button>
-
-              <a
-                href="https://docs.google.com/spreadsheets/d/11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4/edit"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 transition-all cursor-pointer shadow-2xs group"
-                title="เปิดดูข้อมูลต้นฉบับบน Google Sheets"
-              >
-                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Google Sheet</span>
-                <ExternalLink className="w-3 h-3 text-emerald-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </a>
-
-              <button
-                onClick={fetchData}
-                disabled={loading}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition-all cursor-pointer disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-600' : ''}`} />
-                <span>รีเฟรช</span>
-              </button>
-
-              <button
-                onClick={handleExportCSV}
-                disabled={filteredList.length === 0}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export CSV</span>
-              </button>
-            </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold text-slate-500 mr-1">
+              พบ {filteredList.length} รายการ
+            </span>
+            <button
+              type="button"
+              onClick={fetchData}
+              disabled={loading}
+              className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+              title="รีเฟรชข้อมูล"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-600' : ''}`} />
+            </button>
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              disabled={filteredList.length === 0}
+              className="p-2 rounded-xl bg-slate-900 text-white hover:bg-black transition-colors cursor-pointer"
+              title="Export CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
 
