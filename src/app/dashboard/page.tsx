@@ -2459,19 +2459,30 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50/80 text-slate-500 font-black border-b border-slate-100">
+              <div className="overflow-x-auto scrollbar-thin">
+                <table className="w-full min-w-[1420px] text-left text-xs table-fixed">
+                  <colgroup>
+                    <col className="w-[240px]" />
+                    <col className="w-[110px]" />
+                    <col className="w-[130px]" />
+                    <col className="w-[170px]" />
+                    <col className="w-[150px]" />
+                    <col className="w-[100px]" />
+                    <col className="w-[260px]" />
+                    <col className="w-[260px]" />
+                  </colgroup>
+                  <thead className="bg-slate-50/90 text-slate-500 font-black border-b border-slate-100">
                     <tr>
-                      <th className="py-3 px-3.5">เดือน</th>
-                      <th className="py-3 px-3.5">ช่วงเวลาโปรโมชั่น (Period)</th>
-                      <th className="py-3 px-3.5">จำนวนโปรโมชั่น</th>
-                      <th className="py-3 px-3.5">สัดส่วนทั้งปี (%)</th>
-                      <th className="py-3 px-3.5">ห้างที่จัดโปรมากสุด</th>
-                      <th className="py-3 px-3.5">แบรนด์เด่นประจำเดือน</th>
-                      <th className="py-3 px-3.5">ส่วนลดเฉลี่ย</th>
-                      <th className="py-3 px-3.5">ดีลเด็ดลดแรงสุด</th>
-                      <th className="py-3 px-3.5">แคมเปญ / เทศกาลการตลาด</th>
+                      <th className="py-3.5 px-4 sticky left-0 z-20 bg-slate-50/95 backdrop-blur-xs border-r border-slate-200/80 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.06)]">
+                        เดือน & ช่วงเวลาโปรโมชั่น
+                      </th>
+                      <th className="py-3.5 px-3.5">จำนวนโปรโมชั่น</th>
+                      <th className="py-3.5 px-3.5">สัดส่วนทั้งปี (%)</th>
+                      <th className="py-3.5 px-3.5">ห้างที่จัดโปรมากสุด</th>
+                      <th className="py-3.5 px-3.5">แบรนด์เด่นประจำเดือน</th>
+                      <th className="py-3.5 px-3.5">ส่วนลดเฉลี่ย</th>
+                      <th className="py-3.5 px-3.5">ดีลเด็ดลดแรงสุด</th>
+                      <th className="py-3.5 px-3.5">แคมเปญ / เทศกาลการตลาด</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -2481,78 +2492,85 @@ export default function DashboardPage() {
                       const isThird = m.month === monthlyInsights.thirdMonth?.month;
                       const isDeepestDisc = m.month === monthlyInsights.deepestDiscMonth?.month;
                       const note = MONTH_INSIGHT_NOTES[m.month];
+                      const isSelected = selectedMonth === m.month;
 
                       return (
                         <tr
                           key={m.month}
                           onClick={() => setSelectedMonth(m.month)}
-                          className={`hover:bg-amber-50/40 transition-colors cursor-pointer ${selectedMonth === m.month ? 'bg-amber-50/70' : ''
-                            }`}
+                          className={`group transition-colors cursor-pointer ${
+                            isSelected ? 'bg-amber-50/80' : 'hover:bg-amber-50/40'
+                          }`}
                         >
-                          {/* Month Name + Badge */}
-                          <td className="py-3.5 px-3.5 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-slate-900 text-sm">
-                                {m.fullName}
-                              </span>
-                              {isPeak && (
-                                <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-2xs">
-                                  🏆 อันดับ 1
+                          {/* 1. Month Name + Badges + Campaign Period (Sticky Left Column) */}
+                          <td className={`py-3.5 px-4 sticky left-0 z-10 border-r border-slate-100 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.06)] transition-colors ${
+                            isSelected ? 'bg-amber-50/95' : 'bg-white group-hover:bg-amber-50/60'
+                          }`}>
+                            <div className="flex flex-col gap-1.5 overflow-hidden">
+                              <div className="flex items-center gap-2">
+                                <span className="font-black text-slate-900 text-sm whitespace-nowrap">
+                                  {m.fullName}
                                 </span>
-                              )}
-                              {isRunnerUp && (
-                                <span className="px-2 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-2xs">
-                                  🔥 อันดับ 2
-                                </span>
-                              )}
-                              {isThird && (
-                                <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black">
-                                  อันดับ 3
-                                </span>
-                              )}
-                              {isDeepestDisc && !isPeak && (
-                                <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">
-                                  🏷️ ลดลึกสุด
-                                </span>
+                                {isPeak && (
+                                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black shadow-2xs shrink-0">
+                                    🏆 อันดับ 1
+                                  </span>
+                                )}
+                                {isRunnerUp && (
+                                  <span className="px-2 py-0.5 rounded-full bg-orange-500 text-white text-[10px] font-black shadow-2xs shrink-0">
+                                    🔥 อันดับ 2
+                                  </span>
+                                )}
+                                {isThird && (
+                                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black shrink-0">
+                                    อันดับ 3
+                                  </span>
+                                )}
+                                {isDeepestDisc && !isPeak && (
+                                  <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black shrink-0">
+                                    🏷️ ลดลึกสุด
+                                  </span>
+                                )}
+                              </div>
+
+                              {m.topPeriod ? (
+                                <div className="flex flex-col gap-0.5">
+                                  <span
+                                    className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200/70 inline-flex items-center gap-1.5 w-fit"
+                                    title={`ช่วงเวลาโปรโมชั่นหลัก: ${m.topPeriod}`}
+                                  >
+                                    <CalendarDays className="w-3 h-3 text-amber-600 shrink-0" />
+                                    <span className="truncate max-w-[170px]">{m.topPeriod}</span>
+                                  </span>
+                                  {m.periods.length > 1 && (
+                                    <span className="text-[10px] text-slate-400 pl-0.5 font-medium">
+                                      + อีก {m.periods.length - 1} ช่วงเวลาแคมเปญ
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-slate-300 text-xs">-</span>
                               )}
                             </div>
                           </td>
 
-                          {/* Promo Period */}
-                          <td className="py-3.5 px-3.5 whitespace-nowrap">
-                            {m.topPeriod ? (
-                              <div className="flex flex-col gap-0.5">
-                                <span className="px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200/80 inline-flex items-center gap-1.5 w-fit">
-                                  <CalendarDays className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                                  <span>{m.topPeriod}</span>
-                                </span>
-                                {m.periods.length > 1 && (
-                                  <span className="text-[10px] text-slate-400 pl-1 font-medium">
-                                    + อีก {m.periods.length - 1} ช่วงเวลาแคมเปญ
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-slate-300">-</span>
-                            )}
-                          </td>
-
-                          {/* Deals count */}
+                          {/* 2. Deals count */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
                             <span className="font-black text-slate-900 text-sm">
                               {m.count}
                             </span>
-                            <span className="text-[11px] text-slate-400 font-semibold ml-1">ดีล</span>
+                            <span className="text-xs text-slate-400 font-semibold ml-1">ดีล</span>
                           </td>
 
-                          {/* Percent with Mini Bar */}
+                          {/* 3. Percent with Mini Bar */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                              <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden shrink-0">
                                 <div
                                   style={{ width: `${Math.min(100, m.percent * 6)}%` }}
-                                  className={`h-full rounded-full ${isPeak ? 'bg-amber-500' : isRunnerUp ? 'bg-orange-500' : 'bg-slate-400'
-                                    }`}
+                                  className={`h-full rounded-full ${
+                                    isPeak ? 'bg-amber-500' : isRunnerUp ? 'bg-orange-500' : 'bg-slate-400'
+                                  }`}
                                 />
                               </div>
                               <span className="font-bold text-slate-700 text-xs">
@@ -2561,57 +2579,98 @@ export default function DashboardPage() {
                             </div>
                           </td>
 
-                          {/* Top Store */}
+                          {/* 4. Top Store */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-xl text-xs font-black bg-slate-100 text-slate-800 border border-slate-200">
-                              {m.topStore} ({m.topStoreCount} ดีล)
-                            </span>
+                            {m.count > 0 ? (
+                              <span
+                                className="px-2.5 py-1 rounded-xl text-xs font-black bg-slate-100 text-slate-800 border border-slate-200/80 inline-block truncate max-w-[155px]"
+                                title={`${m.topStore} (${m.topStoreCount} ดีล)`}
+                              >
+                                {m.topStore} ({m.topStoreCount} ดีล)
+                              </span>
+                            ) : (
+                              <span className="text-slate-300">- (0 ดีล)</span>
+                            )}
                           </td>
 
-                          {/* Top Brand */}
+                          {/* 5. Top Brand */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
-                            <span className="font-bold text-slate-800">
-                              {m.topBrand}
-                            </span>
-                            <span className="text-[11px] text-slate-400 font-semibold ml-1">
-                              ({m.topBrandCount} ดีล)
-                            </span>
+                            {m.count > 0 && m.topBrand !== '-' ? (
+                              <div
+                                className="flex items-center gap-1 truncate max-w-[140px]"
+                                title={`${m.topBrand} (${m.topBrandCount} ดีล)`}
+                              >
+                                <span className="font-bold text-slate-800 truncate">{m.topBrand}</span>
+                                <span className="text-xs text-slate-400 font-semibold shrink-0">
+                                  ({m.topBrandCount} ดีล)
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-slate-300">- (0 ดีล)</span>
+                            )}
                           </td>
 
-                          {/* Avg Discount */}
+                          {/* 6. Avg Discount */}
                           <td className="py-3.5 px-3.5 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-lg text-xs font-black ${m.avgDiscount >= 20
-                              ? 'bg-rose-50 text-rose-600 border border-rose-200'
-                              : 'bg-slate-100 text-slate-700'
-                              }`}>
+                            <span className={`px-2 py-1 rounded-lg text-xs font-black inline-block ${
+                              m.avgDiscount >= 20
+                                ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                                : m.avgDiscount > 0
+                                  ? 'bg-slate-100 text-slate-700'
+                                  : 'text-slate-300'
+                            }`}>
                               {m.avgDiscount > 0 ? `-${m.avgDiscount}%` : '-'}
                             </span>
                           </td>
 
-                          {/* Best Deal */}
-                          <td className="py-3.5 px-3.5 max-w-[200px]">
+                          {/* 7. Best Deal */}
+                          <td className="py-3.5 px-3.5">
                             {m.bestDeal ? (
-                              <div>
-                                <span className="font-black text-rose-600 text-xs">
-                                  -{m.bestDeal.discPercent}%
-                                </span>
-                                <span className="font-bold text-slate-800 text-xs ml-1.5 truncate">
-                                  {m.bestDeal.brand} {m.bestDeal.itemName}
-                                </span>
+                              <div className="w-[235px] flex flex-col gap-0.5 overflow-hidden">
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className="px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-200/80 font-black text-xs shrink-0">
+                                    -{m.bestDeal.discPercent}%
+                                  </span>
+                                  <span
+                                    className="font-bold text-slate-900 text-xs truncate"
+                                    title={`${m.bestDeal.brand} ${m.bestDeal.itemName}`}
+                                  >
+                                    {m.bestDeal.brand}
+                                  </span>
+                                </div>
+                                <p
+                                  className="text-[11px] text-slate-600 truncate leading-snug"
+                                  title={m.bestDeal.itemName}
+                                >
+                                  {m.bestDeal.itemName}
+                                </p>
                               </div>
                             ) : (
                               <span className="text-slate-300">-</span>
                             )}
                           </td>
 
-                          {/* Retail Seasonality Context */}
-                          <td className="py-3.5 px-3.5 max-w-[240px]">
-                            <span className="font-bold text-slate-800 block truncate">
-                              {note?.icon} {note?.title}
-                            </span>
-                            <span className="text-[11px] text-slate-400 block truncate">
-                              {note?.desc}
-                            </span>
+                          {/* 8. Retail Seasonality Context */}
+                          <td className="py-3.5 px-3.5">
+                            {note ? (
+                              <div className="w-[235px] flex flex-col gap-0.5 overflow-hidden">
+                                <div
+                                  className="flex items-center gap-1.5 font-bold text-slate-800 text-xs truncate"
+                                  title={`${note.icon} ${note.title}`}
+                                >
+                                  <span className="text-sm shrink-0">{note.icon}</span>
+                                  <span className="truncate">{note.title}</span>
+                                </div>
+                                <p
+                                  className="text-[11px] text-slate-400 truncate leading-snug"
+                                  title={note.desc}
+                                >
+                                  {note.desc}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-slate-300">-</span>
+                            )}
                           </td>
                         </tr>
                       );
