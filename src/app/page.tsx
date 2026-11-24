@@ -203,26 +203,31 @@ export default function HomePage() {
       }));
 
       // เตรียมข้อมูลแถวสำหรับ Sheet (A–N)
-      const rowsPayload: SheetRowData[] = selectedItems.map((it) => ({
-        date: it.date,
-        store: it.store,
-        brand: it.brand,
-        itemName: it.itemName,
-        color: it.color,
-        packSize: it.packSize,
-        promotion: it.promotion,
-        channel: it.channel,
-        freqWeek: it.freqWeek || 1,
-        freqMonth: it.freqMonth || it.freqWeek || 1,
-        period: it.period,
-        machanic: it.machanic,
-        retailPrice: it.retailPrice !== null ? Number(formatPrice(it.retailPrice)) : null,
-        proPrice: it.proPrice !== null ? Number(formatPrice(it.proPrice)) : null,
-        subCategory: it.subCategory,
-        isPredictedPeriod: it.isPredictedPeriod,
-        imageUrl: it.imageUrl,
-        imageId: it.imageId || (imagesPayload.length > 0 ? imagesPayload[0].id : undefined),
-      }));
+      const rowsPayload: SheetRowData[] = selectedItems.map((it, itemIdx) => {
+        // ให้แน่ใจว่าแถวผูกกับ imageId ที่ถูกต้อง หรือใช้ภาพแรกเป็น fallback
+        const targetImageId =
+          it.imageId || (imagesPayload.length > 0 ? imagesPayload[itemIdx % imagesPayload.length].id : undefined);
+        return {
+          date: it.date,
+          store: it.store,
+          brand: it.brand,
+          itemName: it.itemName,
+          color: it.color,
+          packSize: it.packSize,
+          promotion: it.promotion,
+          channel: it.channel,
+          freqWeek: it.freqWeek || 1,
+          freqMonth: it.freqMonth || it.freqWeek || 1,
+          period: it.period,
+          machanic: it.machanic,
+          retailPrice: it.retailPrice !== null ? Number(formatPrice(it.retailPrice)) : null,
+          proPrice: it.proPrice !== null ? Number(formatPrice(it.proPrice)) : null,
+          subCategory: it.subCategory,
+          isPredictedPeriod: it.isPredictedPeriod,
+          imageUrl: it.imageUrl,
+          imageId: targetImageId,
+        };
+      });
 
       const data = await saveRowsClient(
         rowsPayload,

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CheckCircle2, ExternalLink, PlusCircle, FileSpreadsheet, Image as ImageIcon } from 'lucide-react';
+import { CheckCircle2, ExternalLink, PlusCircle, FileSpreadsheet, Image as ImageIcon, AlertCircle } from 'lucide-react';
 
 interface SuccessModalProps {
   isOpen: boolean;
@@ -21,6 +21,8 @@ export default function SuccessModal({
   onUploadMore,
 }: SuccessModalProps) {
   if (!isOpen) return null;
+
+  const validImageUrls = imageUrls.filter((url): url is string => Boolean(url && url.trim()));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
@@ -62,15 +64,26 @@ export default function SuccessModal({
             </a>
           </div>
 
-          {imageUrls.length > 0 && (
+          {validImageUrls.length > 0 ? (
             <div className="flex items-center justify-between border-t border-slate-200/60 pt-2">
               <span className="text-slate-500 flex items-center gap-1.5">
                 <ImageIcon className="w-4 h-4 text-blue-600" />
                 <span>รูปที่บันทึกลง Drive:</span>
               </span>
-              <span className="text-slate-700 font-medium">
-                {imageUrls.filter(Boolean).length} รูป
-              </span>
+              <a
+                href={validImageUrls[0]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 hover:underline"
+              >
+                <span>ดูรูปภาพ ({validImageUrls.length} รูป)</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          ) : (
+            <div className="border-t border-slate-200/60 pt-2 text-xs text-amber-700 bg-amber-50 p-2.5 rounded-xl flex items-start gap-1.5">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>บันทึกแถวข้อมูลสำเร็จ แต่ยังไม่ได้บันทึกรูปภาพลง Google Drive (โปรดตรวจสอบการอัปเดตโค้ด Apps Script ในชีต)</span>
             </div>
           )}
         </div>

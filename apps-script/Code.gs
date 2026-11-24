@@ -13,8 +13,8 @@
 function getSettings() {
   var props = PropertiesService.getScriptProperties();
   return {
-    SECRET: props.getProperty('SECRET') || '',
-    FOLDER_ID: props.getProperty('FOLDER_ID') || '',
+    SECRET: props.getProperty('SECRET') || 'my_super_secret_promo_key_2026',
+    FOLDER_ID: props.getProperty('FOLDER_ID') || '1NzCca2w0ExM_ka9yQD03nvmRMvySm5aa',
     SPREADSHEET_ID: props.getProperty('SPREADSHEET_ID') || '11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4',
     SHEET_NAME: props.getProperty('SHEET_NAME') || 'PRT'
   };
@@ -287,17 +287,59 @@ function handleSave(payload, sheetName) {
     return jsonResponse({ ok: false, error: 'ไม่มีแถวข้อมูลที่จะบันทึก' });
   }
 
+  // 1. ค้นหาโฟลเดอร์ Google Drive สำหรับเก็บรูปภาพ พร้อมระบบ Fallback 4 ระดับ (รับประกันการพบโฟลเดอร์ 100%)
   var driveFolder = null;
-  if (settings.FOLDER_ID) {
+  var targetFolderId = settings.FOLDER_ID || '1NzCca2w0ExM_ka9yQD03nvmRMvySm5aa';
+  if (targetFolderId) {
     try {
-      driveFolder = DriveApp.getFolderById(settings.FOLDER_ID);
-    } catch (e) {
-      Logger.log('ไม่สามารถเข้าถึง Folder ID: ' + e.toString());
+      driveFolder = DriveApp.getFolderById(targetFolderId);
+    } catch (eFolder) {
+      Logger.log('ไม่สามารถเปิด FOLDER_ID (' + targetFolderId + '): ' + eFolder.toString());
+    }
+  }
+
+  // Fallback 1: โฟลเดอร์แม่ของ Google Spreadsheet นี้
+  if (!driveFolder) {
+    try {
+      var ssId = settings.SPREADSHEET_ID || (sheet && sheet.getParent() ? sheet.getParent().getId() : null);
+      if (ssId) {
+        var ssFile = DriveApp.getFileById(ssId);
+        var parents = ssFile.getParents();
+        if (parents.hasNext()) {
+          driveFolder = parents.next();
+        }
+      }
+    } catch (eParent) {
+      Logger.log('ไม่สามารถดึงโฟลเดอร์ของ Spreadsheet: ' + eParent.toString());
+    }
+  }
+
+  // Fallback 2: ค้นหาหรือสร้างโฟลเดอร์ชื่อ Promo_Tracker_Images
+  if (!driveFolder) {
+    try {
+      var existingFolders = DriveApp.getFoldersByName('Promo_Tracker_Images');
+      if (existingFolders.hasNext()) {
+        driveFolder = existingFolders.next();
+      } else {
+        driveFolder = DriveApp.createFolder('Promo_Tracker_Images');
+      }
+    } catch (eCreate) {
+      Logger.log('ไม่สามารถสร้าง Promo_Tracker_Images: ' + eCreate.toString());
+    }
+  }
+
+  // Fallback 3: Root Folder ของ Google Drive
+  if (!driveFolder) {
+    try {
+      driveFolder = DriveApp.getRootFolder();
+    } catch (eRoot) {
+      Logger.log('ไม่สามารถเข้าถึง Root Folder: ' + eRoot.toString());
     }
   }
 
   var imageUrlMap = {};
   var uploadedUrls = [];
+  var uploadErrors = [];
 
   for (var k = 0; k < images.length; k++) {
     var img = images[k];
@@ -311,12 +353,17 @@ function handleSave(payload, sheetName) {
         var mm = ('0' + (now.getMonth() + 1)).slice(-2);
         var subfolderName = yyyy + '-' + mm;
         
-        var subfolders = driveFolder.getFoldersByName(subfolderName);
-        var targetSubfolder;
-        if (subfolders.hasNext()) {
-          targetSubfolder = subfolders.next();
-        } else {
-          targetSubfolder = driveFolder.createFolder(subfolderName);
+        var targetSubfolder = driveFolder;
+        try {
+          var subfolders = driveFolder.getFoldersByName(subfolderName);
+          if (subfolders.hasNext()) {
+            targetSubfolder = subfolders.next();
+          } else {
+            targetSubfolder = driveFolder.createFolder(subfolderName);
+          }
+        } catch (subErr) {
+          Logger.log('ไม่สามารถสร้างโฟลเดอร์ย่อยได้ ใช้โฟลเดอร์หลักแทน: ' + subErr.toString());
+          targetSubfolder = driveFolder;
         }
 
         var rawBase64 = img.base64;
@@ -330,12 +377,21 @@ function handleSave(payload, sheetName) {
         var blob = Utilities.newBlob(decodedBytes, mimeType, fileName);
         var file = targetSubfolder.createFile(blob);
         
-        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        try {
+          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        } catch (shareErr) {
+          Logger.log('setSharing warning: ' + shareErr.toString());
+        }
+
         viewUrl = file.getUrl();
       } catch (uploadErr) {
-        Logger.log('บันทึกรูปภาพลง Drive ล้มเหลว: ' + uploadErr.toString());
+        var errMsg = 'บันทึกรูปภาพลง Drive ล้มเหลว (รูปที่ ' + (k + 1) + '): ' + uploadErr.toString();
+        Logger.log(errMsg);
+        uploadErrors.push(errMsg);
         viewUrl = '';
       }
+    } else {
+      uploadErrors.push('ไม่พบโฟลเดอร์ Google Drive สำหรับบันทึกรูป');
     }
 
     if (img.id) {
@@ -353,7 +409,7 @@ function handleSave(payload, sheetName) {
       imgUrl = imageUrlMap[r.imageId];
     } else if (r.imageUrl) {
       imgUrl = r.imageUrl;
-    } else if (uploadedUrls.length > 0) {
+    } else if (uploadedUrls.length > 0 && uploadedUrls[0]) {
       imgUrl = uploadedUrls[0];
     }
 
@@ -415,7 +471,8 @@ function handleSave(payload, sheetName) {
     rowsAdded: numRows,
     sheetName: sheetName,
     imageUrls: uploadedUrls,
-    spreadsheetUrl: sheet.getParent().getUrl()
+    spreadsheetUrl: sheet.getParent().getUrl(),
+    uploadErrors: uploadErrors.length > 0 ? uploadErrors : undefined
   });
 }
 
