@@ -74,9 +74,9 @@ export default function PromotionCard({
 
   return (
     <div
-      className={`rounded-3xl border transition-all shadow-sm ${
+      className={`rounded-3xl border transition-all shadow-md ${
         item.selected
-          ? 'border-amber-200 bg-white ring-1 ring-amber-200/50'
+          ? 'border-blue-300 bg-white ring-1 ring-sky-300/60'
           : 'border-slate-200 bg-slate-50/60 opacity-80'
       }`}
     >
@@ -88,17 +88,17 @@ export default function PromotionCard({
             type="checkbox"
             checked={item.selected}
             onChange={(e) => handleChange('selected', e.target.checked)}
-            className="w-5 h-5 text-amber-600 rounded-lg border-slate-300 focus:ring-amber-500 cursor-pointer"
+            className="w-5 h-5 text-sky-600 rounded-lg border-slate-300 focus:ring-sky-500 cursor-pointer"
             id={`select-${item.id}`}
           />
           <label
             htmlFor={`select-${item.id}`}
-            className="font-bold text-sm sm:text-base text-slate-800 cursor-pointer flex items-center gap-2"
+            className="font-black text-sm sm:text-base text-[#0f2b5c] cursor-pointer flex items-center gap-2"
           >
             <span>รายการที่ {index + 1} จาก {total}</span>
             {item.confidence < 0.7 && (
-              <span className="text-[11px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-600" />
+              <span className="text-[11px] bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-700" />
                 ความมั่นใจ {(item.confidence * 100).toFixed(0)}%
               </span>
             )}
@@ -195,12 +195,12 @@ export default function PromotionCard({
 
           {/* Unit price promo */}
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-amber-100 text-amber-700 rounded-lg">
-              <Package className="w-4 h-4" />
+            <div className="p-1.5 bg-sky-50 text-sky-800 rounded-lg border border-sky-200">
+              <Package className="w-4 h-4 text-sky-700" />
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">ราคา/ซอง (โปร)</span>
-              <span className="font-bold text-amber-700">
+              <span className="text-slate-400 block text-[10px] font-medium">ราคา/หน่วย (โปร)</span>
+              <span className="font-black text-sky-800">
                 {unitPro !== null ? `${unitPro.toFixed(2)} บ.` : '-'}
               </span>
             </div>
@@ -208,12 +208,12 @@ export default function PromotionCard({
 
           {/* Freq/Month */}
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-amber-100 text-amber-800 rounded-lg">
-              <Layers className="w-4 h-4" />
+            <div className="p-1.5 bg-blue-50 text-[#0f2b5c] rounded-lg border border-blue-200">
+              <Layers className="w-4 h-4 text-blue-800" />
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">ความถี่ในเดือน</span>
-              <span className="font-bold text-amber-800">
+              <span className="text-slate-400 block text-[10px] font-medium">ความถี่ในรอบเดือน</span>
+              <span className="font-black text-[#0f2b5c]">
                 ครั้งที่ {item.freqMonth || item.freqWeek || 1} ของเดือน
               </span>
             </div>

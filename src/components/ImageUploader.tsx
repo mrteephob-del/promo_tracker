@@ -210,38 +210,38 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-4 sm:p-6 space-y-6">
+    <div className="bg-white rounded-3xl border border-blue-200/80 shadow-md p-4 sm:p-6 space-y-6">
       {/* Title */}
       <div>
-        <h2 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Camera className="w-5 h-5 text-amber-600" />
-          <span>อัปโหลดรูปภาพโปรโมชั่น</span>
+        <h2 className="text-lg sm:text-xl font-black text-[#0f2b5c] flex items-center gap-2">
+          <Camera className="w-5 h-5 text-sky-700" />
+          <span>อัปโหลดรูปภาพโปรโมชั่นและป้ายราคา (Image Ingestion)</span>
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-          ถ่ายจากกล้องมือถือหรือเลือกรูปจากแกลเลอรี่ AI จะช่วยอ่านและแยกข้อมูลอัตโนมัติ
+        <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">
+          ถ่ายจากกล้องมือถือหรือเลือกรูปจากคลังภาพ ระบบ AI จะช่วยวิเคราะห์และสกัดข้อมูลอัตโนมัติ
         </p>
       </div>
 
       {/* AI Accuracy Mode Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3.5 bg-sky-50/70 rounded-2xl border border-sky-200">
         <div>
-          <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-amber-600" />
-            <span>ระดับความแม่นยำของ AI:</span>
+          <span className="text-xs font-bold text-[#0f2b5c] flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-sky-600" />
+            <span>ระดับความแม่นยำของ AI (Model Selection):</span>
           </span>
-          <span className="text-[11px] text-slate-500 block mt-0.5">
+          <span className="text-[11px] text-slate-600 block mt-0.5 font-medium">
             {modelMode === 'pro'
               ? '🎯 โหมดแม่นยำสูง (Gemini Pro) - วิเคราะห์ภาพละเอียด อ่านป้ายตัวหนังสือเล็ก/ป้ายราคาซับซ้อนแม่นยำที่สุด'
               : '⚡ โหมดปกติ (Gemini Flash) - เน้นความเร็ว ประมวลผลไว'}
           </span>
         </div>
-        <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200 shadow-xs self-start sm:self-auto">
+        <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-sky-200 shadow-2xs self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setModelMode('pro')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${modelMode === 'pro'
-              ? 'bg-amber-600 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-[#0f2b5c] text-white shadow-xs'
+              : 'text-slate-600 hover:text-[#0f2b5c]'
               }`}
           >
             <span>🎯 แม่นยำสูง (Pro)</span>
@@ -250,8 +250,8 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             type="button"
             onClick={() => setModelMode('flash')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${modelMode === 'flash'
-              ? 'bg-amber-600 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-[#0f2b5c] text-white shadow-xs'
+              : 'text-slate-600 hover:text-[#0f2b5c]'
               }`}
           >
             <span>⚡ ปกติ (Flash)</span>
@@ -260,17 +260,17 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
       </div>
 
       {/* Select Store, Channel, and Date */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 bg-amber-50/50 p-3.5 sm:p-4 rounded-2xl border border-amber-100">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 bg-blue-50/40 p-3.5 sm:p-4 rounded-2xl border border-blue-200/60">
         {/* Store */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-            <Store className="w-3.5 h-3.5 text-amber-600" />
-            <span>ร้านค้า</span>
+          <label className="block text-xs font-bold text-[#0f2b5c] mb-1 flex items-center gap-1.5">
+            <Store className="w-3.5 h-3.5 text-sky-700" />
+            <span>ห้างค้าปลีก / ร้านค้า</span>
           </label>
           <select
             value={selectedStore}
             onChange={(e) => setSelectedStore(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="w-full bg-white border border-blue-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
           >
             <option value="auto">✨ ให้ AI ตรวจจับจากโลโก้</option>
             {TRACKED_STORES.map((s) => (
@@ -283,14 +283,14 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
         {/* Channel */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-            <Share2 className="w-3.5 h-3.5 text-amber-600" />
-            <span>ช่องทาง</span>
+          <label className="block text-xs font-bold text-[#0f2b5c] mb-1 flex items-center gap-1.5">
+            <Share2 className="w-3.5 h-3.5 text-sky-700" />
+            <span>ช่องทางจำหน่าย</span>
           </label>
           <select
             value={selectedChannel}
             onChange={(e) => setSelectedChannel(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="w-full bg-white border border-blue-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
           >
             {TRACKED_CHANNELS.map((ch) => (
               <option key={ch} value={ch}>
@@ -302,28 +302,28 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
         {/* Record Date */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-amber-600" />
-            <span>วันที่บันทึก</span>
+          <label className="block text-xs font-bold text-[#0f2b5c] mb-1 flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-sky-700" />
+            <span>วันที่บันทึกสำรวจ</span>
           </label>
           <input
             type="date"
             value={recordDateYMD}
             onChange={(e) => setRecordDateYMD(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="w-full bg-white border border-blue-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
           />
         </div>
       </div>
 
       {/* Scanning & Store Guidance Tip */}
-      <div className="bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 p-3 rounded-2xl border border-amber-200/60 text-xs text-amber-900 flex items-start gap-2.5">
-        <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+      <div className="bg-gradient-to-r from-blue-50 via-sky-50 to-blue-50 p-3 rounded-2xl border border-sky-200 text-xs text-[#0f2b5c] flex items-start gap-2.5">
+        <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="font-bold text-amber-950">
+          <p className="font-bold text-[#0f2b5c]">
             ระบบปรับแต่ง AI ให้เข้าใจเลย์เอาต์ป้ายเฉพาะของแต่ละห้างไทย (CJ More, Mini BigC, Lotus, 7-11)
           </p>
-          <p className="text-[11px] text-amber-800 leading-relaxed">
-            💡 <strong>แนะนำ:</strong> เลือกร้านค้าด้านบนก่อนถ่าย เพื่อให้ AI ถอดรหัสราคาโปรเฉพาะของห้างนั้นได้แม่นยำ 100% พร้อมระบบ Auto-Contrast ดึงตัวเลขป้ายราคาที่เบลอให้คมชัดขึ้นอัตโนมัติ
+          <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+            💡 <strong>คำแนะนำ:</strong> เลือกร้านค้าด้านบนก่อนถ่าย เพื่อให้ AI ถอดรหัสราคาโปรเฉพาะของห้างนั้นได้แม่นยำ พร้อมระบบ Auto-Contrast ดึงตัวเลขป้ายราคาที่เบลอให้คมชัดขึ้นอัตโนมัติ
           </p>
         </div>
       </div>
@@ -353,7 +353,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             type="button"
             onClick={() => cameraInputRef.current?.click()}
             disabled={compressing || analyzing}
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-medium rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-bold rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
           >
             <Camera className="w-5 h-5" />
             <span className="text-sm">ถ่ายรูปจากกล้อง</span>
@@ -363,9 +363,9 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={compressing || analyzing}
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 font-medium rounded-2xl transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-white hover:bg-sky-50 active:bg-sky-100 text-[#0f2b5c] border border-blue-200 font-bold rounded-2xl transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
           >
-            <ImageIcon className="w-5 h-5 text-slate-600" />
+            <ImageIcon className="w-5 h-5 text-sky-700" />
             <span className="text-sm">เลือกจากคลังภาพ</span>
           </button>
         </div>
@@ -378,22 +378,22 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
           }}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-slate-300 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/30 rounded-2xl p-6 text-center cursor-pointer transition-colors"
+          className="border-2 border-dashed border-sky-300 hover:border-sky-500 bg-sky-50/25 hover:bg-sky-50/60 rounded-2xl p-6 text-center cursor-pointer transition-colors"
         >
-          <UploadCloud className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-          <p className="text-sm font-medium text-slate-700">
+          <UploadCloud className="w-10 h-10 text-sky-500 mx-auto mb-2" />
+          <p className="text-sm font-bold text-[#0f2b5c]">
             แตะหรือลากรูปภาพมาวางที่นี่
           </p>
-          <p className="text-xs text-slate-400 mt-1">
-            รองรับ JPG, PNG (ระบบจะบีบอัดภาพความละเอียดสูง 2600px คมชัดระดับ HD)
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            รองรับ JPG, PNG (ระบบจะบีบอัดภาพความละเอียดสูง 2600px คมชัดระดับ HD เพื่อส่งวิเคราะห์)
           </p>
         </div>
       </div>
 
       {/* Compressing indicator */}
       {compressing && (
-        <div className="flex items-center justify-center gap-2 p-3 bg-amber-50 text-amber-800 rounded-xl text-xs sm:text-sm">
-          <Loader2 className="w-4 h-4 animate-spin" />
+        <div className="flex items-center justify-center gap-2 p-3 bg-sky-50 text-sky-800 rounded-xl text-xs sm:text-sm font-bold border border-sky-200">
+          <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
           <span>กำลังปรับขนาดและบีบอัดรูปภาพ...</span>
         </div>
       )}
@@ -402,17 +402,17 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
       {images.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-[#0f2b5c] flex items-center gap-1.5">
               <span>รูปภาพที่เลือก ({images.length} รูป)</span>
               {images.some((im) => im.isCropped) && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
                   มีรูปที่ตีกรอบโฟกัสแล้ว
                 </span>
               )}
             </span>
             <button
               onClick={() => setImages([])}
-              className="text-xs text-rose-500 hover:underline cursor-pointer"
+              className="text-xs text-rose-600 hover:underline cursor-pointer font-bold"
             >
               ล้างทั้งหมด
             </button>
@@ -423,7 +423,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
               <div
                 key={idx}
                 onClick={() => openCropModal(idx)}
-                className="relative group rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-amber-400 aspect-square bg-slate-100 cursor-pointer shadow-xs transition-all"
+                className="relative group rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-sky-500 aspect-square bg-slate-100 cursor-pointer shadow-xs transition-all"
                 title="คลิกเพื่อตีกรอบหรือตัดเฉพาะส่วน (Crop & Focus)"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -441,8 +441,8 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
                     openCropModal(idx);
                   }}
                   className={`absolute top-1.5 left-1.5 px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold shadow-xs backdrop-blur-xs ${img.isCropped
-                    ? 'bg-amber-500 text-slate-950 font-black'
-                    : 'bg-black/60 hover:bg-amber-600 text-white'
+                    ? 'bg-sky-600 text-white font-black'
+                    : 'bg-black/60 hover:bg-sky-600 text-white'
                     }`}
                   title="ตีกรอบเลือกเฉพาะสินค้า"
                 >
@@ -467,7 +467,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent text-white text-[10px] px-2 py-1 flex items-center justify-between">
                   <span className="truncate">{idx + 1}. {(img.compressedSize / 1024).toFixed(0)} KB</span>
                   {img.isCropped && (
-                    <span className="text-[9px] bg-amber-400 text-slate-950 font-black px-1 rounded">
+                    <span className="text-[9px] bg-sky-400 text-slate-950 font-black px-1 rounded">
                       Crop HD
                     </span>
                   )}
@@ -477,21 +477,21 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           </div>
 
           {/* Quick Crop Tip Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 bg-amber-50/90 rounded-2xl border border-amber-200/80 text-xs text-amber-950">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 bg-sky-50/90 rounded-2xl border border-sky-200 text-xs text-[#0f2b5c]">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+              <div className="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-700 flex items-center justify-center shrink-0">
                 <Crop className="w-3.5 h-3.5" />
               </div>
-              <span className="leading-snug">
+              <span className="leading-snug font-medium">
                 <strong>ใบปลิวจากเพจมีหลายสินค้า?</strong> แตะที่รูปหรือกดปุ่ม <strong>"ครอป"</strong> เพื่อลากสี่เหลี่ยมเลือกเฉพาะช่องสินค้าที่ต้องการสแกน
               </span>
             </div>
             <button
               type="button"
               onClick={() => openCropModal(0)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-colors shrink-0 cursor-pointer self-start sm:self-auto shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0f2b5c] hover:bg-[#163a75] text-white font-bold rounded-xl text-xs transition-colors shrink-0 cursor-pointer self-start sm:self-auto shadow-xs"
             >
-              <Crop className="w-3.5 h-3.5" />
+              <Crop className="w-3.5 h-3.5 text-sky-300" />
               <span>ตีกรอบรูปภาพ</span>
             </button>
           </div>
@@ -500,7 +500,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
       {/* Error alert */}
       {error && (
-        <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-rose-700 text-sm">
+        <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-rose-700 text-sm font-medium">
           <div className="flex items-start gap-2.5">
             <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
             <span>{error}</span>
@@ -524,16 +524,16 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           type="button"
           onClick={handleAnalyze}
           disabled={images.length === 0 || analyzing || compressing}
-          className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3.5 px-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 active:scale-[0.99] text-white font-medium rounded-2xl shadow-lg shadow-amber-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base"
+          className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3.5 px-6 bg-gradient-to-r from-[#0d2b5c] via-[#0f2b5c] to-sky-700 hover:from-[#091e38] hover:to-sky-800 active:scale-[0.99] text-white font-bold rounded-2xl shadow-lg shadow-blue-950/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base"
         >
           {analyzing ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>{analysisProgress || 'AI กำลังวิเคราะห์รูปภาพ...'}</span>
+              <Loader2 className="w-5 h-5 animate-spin text-sky-300" />
+              <span>{analysisProgress || 'ระบบ AI กำลังวิเคราะห์รูปภาพ...'}</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-5 h-5 text-amber-300" />
               <span>วิเคราะห์รูปภาพ ({images.length} รูป)</span>
             </>
           )}

@@ -845,7 +845,8 @@ export default function DashboardPage() {
     if (other > 0) merged.push(['อื่นๆ', other]);
 
     const total = filteredList.length || 1;
-    const colors = ['#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6', '#64748b'];
+    // Thai Government corporate palette: Royal Navy, Sky Blue, Deep Blue, Azure, Teal, Slate
+    const colors = ['#0f2b5c', '#0284c7', '#1e40af', '#0ea5e9', '#0d9488', '#64748b'];
 
     let accumulatedPercent = 0;
     return merged.map(([name, count], idx) => {
@@ -1248,12 +1249,12 @@ export default function DashboardPage() {
               onClick={() => setViewMode('overview')}
               className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                 viewMode === 'overview'
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-[#0f2b5c] to-sky-700 text-white shadow-xs'
+                  : 'text-[#0f2b5c] hover:bg-sky-50 hover:text-blue-900'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <BarChart3 className={`w-4 h-4 ${viewMode === 'overview' ? 'text-white' : 'text-amber-600'}`} />
+                <BarChart3 className={`w-4 h-4 ${viewMode === 'overview' ? 'text-white' : 'text-sky-700'}`} />
                 <span>ภาพรวมและชาร์ต</span>
               </div>
               <ChevronRight className={`w-3.5 h-3.5 transition-transform ${viewMode === 'overview' ? 'opacity-100 translate-x-0.5' : 'opacity-30'}`} />
@@ -1265,16 +1266,16 @@ export default function DashboardPage() {
               onClick={() => setViewMode('monthly')}
               className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                 viewMode === 'monthly'
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shadow-orange-500/20'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-[#0f2b5c] to-sky-700 text-white shadow-xs'
+                  : 'text-[#0f2b5c] hover:bg-sky-50 hover:text-blue-900'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <CalendarDays className={`w-4 h-4 ${viewMode === 'monthly' ? 'text-white' : 'text-orange-500'}`} />
+                <CalendarDays className={`w-4 h-4 ${viewMode === 'monthly' ? 'text-white' : 'text-sky-700'}`} />
                 <span>สถิติรายเดือน</span>
               </div>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                viewMode === 'monthly' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-900'
+                viewMode === 'monthly' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-900'
               }`}>
                 12 เดือน
               </span>
@@ -1286,16 +1287,16 @@ export default function DashboardPage() {
               onClick={() => setViewMode('frequency')}
               className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                 viewMode === 'frequency'
-                  ? 'bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-xs shadow-indigo-500/20'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-[#0f2b5c] to-sky-700 text-white shadow-xs'
+                  : 'text-[#0f2b5c] hover:bg-sky-50 hover:text-blue-900'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Zap className={`w-4 h-4 ${viewMode === 'frequency' ? 'text-white' : 'text-indigo-600'}`} />
+                <Zap className={`w-4 h-4 ${viewMode === 'frequency' ? 'text-white' : 'text-sky-700'}`} />
                 <span>ความถี่จัดโปร</span>
               </div>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                viewMode === 'frequency' ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-900'
+                viewMode === 'frequency' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-900'
               }`}>
                 {frequencyAnalytics.overallAvgMonthlyFreq} ดีล/ด.
               </span>
@@ -1307,16 +1308,16 @@ export default function DashboardPage() {
               onClick={() => setViewMode('comparison')}
               className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                 viewMode === 'comparison'
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xs shadow-rose-500/20'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-[#0f2b5c] to-sky-700 text-white shadow-xs'
+                  : 'text-[#0f2b5c] hover:bg-sky-50 hover:text-blue-900'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Swords className={`w-4 h-4 ${viewMode === 'comparison' ? 'text-white' : 'text-rose-500'}`} />
+                <Swords className={`w-4 h-4 ${viewMode === 'comparison' ? 'text-white' : 'text-sky-700'}`} />
                 <span>เทียบราคาข้ามห้าง</span>
               </div>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                viewMode === 'comparison' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-900'
+                viewMode === 'comparison' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-900'
               }`}>
                 {crossStoreList.length} ดีล
               </span>
@@ -1324,12 +1325,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Complete Filters Card in Sidebar */}
-          <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-xs space-y-3.5">
+          <div className="bg-white rounded-3xl p-4 border border-blue-200/80 shadow-xs space-y-3.5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-amber-600" />
-                <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">
-                  ตัวกรองข้อมูล
+                <SlidersHorizontal className="w-4 h-4 text-sky-700" />
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#0f2b5c]">
+                  ตัวกรองและจำแนกข้อมูล
                 </span>
               </div>
               {isAnyFilterActive ? (
@@ -1644,15 +1645,15 @@ export default function DashboardPage() {
         <main className="flex-1 min-w-0 space-y-5 sm:space-y-6 w-full transition-all duration-300">
         {/* DESKTOP TOP BAR WHEN SIDEBAR IS COLLAPSED (แถบเครื่องมือด้านบนเมื่อย่อแถบเมนู) */}
         {!isDesktopSidebarOpen && (
-          <div className="hidden lg:flex items-center justify-between p-3 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-xs transition-all">
+          <div className="hidden lg:flex items-center justify-between p-3 bg-white/95 backdrop-blur-md rounded-2xl border border-blue-200/80 shadow-md transition-all">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={toggleDesktopSidebar}
-                className="inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-[#0d2b5c] via-[#0f2b5c] to-sky-700 hover:from-[#091e38] hover:to-sky-800 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer group"
                 title="คลิกเพื่อเปิดแถบเมนูและตัวกรองข้อมูล"
               >
-                <PanelLeftOpen className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <PanelLeftOpen className="w-4 h-4 text-sky-300 group-hover:scale-110 transition-transform" />
                 <span>เปิดแถบเมนู & ตัวกรอง</span>
                 {isAnyFilterActive ? (
                   <span className="text-[10px] bg-white/20 text-white font-black px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1667,17 +1668,17 @@ export default function DashboardPage() {
               </button>
 
               {/* View Switcher Shortcut */}
-              <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl text-xs font-bold">
+              <div className="flex items-center gap-1 bg-blue-50/70 p-1 rounded-xl text-xs font-bold border border-blue-200/50">
                 <button
                   type="button"
                   onClick={() => setViewMode('overview')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     viewMode === 'overview'
-                      ? 'bg-white text-slate-900 shadow-2xs font-black'
-                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                      ? 'bg-[#0f2b5c] text-white shadow-2xs font-black'
+                      : 'text-[#0f2b5c] hover:bg-white/80 font-semibold'
                   }`}
                 >
-                  <BarChart3 className={`w-3.5 h-3.5 ${viewMode === 'overview' ? 'text-amber-600' : ''}`} />
+                  <BarChart3 className={`w-3.5 h-3.5 ${viewMode === 'overview' ? 'text-sky-300' : 'text-sky-700'}`} />
                   <span>ภาพรวมและชาร์ต</span>
                 </button>
                 <button
@@ -1685,11 +1686,11 @@ export default function DashboardPage() {
                   onClick={() => setViewMode('monthly')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     viewMode === 'monthly'
-                      ? 'bg-white text-slate-900 shadow-2xs font-black'
-                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                      ? 'bg-[#0f2b5c] text-white shadow-2xs font-black'
+                      : 'text-[#0f2b5c] hover:bg-white/80 font-semibold'
                   }`}
                 >
-                  <CalendarDays className={`w-3.5 h-3.5 ${viewMode === 'monthly' ? 'text-orange-500' : ''}`} />
+                  <CalendarDays className={`w-3.5 h-3.5 ${viewMode === 'monthly' ? 'text-sky-300' : 'text-sky-700'}`} />
                   <span>สถิติ 12 เดือน</span>
                 </button>
                 <button
@@ -1697,11 +1698,11 @@ export default function DashboardPage() {
                   onClick={() => setViewMode('frequency')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     viewMode === 'frequency'
-                      ? 'bg-white text-slate-900 shadow-2xs font-black'
-                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                      ? 'bg-[#0f2b5c] text-white shadow-2xs font-black'
+                      : 'text-[#0f2b5c] hover:bg-white/80 font-semibold'
                   }`}
                 >
-                  <Zap className={`w-3.5 h-3.5 ${viewMode === 'frequency' ? 'text-indigo-600' : ''}`} />
+                  <Zap className={`w-3.5 h-3.5 ${viewMode === 'frequency' ? 'text-sky-300' : 'text-sky-700'}`} />
                   <span>ความถี่จัดโปร</span>
                 </button>
                 <button
@@ -1709,11 +1710,11 @@ export default function DashboardPage() {
                   onClick={() => setViewMode('comparison')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     viewMode === 'comparison'
-                      ? 'bg-white text-slate-900 shadow-2xs font-black'
-                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                      ? 'bg-[#0f2b5c] text-white shadow-2xs font-black'
+                      : 'text-[#0f2b5c] hover:bg-white/80 font-semibold'
                   }`}
                 >
-                  <Swords className={`w-3.5 h-3.5 ${viewMode === 'comparison' ? 'text-rose-500' : ''}`} />
+                  <Swords className={`w-3.5 h-3.5 ${viewMode === 'comparison' ? 'text-sky-300' : 'text-sky-700'}`} />
                   <span>เทียบราคาข้ามห้าง</span>
                 </button>
               </div>
@@ -5826,13 +5827,13 @@ export default function DashboardPage() {
         <button
           type="button"
           onClick={toggleDesktopSidebar}
-          className="hidden lg:flex fixed left-5 bottom-6 z-40 items-center gap-2 px-4 py-2.5 bg-slate-900/90 hover:bg-slate-900 text-white rounded-full shadow-xl hover:shadow-2xl border border-slate-700/50 backdrop-blur-md text-xs font-bold transition-all hover:scale-105 cursor-pointer group"
+          className="hidden lg:flex fixed left-5 bottom-6 z-40 items-center gap-2 px-4 py-2.5 bg-[#0f2b5c]/95 hover:bg-[#0a2342] text-white rounded-full shadow-xl hover:shadow-2xl border border-sky-400/50 backdrop-blur-md text-xs font-bold transition-all hover:scale-105 cursor-pointer group"
           title="คลิกเพื่อสไลด์เปิดแถบเมนูและตัวกรองข้อมูล"
         >
-          <PanelLeftOpen className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+          <PanelLeftOpen className="w-4 h-4 text-sky-300 group-hover:scale-110 transition-transform" />
           <span>เปิดเมนู & ตัวกรอง</span>
           {isAnyFilterActive && (
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-sky-300 animate-pulse" />
           )}
         </button>
       )}

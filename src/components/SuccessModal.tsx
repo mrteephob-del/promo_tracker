@@ -57,7 +57,7 @@ export default function SuccessModal({
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="text-amber-700 hover:text-amber-800 font-semibold inline-flex items-center gap-1 hover:underline"
+              className="text-sky-700 hover:text-sky-900 font-bold inline-flex items-center gap-1 hover:underline"
             >
               <span>เปิดดูแท็บ {sheetName}</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -67,21 +67,21 @@ export default function SuccessModal({
           {validImageUrls.length > 0 ? (
             <div className="flex items-center justify-between border-t border-slate-200/60 pt-2">
               <span className="text-slate-500 flex items-center gap-1.5">
-                <ImageIcon className="w-4 h-4 text-blue-600" />
+                <ImageIcon className="w-4 h-4 text-sky-600" />
                 <span>รูปที่บันทึกลง Drive:</span>
               </span>
               <a
                 href={validImageUrls[0]}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 hover:underline"
+                className="text-sky-700 hover:text-sky-900 font-bold inline-flex items-center gap-1 hover:underline"
               >
                 <span>ดูรูปภาพ ({validImageUrls.length} รูป)</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
           ) : (
-            <div className="border-t border-slate-200/60 pt-2 text-xs text-amber-700 bg-amber-50 p-2.5 rounded-xl flex items-start gap-1.5">
+            <div className="border-t border-slate-200/60 pt-2 text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl flex items-start gap-1.5">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <span>บันทึกแถวข้อมูลสำเร็จ แต่ยังไม่ได้บันทึกรูปภาพลง Google Drive (โปรดตรวจสอบการอัปเดตโค้ด Apps Script ในชีต)</span>
             </div>
@@ -93,9 +93,9 @@ export default function SuccessModal({
           <button
             type="button"
             onClick={onUploadMore}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-2xl shadow-lg shadow-amber-600/20 transition-all cursor-pointer text-base"
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-[#0f2b5c] hover:bg-[#163a75] text-white font-bold rounded-2xl shadow-lg shadow-blue-950/20 transition-all cursor-pointer text-base"
           >
-            <PlusCircle className="w-5 h-5" />
+            <PlusCircle className="w-5 h-5 text-sky-300" />
             <span>อัปโหลดรูปต่อ</span>
           </button>
 

@@ -281,8 +281,8 @@ export default function HomePage() {
       <Header />
 
       <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:px-8 pb-24 space-y-6">
-        {/* Category Switcher Tabs */}
-        <div className="flex p-1.5 bg-slate-200/80 rounded-2xl max-w-lg mx-auto sm:mx-0 shadow-inner">
+        {/* Category Switcher Tabs (ระบบสลับประเภทสินค้า - ดีไซน์ราชการ ขาว/ฟ้า/น้ำเงิน) */}
+        <div className="flex p-1.5 bg-slate-200/90 border border-blue-200/70 rounded-2xl max-w-lg mx-auto sm:mx-0 shadow-xs">
           <button
             type="button"
             onClick={() => {
@@ -291,13 +291,15 @@ export default function HomePage() {
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'coffee'
-                ? 'bg-white text-amber-900 shadow-md shadow-slate-300'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
             }`}
           >
             <span className="text-base">☕</span>
             <span>กาแฟซอง</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+              category === 'coffee' ? 'bg-sky-500/25 text-sky-200 border border-sky-400/30' : 'bg-slate-300/80 text-slate-700'
+            }`}>
               PRT
             </span>
           </button>
@@ -310,13 +312,15 @@ export default function HomePage() {
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'noodle'
-                ? 'bg-white text-orange-900 shadow-md shadow-slate-300'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
             }`}
           >
             <span className="text-base">🍜</span>
             <span>บะหมี่ / โจ๊ก / ข้าวต้ม</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-800">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+              category === 'noodle' ? 'bg-sky-500/25 text-sky-200 border border-sky-400/30' : 'bg-slate-300/80 text-slate-700'
+            }`}>
               NOODLE
             </span>
           </button>
@@ -325,30 +329,25 @@ export default function HomePage() {
         {step === 'upload' ? (
           /* Step 1: Uploading Images */
           <div className="space-y-6">
-            <div
-              className={`text-white rounded-3xl p-6 sm:p-8 shadow-lg transition-all ${
-                category === 'coffee'
-                  ? 'bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 shadow-amber-600/10'
-                  : 'bg-gradient-to-r from-orange-600 via-red-600 to-amber-700 shadow-orange-600/10'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider">
-                  {category === 'coffee' ? 'Coffee Tracker' : 'Noodles & Porridge Tracker'}
+            <div className="text-white rounded-3xl p-6 sm:p-8 shadow-xl bg-gradient-to-r from-[#0a2342] via-[#0f2b5c] to-[#0284c7] border border-sky-900/40 relative overflow-hidden">
+              <div className="flex items-center gap-2 mb-2.5 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/20 border border-sky-400/30 backdrop-blur-md rounded-full text-xs font-bold text-sky-200 uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-300 animate-pulse" />
+                  <span>ระบบบริการบันทึกข้อมูล e-Service</span>
                 </span>
-                <span className="text-xs bg-black/20 px-2.5 py-1 rounded-full font-medium">
-                  แท็บ Sheet: {CATEGORIES[category].sheetName}
+                <span className="text-xs bg-[#081e3a] text-sky-200 border border-sky-400/30 px-3 py-1 rounded-full font-bold">
+                  แท็บฐานข้อมูลกลาง: {CATEGORIES[category].sheetName}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
                 {category === 'coffee'
-                  ? 'บันทึกโปรโมชั่นกาแฟซอง'
-                  : 'บันทึกโปรโมชั่น บะหมี่ โจ๊ก ข้าวต้ม'}
+                  ? 'ระบบบันทึกและตรวจสอบราคาโปรโมชั่นกาแฟซอง'
+                  : 'ระบบบันทึกและตรวจสอบราคาโปรโมชั่น บะหมี่ โจ๊ก ข้าวต้ม'}
               </h1>
-              <p className="text-white/80 text-xs sm:text-sm mt-1 max-w-xl">
+              <p className="text-sky-100/90 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed">
                 {category === 'coffee'
-                  ? 'ระบบสกัดข้อมูลโปรโมชั่นของ 4 แบรนด์หลัก (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) บันทึกลงแท็บ PRT'
-                  : 'บะหมี่กึ่งสำเร็จรูปทุกแบรนด์ (ซอง/ถ้วย), โจ๊ก (ซอง/ถ้วย), และข้าวต้ม (ถ้วย) บันทึกลงแท็บ NOODLE'}
+                  ? 'ระบบสกัดข้อมูลโปรโมชั่นของ 4 แบรนด์หลัก (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) เพื่อติดตามดัชนีราคาและส่วนลดเฉลี่ย'
+                  : 'ระบบสกัดข้อมูลโปรโมชั่นบะหมี่กึ่งสำเร็จรูปทุกแบรนด์ โจ๊ก และข้าวต้ม เพื่อวิเคราะห์โครงสร้างราคาเปรียบเทียบ'}
               </p>
             </div>
 
@@ -362,22 +361,22 @@ export default function HomePage() {
           /* Step 2: Review and Verification */
           <div className="space-y-6">
             {/* Top Navigation & Action Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-slate-200/80 shadow-sm sticky top-20 z-30">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-blue-200/80 shadow-md sticky top-20 z-30">
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setStep('upload')}
-                  className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                  className="p-2 text-slate-500 hover:text-[#0f2b5c] hover:bg-sky-50 rounded-xl transition-colors cursor-pointer"
                   title="ย้อนกลับไปหน้าอัปโหลด"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div>
-                  <h2 className="text-base sm:text-lg font-bold text-slate-800">
-                    ตรวจสอบข้อมูล ({items.length} รายการ)
+                  <h2 className="text-base sm:text-lg font-black text-[#0f2b5c]">
+                    ตรวจสอบข้อมูลรายการ ({items.length} รายการ)
                   </h2>
-                  <p className="text-xs text-slate-500">
-                    เลือกบันทึกแล้ว {selectedCount} จาก {items.length} รายการ
+                  <p className="text-xs text-slate-500 font-medium">
+                    เลือกบันทึกแล้ว <strong className="text-sky-700">{selectedCount}</strong> จาก {items.length} รายการ
                   </p>
                 </div>
               </div>
@@ -388,11 +387,11 @@ export default function HomePage() {
                   type="button"
                   onClick={() => checkDuplicates(items)}
                   disabled={checkingDuplicates || saving}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                   title="ตรวจสอบข้อมูลซ้ำกับใน Google Sheet"
                 >
                   <RefreshCw
-                    className={`w-4 h-4 ${checkingDuplicates ? 'animate-spin text-amber-600' : ''}`}
+                    className={`w-4 h-4 ${checkingDuplicates ? 'animate-spin text-sky-600' : 'text-sky-700'}`}
                   />
                   <span className="hidden sm:inline">ตรวจข้อมูลซ้ำ</span>
                 </button>
@@ -401,9 +400,9 @@ export default function HomePage() {
                   type="button"
                   onClick={handleAddNewRow}
                   disabled={saving}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-[#0f2b5c] border border-slate-200 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer"
                 >
-                  <Plus className="w-4 h-4 text-slate-600" />
+                  <Plus className="w-4 h-4 text-[#0f2b5c]" />
                   <span>เพิ่มแถว</span>
                 </button>
 
@@ -411,17 +410,17 @@ export default function HomePage() {
                   type="button"
                   onClick={handleSaveToSheet}
                   disabled={saving || selectedCount === 0}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-medium rounded-xl shadow-md shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#0f2b5c] hover:bg-[#163a75] active:bg-[#0a2342] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-blue-950/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>กำลังบันทึกลง Sheet...</span>
+                      <Loader2 className="w-4 h-4 animate-spin text-sky-300" />
+                      <span>กำลังบันทึกฐานข้อมูล...</span>
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4" />
-                      <span>บันทึกลง Sheet ({selectedCount})</span>
+                      <Save className="w-4 h-4 text-sky-300" />
+                      <span>บันทึกลงฐานข้อมูล ({selectedCount})</span>
                     </>
                   )}
                 </button>
@@ -438,11 +437,11 @@ export default function HomePage() {
 
             {/* Info Banner when fallback to manual */}
             {items.some((it) => it.confidence === 0 && it.notes?.includes('ไม่พบรายการ')) && (
-              <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-start gap-2.5 text-blue-800 text-xs sm:text-sm">
-                <Info className="w-5 h-5 flex-shrink-0 text-blue-600 mt-0.5" />
+              <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-start gap-2.5 text-blue-900 text-xs sm:text-sm">
+                <Info className="w-5 h-5 flex-shrink-0 text-blue-700 mt-0.5" />
                 <div>
-                  <span className="font-semibold">เปิดแบบฟอร์มกรอกข้อมูลเอง (Manual Entry):</span>{' '}
-                  เนื่องจากในรูปภาพที่อัปโหลด AI ตรวจไม่พบโปรโมชั่นกาแฟซอง (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) ระบบจึงเปิดแบบฟอร์มให้คุณกรอกข้อมูลด้วยตนเอง โดยสามารถกดปุ่ม &quot;ดูรูป&quot; เพื่อเทียบข้อมูลได้ทันที
+                  <span className="font-bold">เปิดแบบฟอร์มกรอกข้อมูลอิเล็กทรอนิกส์ (Manual Entry):</span>{' '}
+                  เนื่องจากในรูปภาพที่อัปโหลด ระบบตรวจไม่พบรายการโปรโมชั่นที่ตรงกับเงื่อนไข ระบบจึงเปิดแบบฟอร์มให้เจ้าหน้าที่กรอกข้อมูลด้วยตนเอง โดยสามารถกดปุ่ม &quot;ดูรูป&quot; เพื่อเทียบข้อมูลได้ทันที
                 </div>
               </div>
             )}
@@ -453,7 +452,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => handleToggleSelectAll(true)}
-                  className="text-amber-700 hover:underline cursor-pointer flex items-center gap-1"
+                  className="text-sky-700 hover:text-sky-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
                 >
                   <CheckCheck className="w-3.5 h-3.5" />
                   <span>เลือกทั้งหมด</span>
@@ -462,18 +461,18 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => handleToggleSelectAll(false)}
-                  className="hover:underline cursor-pointer"
+                  className="hover:underline cursor-pointer font-medium"
                 >
                   ยกเลิกการเลือกทั้งหมด
                 </button>
               </div>
 
-              <span>ช่องสีเหลืองคือช่องที่ AI ไม่มั่นใจ หรือเป็นค่าว่าง</span>
+              <span className="text-slate-500 font-medium">ช่องสีเหลืองคือช่องที่ AI ไม่มั่นใจ หรือเป็นค่าว่าง</span>
             </div>
 
             {/* Promotion Cards List */}
             {items.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8 space-y-3">
+              <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-blue-200 p-8 space-y-3">
                 <FileSpreadsheet className="w-12 h-12 text-slate-300 mx-auto" />
                 <h3 className="text-base font-bold text-slate-700">
                   ไม่มีรายการโปรโมชั่น
@@ -484,7 +483,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={handleAddNewRow}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0f2b5c] hover:bg-[#163a75] text-white rounded-xl text-sm font-bold transition-colors cursor-pointer shadow-sm"
                 >
                   <Plus className="w-4 h-4" />
                   <span>เพิ่มรายการใหม่</span>

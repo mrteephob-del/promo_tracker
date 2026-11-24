@@ -147,12 +147,12 @@ export default function HistoryPage() {
         {/* Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <History className="w-6 h-6 text-amber-600" />
-              <span>ประวัติโปรโมชั่น & สรุปภาพรวม</span>
+            <h1 className="text-xl sm:text-2xl font-black text-[#0f2b5c] flex items-center gap-2">
+              <History className="w-6 h-6 text-sky-700" />
+              <span>คลังประวัติโปรโมชั่นและบันทึกราคาย้อนหลัง</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              ดึงข้อมูล 50 รายการล่าสุดจาก Google Sheet แท็บ {sheetName}
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">
+              สืบค้นและตรวจสอบข้อมูล 50 รายการล่าสุดจากฐานข้อมูลกลาง Google Sheet แท็บ {sheetName}
             </p>
           </div>
 
@@ -160,9 +160,9 @@ export default function HistoryPage() {
             <button
               onClick={() => fetchHistory(category)}
               disabled={loading}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-medium rounded-xl transition-all cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-sky-50 border border-blue-200 text-[#0f2b5c] text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-amber-600' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-600' : 'text-sky-700'}`} />
               <span>รีเฟรชข้อมูล</span>
             </button>
 
@@ -170,17 +170,17 @@ export default function HistoryPage() {
               href="https://docs.google.com/spreadsheets/d/11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4/edit"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs sm:text-sm font-medium rounded-xl transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs sm:text-sm font-bold rounded-xl transition-all"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-              <span>เปิด Sheet ({sheetName})</span>
+              <span>เปิดฐานข้อมูล ({sheetName})</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
 
         {/* Category Switcher Tabs */}
-        <div className="flex p-1.5 bg-slate-200/80 rounded-2xl max-w-lg shadow-inner">
+        <div className="flex p-1.5 bg-slate-200/90 border border-blue-200/60 rounded-2xl max-w-lg shadow-xs">
           <button
             type="button"
             onClick={() => {
@@ -189,12 +189,14 @@ export default function HistoryPage() {
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'coffee'
-                ? 'bg-white text-amber-900 shadow-md shadow-slate-300'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
             }`}
           >
             <span>☕ กาแฟซอง</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+              category === 'coffee' ? 'bg-sky-500/25 text-sky-200 border border-sky-400/30' : 'bg-slate-300/80 text-slate-700'
+            }`}>
               PRT
             </span>
           </button>
@@ -207,12 +209,14 @@ export default function HistoryPage() {
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'noodle'
-                ? 'bg-white text-orange-900 shadow-md shadow-slate-300'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
             }`}
           >
             <span>🍜 บะหมี่ / โจ๊ก / ข้าวต้ม</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-800">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+              category === 'noodle' ? 'bg-sky-500/25 text-sky-200 border border-sky-400/30' : 'bg-slate-300/80 text-slate-700'
+            }`}>
               NOODLE
             </span>
           </button>
@@ -227,15 +231,15 @@ export default function HistoryPage() {
         )}
 
         {/* Weekly Summary Matrix */}
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-4 sm:p-6 space-y-3">
+        <div className="bg-white rounded-3xl border border-blue-200/80 shadow-md p-4 sm:p-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-amber-600" />
+            <h2 className="text-sm sm:text-base font-black text-[#0f2b5c] flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-sky-700" />
               <span>
                 สรุปโปรโมชั่นประจำสัปดาห์นี้ ({currentWeekKey}) - แท็บ {sheetName}
               </span>
             </h2>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-sky-800 font-bold bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">
               รวม {currentWeekRows.length} รายการ
             </span>
           </div>
@@ -243,14 +247,14 @@ export default function HistoryPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs sm:text-sm text-left border-collapse min-w-[500px]">
               <thead>
-                <tr className="bg-slate-50 border-y border-slate-200 text-slate-600">
-                  <th className="py-2.5 px-3 font-semibold">ร้านค้า</th>
+                <tr className="bg-[#0f2b5c] text-white border-y border-blue-900">
+                  <th className="py-2.5 px-3 font-bold">ห้างค้าปลีก / ร้านค้า</th>
                   {activeBrands.map((b) => (
-                    <th key={b} className="py-2.5 px-3 font-semibold text-center">
+                    <th key={b} className="py-2.5 px-3 font-bold text-center">
                       {b}
                     </th>
                   ))}
-                  <th className="py-2.5 px-3 font-semibold text-center bg-amber-50/50 text-amber-900">
+                  <th className="py-2.5 px-3 font-black text-center bg-sky-900 text-sky-100">
                     รวม
                   </th>
                 </tr>
@@ -259,15 +263,15 @@ export default function HistoryPage() {
                 {TRACKED_STORES.map((s) => {
                   let storeTotal = 0;
                   return (
-                    <tr key={s} className="hover:bg-slate-50/50">
-                      <td className="py-2.5 px-3 font-medium text-slate-800">{s}</td>
+                    <tr key={s} className="hover:bg-sky-50/50">
+                      <td className="py-2.5 px-3 font-bold text-[#0f2b5c]">{s}</td>
                       {activeBrands.map((b) => {
                         const count = matrixCounts[s]?.[b] || 0;
                         storeTotal += count;
                         return (
                           <td key={b} className="py-2.5 px-3 text-center">
                             {count > 0 ? (
-                              <span className="inline-block px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded-lg text-xs">
+                              <span className="inline-block px-2 py-0.5 bg-sky-100 text-sky-900 font-bold rounded-lg text-xs border border-sky-300">
                                 {count}
                               </span>
                             ) : (
@@ -276,7 +280,7 @@ export default function HistoryPage() {
                           </td>
                         );
                       })}
-                      <td className="py-2.5 px-3 text-center font-bold text-amber-900 bg-amber-50/30">
+                      <td className="py-2.5 px-3 text-center font-black text-sky-950 bg-sky-50/70">
                         {storeTotal}
                       </td>
                     </tr>
@@ -288,20 +292,20 @@ export default function HistoryPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-4 space-y-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-            <Filter className="w-4 h-4 text-amber-600" />
-            <span>ตัวกรองรายการ ({filteredRows.length} จาก {rows.length})</span>
+        <div className="bg-white rounded-3xl border border-blue-200/80 shadow-sm p-4 space-y-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#0f2b5c]">
+            <Filter className="w-4 h-4 text-sky-700" />
+            <span>ตัวกรองและจำแนกรายการ ({filteredRows.length} จาก {rows.length})</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             {/* Store filter */}
             <div>
-              <label className="block text-[11px] text-slate-500 mb-1">เลือกร้านค้า</label>
+              <label className="block text-[11px] font-bold text-[#0f2b5c] mb-1">เลือกห้างค้าปลีก</label>
               <select
                 value={storeFilter}
                 onChange={(e) => setStoreFilter(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
               >
                 <option value="all">ทุกร้านค้า</option>
                 {TRACKED_STORES.map((s) => (
@@ -314,11 +318,11 @@ export default function HistoryPage() {
 
             {/* Brand filter */}
             <div>
-              <label className="block text-[11px] text-slate-500 mb-1">เลือกแบรนด์</label>
+              <label className="block text-[11px] font-bold text-[#0f2b5c] mb-1">เลือกแบรนด์สินค้า</label>
               <select
                 value={brandFilter}
                 onChange={(e) => setBrandFilter(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
               >
                 <option value="all">ทุกแบรนด์</option>
                 {activeBrands.map((b) => (
@@ -331,11 +335,11 @@ export default function HistoryPage() {
 
             {/* Week filter */}
             <div>
-              <label className="block text-[11px] text-slate-500 mb-1">เลือกช่วงสัปดาห์</label>
+              <label className="block text-[11px] font-bold text-[#0f2b5c] mb-1">เลือกช่วงสัปดาห์</label>
               <select
                 value={weekFilter}
                 onChange={(e) => setWeekFilter(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
               >
                 <option value="all">ทั้งหมด (50 แถวล่าสุด)</option>
                 <option value="thisWeek">เฉพาะสัปดาห์นี้ ({currentWeekKey})</option>
@@ -346,7 +350,7 @@ export default function HistoryPage() {
           {/* Sub-Category Pills for Noodle Category */}
           {category === 'noodle' && (
             <div className="pt-2 border-t border-slate-100 space-y-1.5">
-              <label className="block text-[11px] font-semibold text-slate-600">
+              <label className="block text-[11px] font-bold text-[#0f2b5c]">
                 หมวดหมู่อาหาร (Sub-Category):
               </label>
               <div className="flex flex-wrap gap-1.5">
@@ -365,14 +369,14 @@ export default function HistoryPage() {
                       onClick={() => setSubCategoryFilter(pill.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         active
-                          ? 'bg-amber-600 text-white shadow-sm'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                          ? 'bg-[#0f2b5c] text-white shadow-xs'
+                          : 'bg-slate-100 hover:bg-sky-50 text-slate-700 border border-slate-200'
                       }`}
                     >
                       <span>{pill.icon} {pill.label}</span>
                       <span
-                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
-                          active ? 'bg-amber-700 text-amber-100' : 'bg-slate-200 text-slate-600'
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                          active ? 'bg-sky-500/30 text-sky-200' : 'bg-slate-200 text-slate-700'
                         }`}
                       >
                         {pill.count}
@@ -458,7 +462,7 @@ export default function HistoryPage() {
                       </span>
                     )}
                     {r.proPrice && (
-                      <span className="font-bold text-amber-700 text-sm">
+                      <span className="font-black text-[#0f2b5c] text-sm">
                         โปร {r.proPrice} บ.
                       </span>
                     )}
@@ -472,10 +476,10 @@ export default function HistoryPage() {
                   <div className="flex items-center gap-3">
                     {r.period && (
                       <span className="text-slate-600 flex items-center gap-1.5 flex-wrap">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <Calendar className="w-3.5 h-3.5 text-sky-700" />
                         <span>{r.period}</span>
                         {r.isPredictedPeriod && (
-                          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-900 border border-sky-300">
                             🔮 คาดการณ์
                           </span>
                         )}
@@ -487,7 +491,7 @@ export default function HistoryPage() {
                         href={r.imageUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-amber-600 hover:text-amber-700 font-semibold inline-flex items-center gap-1 hover:underline"
+                        className="text-sky-700 hover:text-[#0f2b5c] font-bold inline-flex items-center gap-1 hover:underline"
                       >
                         <span>ดูรูป</span>
                         <ExternalLink className="w-3 h-3" />

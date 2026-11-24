@@ -84,20 +84,20 @@ export default function ApiKeyModal({ isOpen, onClose, onKeySaved }: ApiKeyModal
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center border border-amber-200">
-            <KeyRound className="w-5 h-5" />
+          <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-800 flex items-center justify-center border border-sky-200">
+            <KeyRound className="w-5 h-5 text-sky-700" />
           </div>
           <div>
-            <h3 className="text-base font-black text-slate-900">ตั้งค่า Google Gemini API Key</h3>
-            <p className="text-xs text-slate-500">สำหรับให้อ่านและถอดรหัสรูปโปรโมชั่นจริง</p>
+            <h3 className="text-base font-black text-[#0f2b5c]">ตั้งค่า Google Gemini API Key</h3>
+            <p className="text-xs text-slate-500 font-medium">กุญแจเชื่อมต่อระบบเพื่ออ่านและถอดรหัสรูปโปรโมชั่น</p>
           </div>
         </div>
 
         <div className="space-y-4">
-          <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-xs text-slate-600 leading-relaxed">
-            <p className="font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+          <div className="bg-blue-50/50 p-3 rounded-2xl border border-blue-200/80 text-xs text-slate-700 leading-relaxed">
+            <p className="font-bold text-[#0f2b5c] mb-1 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>ความปลอดภัยของข้อมูล</span>
+              <span>ความปลอดภัยและความเป็นส่วนตัวของข้อมูล</span>
             </p>
             <p>
               คีย์จะถูกบันทึกไว้ใน Browser ของคุณเท่านั้น (Local Storage) ไม่มีการส่งกลับไปบันทึกที่เซิร์ฟเวอร์ใดๆ
@@ -105,7 +105,7 @@ export default function ApiKeyModal({ isOpen, onClose, onKeySaved }: ApiKeyModal
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label className="block text-xs font-bold text-[#0f2b5c] mb-1.5">
               Gemini API Key (ขึ้นต้นด้วย AIzaSy...)
             </label>
             <div className="relative">
@@ -114,7 +114,7 @@ export default function ApiKeyModal({ isOpen, onClose, onKeySaved }: ApiKeyModal
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full pr-10 pl-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-slate-900 shadow-2xs"
+                className="w-full pr-10 pl-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono text-slate-900 shadow-2xs"
               />
               <button
                 type="button"
@@ -133,13 +133,13 @@ export default function ApiKeyModal({ isOpen, onClose, onKeySaved }: ApiKeyModal
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : status === 'error'
                   ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+                  : 'bg-sky-50 text-sky-800 border border-sky-200'
               }`}
             >
-              {status === 'testing' && <Loader2 className="w-4 h-4 animate-spin shrink-0 mt-0.5" />}
+              {status === 'testing' && <Loader2 className="w-4 h-4 animate-spin shrink-0 mt-0.5 text-sky-600" />}
               {status === 'success' && <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />}
               {status === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />}
-              <span className="font-medium">{statusMessage}</span>
+              <span className="font-bold">{statusMessage}</span>
             </div>
           )}
 
@@ -148,9 +148,9 @@ export default function ApiKeyModal({ isOpen, onClose, onKeySaved }: ApiKeyModal
               href="https://aistudio.google.com/apikey"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-amber-700 hover:text-amber-800 font-bold inline-flex items-center gap-1 hover:underline"
+              className="text-xs text-sky-700 hover:text-sky-900 font-bold inline-flex items-center gap-1 hover:underline"
             >
-              <span>ขอรับ API Key ฟรีจาก Google</span>
+              <span>ขอรับ API Key ฟรีจาก Google AI Studio</span>
               <ExternalLink className="w-3 h-3" />
             </a>
 
@@ -177,11 +177,11 @@ export default function ApiKeyModal({ isOpen, onClose, onKeySaved }: ApiKeyModal
               type="button"
               onClick={handleTestAndSave}
               disabled={status === 'testing'}
-              className="flex-1 py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="flex-1 py-2.5 px-4 bg-[#0f2b5c] hover:bg-[#163a75] text-white font-bold rounded-xl text-xs shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               {status === 'testing' ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-300" />
                   <span>กำลังทดสอบ...</span>
                 </>
               ) : (
