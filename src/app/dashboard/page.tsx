@@ -44,6 +44,8 @@ import {
   SlidersHorizontal,
   ArrowDownAZ,
   PanelLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
   ArrowLeftRight,
   Plus,
   Trash2,
@@ -198,6 +200,33 @@ export default function DashboardPage() {
   // Modal ดูรูปภาพขยายใหญ่
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string; store: string } | null>(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
+  // Desktop Sidebar State: ควบคุมการเปิด/ปิด แบบสไลด์ (Collapsible Sliding Sidebar) เพื่อขยายพื้นที่ดูข้อมูล
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState<boolean>(true);
+
+  // ดึงค่าการเปิด/ปิด Sidebar ที่บันทึกไว้ใน localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('promo_track_desktop_sidebar');
+      if (saved !== null) {
+        setIsDesktopSidebarOpen(saved === 'true');
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const toggleDesktopSidebar = () => {
+    setIsDesktopSidebarOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('promo_track_desktop_sidebar', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   // Modal ดูรายละเอียดสินค้าและโปรโมชั่น (Product Detail Modal)
   const [selectedProductModal, setSelectedProductModal] = useState<any | null>(null);
@@ -1181,19 +1210,37 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50/70 text-slate-800 pb-28 sm:pb-20 font-sans">
       <Header />
 
-      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col lg:flex-row gap-6 items-start">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col lg:flex-row items-start">
         {/* DESKTOP SIDEBAR MENU */}
-        <aside className="w-64 xl:w-72 shrink-0 hidden lg:block sticky top-20 self-start space-y-3.5 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 pb-6 scrollbar-thin">
-          {/* Main Navigation Card */}
-          <div className="bg-white rounded-3xl p-3 border border-slate-200/90 shadow-xs space-y-1">
-            <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100 mb-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
-                เมนูวิเคราะห์
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                Live Data
-              </span>
-            </div>
+        <aside
+          className={`shrink-0 hidden lg:block sticky top-20 self-start transition-all duration-300 ease-in-out ${
+            isDesktopSidebarOpen
+              ? 'w-64 xl:w-72 opacity-100 lg:mr-6'
+              : 'w-0 opacity-0 overflow-hidden pointer-events-none lg:mr-0'
+          }`}
+        >
+          <div className="w-64 xl:w-72 space-y-3.5 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 pb-6 scrollbar-thin">
+            {/* Main Navigation Card */}
+            <div className="bg-white rounded-3xl p-3 border border-slate-200/90 shadow-xs space-y-1">
+              <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-100 mb-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                    เมนูวิเคราะห์
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Live Data
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleDesktopSidebar}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 border border-slate-200/60 hover:border-slate-300 transition-all cursor-pointer group shadow-2xs"
+                  title="ย่อแถบเมนูและตัวกรอง (ขยายพื้นที่ดูข้อมูล)"
+                >
+                  <span className="text-[10px] font-bold hidden xl:inline text-slate-400 group-hover:text-slate-700">ย่อแถบ</span>
+                  <PanelLeftClose className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-800 group-hover:-translate-x-0.5 transition-transform" />
+                </button>
+              </div>
 
             {/* Menu 1: ภาพรวมและชาร์ต */}
             <button
@@ -1590,10 +1637,122 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
+          </div>
         </aside>
 
         {/* MAIN DASHBOARD CONTENT AREA */}
-        <main className="flex-1 min-w-0 space-y-5 sm:space-y-6 w-full">
+        <main className="flex-1 min-w-0 space-y-5 sm:space-y-6 w-full transition-all duration-300">
+        {/* DESKTOP TOP BAR WHEN SIDEBAR IS COLLAPSED (แถบเครื่องมือด้านบนเมื่อย่อแถบเมนู) */}
+        {!isDesktopSidebarOpen && (
+          <div className="hidden lg:flex items-center justify-between p-3 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-xs transition-all">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={toggleDesktopSidebar}
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer group"
+                title="คลิกเพื่อเปิดแถบเมนูและตัวกรองข้อมูล"
+              >
+                <PanelLeftOpen className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>เปิดแถบเมนู & ตัวกรอง</span>
+                {isAnyFilterActive ? (
+                  <span className="text-[10px] bg-white/20 text-white font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    กรอง {filteredList.length} รายการ
+                  </span>
+                ) : (
+                  <span className="text-[10px] bg-white/20 text-white font-medium px-2 py-0.5 rounded-full">
+                    {filteredList.length} ดีล
+                  </span>
+                )}
+              </button>
+
+              {/* View Switcher Shortcut */}
+              <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('overview')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'overview'
+                      ? 'bg-white text-slate-900 shadow-2xs font-black'
+                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                  }`}
+                >
+                  <BarChart3 className={`w-3.5 h-3.5 ${viewMode === 'overview' ? 'text-amber-600' : ''}`} />
+                  <span>ภาพรวมและชาร์ต</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('monthly')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'monthly'
+                      ? 'bg-white text-slate-900 shadow-2xs font-black'
+                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                  }`}
+                >
+                  <CalendarDays className={`w-3.5 h-3.5 ${viewMode === 'monthly' ? 'text-orange-500' : ''}`} />
+                  <span>สถิติ 12 เดือน</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('frequency')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'frequency'
+                      ? 'bg-white text-slate-900 shadow-2xs font-black'
+                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                  }`}
+                >
+                  <Zap className={`w-3.5 h-3.5 ${viewMode === 'frequency' ? 'text-indigo-600' : ''}`} />
+                  <span>ความถี่จัดโปร</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('comparison')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'comparison'
+                      ? 'bg-white text-slate-900 shadow-2xs font-black'
+                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                  }`}
+                >
+                  <Swords className={`w-3.5 h-3.5 ${viewMode === 'comparison' ? 'text-rose-500' : ''}`} />
+                  <span>เทียบราคาข้ามห้าง</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Actions (Sheet, Refresh, Export) */}
+            <div className="flex items-center gap-2">
+              <a
+                href="https://docs.google.com/spreadsheets/d/11dxu9T0GHr6j3qvn2SkhpmpAPyOStQVTjVLHyuiTYy4/edit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Google Sheet</span>
+                <ExternalLink className="w-3 h-3 text-emerald-500" />
+              </a>
+              <button
+                type="button"
+                onClick={fetchData}
+                disabled={loading}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                title="รีเฟรชข้อมูล"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-600' : ''}`} />
+              </button>
+              <button
+                type="button"
+                onClick={handleExportCSV}
+                disabled={filteredList.length === 0}
+                className="p-2 rounded-xl bg-slate-900 hover:bg-black text-white transition-colors cursor-pointer"
+                title="Export CSV"
+              >
+                <Download className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* MOBILE TOP CONTROLS (สำหรับหน้าจอมือถือ) */}
         <div className="lg:hidden space-y-2.5">
           {/* Row 1: Filter Drawer Toggle, Deal Count & Action Buttons */}
@@ -5660,6 +5819,22 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* FLOATING ACTION PILL ON BOTTOM-LEFT (DESKTOP) */}
+      {!isDesktopSidebarOpen && (
+        <button
+          type="button"
+          onClick={toggleDesktopSidebar}
+          className="hidden lg:flex fixed left-5 bottom-6 z-40 items-center gap-2 px-4 py-2.5 bg-slate-900/90 hover:bg-slate-900 text-white rounded-full shadow-xl hover:shadow-2xl border border-slate-700/50 backdrop-blur-md text-xs font-bold transition-all hover:scale-105 cursor-pointer group"
+          title="คลิกเพื่อสไลด์เปิดแถบเมนูและตัวกรองข้อมูล"
+        >
+          <PanelLeftOpen className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+          <span>เปิดเมนู & ตัวกรอง</span>
+          {isAnyFilterActive && (
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          )}
+        </button>
       )}
     </div>
   );
