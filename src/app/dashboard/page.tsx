@@ -429,107 +429,99 @@ function DashboardFilterControls({
           <button
             type="button"
             onClick={() => setSelectedStore('all')}
-            className={`col-span-2 px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+            className={`col-span-2 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
               selectedStore === 'all'
                 ? 'bg-[#0f2b5c] text-white shadow-xs'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
             }`}
           >
             <span className="flex items-center gap-2 truncate">
-              <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] shrink-0 font-bold border ${
+              <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0 font-bold border ${
                 selectedStore === 'all'
                   ? 'bg-white/20 border-white/30 text-white'
                   : 'bg-white border-slate-200/80 text-slate-600 shadow-2xs'
               }`}>
                 🏪
               </span>
-              <span className="truncate">ทุกห้างสรรพสินค้า</span>
+              <span className="truncate font-bold">ทุกห้าง</span>
             </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono font-bold ${
               selectedStore === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
             }`}>
               {rawListLength}
             </span>
           </button>
 
-          {/* CJ More */}
+          {/* CJ More (เฉพาะรูปโลโก้ ไม่เอาข้อความ) */}
           <button
             type="button"
             onClick={() => setSelectedStore(selectedStore === 'CJ More' ? 'all' : 'CJ More')}
-            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+            title="CJ More"
+            className={`px-2 py-1.5 rounded-xl transition-all flex items-center justify-between cursor-pointer ${
               selectedStore === 'CJ More'
                 ? 'bg-[#0f2b5c] text-white shadow-xs'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
             }`}
           >
-            <span className="flex items-center gap-1.5 truncate">
-              <StoreLogo store="CJ More" className="w-5 h-5 shrink-0" />
-              <span className="truncate">CJ More</span>
-            </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+            <StoreLogo store="CJ More" className="w-8 h-8 shrink-0 shadow-2xs" />
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono font-bold shrink-0 ml-1 ${
               selectedStore === 'CJ More' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
             }`}>
               {storeCounts['CJ More'] || 0}
             </span>
           </button>
 
-          {/* Mini BigC */}
+          {/* Mini BigC (เฉพาะรูปโลโก้ ไม่เอาข้อความ) */}
           <button
             type="button"
             onClick={() => setSelectedStore(selectedStore === 'Mini BigC' ? 'all' : 'Mini BigC')}
-            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+            title="Mini BigC"
+            className={`px-2 py-1.5 rounded-xl transition-all flex items-center justify-between cursor-pointer ${
               selectedStore === 'Mini BigC'
                 ? 'bg-[#0f2b5c] text-white shadow-xs'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
             }`}
           >
-            <span className="flex items-center gap-1.5 truncate">
-              <StoreLogo store="Mini BigC" className="w-5 h-5 shrink-0" />
-              <span className="truncate">Mini BigC</span>
-            </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+            <StoreLogo store="Mini BigC" className="w-8 h-8 shrink-0 shadow-2xs" />
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono font-bold shrink-0 ml-1 ${
               selectedStore === 'Mini BigC' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
             }`}>
               {storeCounts['Mini BigC'] || 0}
             </span>
           </button>
 
-          {/* Lotus Go */}
+          {/* Lotus Go (เฉพาะรูปโลโก้ ไม่เอาข้อความ) */}
           <button
             type="button"
             onClick={() => setSelectedStore(selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'all' : 'Lotus Go Fresh')}
-            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+            title="Lotus's go fresh"
+            className={`px-2 py-1.5 rounded-xl transition-all flex items-center justify-between cursor-pointer ${
               selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's"
                 ? 'bg-[#0f2b5c] text-white shadow-xs'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
             }`}
           >
-            <span className="flex items-center gap-1.5 truncate">
-              <StoreLogo store="Lotus Go Fresh" className="w-5 h-5 shrink-0" />
-              <span className="truncate">Lotus Go</span>
-            </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+            <StoreLogo store="Lotus Go Fresh" className="w-8 h-8 shrink-0 shadow-2xs" />
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono font-bold shrink-0 ml-1 ${
               selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
             }`}>
               {storeCounts['Lotus Go Fresh'] || 0}
             </span>
           </button>
 
-          {/* Tops */}
+          {/* Tops (เฉพาะรูปโลโก้ ไม่เอาข้อความ) */}
           <button
             type="button"
             onClick={() => setSelectedStore(selectedStore === 'Tops' || selectedStore === 'Top' ? 'all' : 'Tops')}
-            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+            title="Tops"
+            className={`px-2 py-1.5 rounded-xl transition-all flex items-center justify-between cursor-pointer ${
               selectedStore === 'Tops' || selectedStore === 'Top'
                 ? 'bg-[#0f2b5c] text-white shadow-xs'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
             }`}
           >
-            <span className="flex items-center gap-1.5 truncate">
-              <StoreLogo store="Tops" className="w-5 h-5 shrink-0" />
-              <span className="truncate">Tops</span>
-            </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+            <StoreLogo store="Tops" className="w-8 h-8 shrink-0 shadow-2xs" />
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono font-bold shrink-0 ml-1 ${
               selectedStore === 'Tops' || selectedStore === 'Top' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
             }`}>
               {storeCounts['Tops'] || storeCounts['Top'] || 0}
