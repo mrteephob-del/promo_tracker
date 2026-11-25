@@ -54,6 +54,8 @@ import {
   ShoppingBag,
   Calculator,
   RotateCcw,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { PromoCategory } from '@/types';
 import { getCachedHistoryRows } from '@/lib/client-api';
@@ -225,42 +227,150 @@ function DashboardFilterControls({
   clearAllFilters,
   filteredCount,
 }: DashboardFilterControlsProps) {
+  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+
+  // ดึงค่าการลด/ขยายที่บันทึกไว้ใน localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('promo_track_filter_expanded');
+      if (saved !== null) {
+        setIsExpanded(saved === 'true');
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const toggleExpanded = () => {
+    setIsExpanded((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('promo_track_filter_expanded', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
   return (
-    <div className="bg-white rounded-3xl p-4 border border-blue-200/80 shadow-xs space-y-3.5">
-      {/* 1. Header: หัวข้อตัวกรอง + ปุ่มรีเซ็ต */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-sky-100 flex items-center justify-center text-[#0f2b5c]">
+    <div className={`bg-white rounded-3xl border border-blue-200/80 shadow-xs transition-all ${
+      isExpanded ? 'p-4 space-y-3.5' : 'p-3.5'
+    }`}>
+      {/* 1. Header: หัวข้อตัวกรอง + ปุ่มรีเซ็ต + ปุ่มลด/ขยาย (Collapsible Toggle) */}
+      <div className={`flex items-center justify-between ${isExpanded ? 'border-b border-slate-100 pb-2.5' : ''}`}>
+        <div
+          onClick={toggleExpanded}
+          className="flex items-center gap-2 cursor-pointer select-none group flex-1"
+          title={isExpanded ? 'คลิกเพื่อย่อตัวกรอง (ลดพื้นที่)' : 'คลิกเพื่อขยายตัวกรอง'}
+        >
+          <div className="w-7 h-7 rounded-xl bg-sky-100 group-hover:bg-sky-200 text-[#0f2b5c] flex items-center justify-center transition-colors">
             <SlidersHorizontal className="w-3.5 h-3.5" />
           </div>
           <div>
-            <span className="text-xs font-black text-[#0f2b5c] block leading-tight">
-              ตัวกรองข้อมูล
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-black text-[#0f2b5c] block leading-tight">
+                ตัวกรองข้อมูล
+              </span>
+              <span className="text-[10px] text-sky-800 bg-sky-50 border border-sky-200/60 px-1.5 py-0.2 rounded-full font-bold">
+                {filteredCount} ดีล
+              </span>
+            </div>
             <span className="text-[10px] text-slate-400 font-medium block">
-              ค้นหา & จัดกลุ่มสินค้า
+              {isExpanded
+                ? 'ค้นหา & จัดกลุ่มสินค้า'
+                : isAnyFilterActive
+                ? 'กรองอยู่ (คลิกเพื่อขยายดู)'
+                : 'คลิกเพื่อขยายตัวกรอง'}
             </span>
           </div>
         </div>
 
-        {isAnyFilterActive ? (
+        <div className="flex items-center gap-1.5">
+          {isAnyFilterActive && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                clearAllFilters();
+              }}
+              className="text-[11px] font-bold text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 px-2 py-1 rounded-xl border border-rose-200 transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+              title="ล้างตัวกรองทั้งหมด"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span className="hidden sm:inline">ล้าง</span>
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={clearAllFilters}
-            className="text-[11px] font-bold text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200 transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
-            title="ล้างตัวกรองทั้งหมด"
+            onClick={toggleExpanded}
+            className={`p-1.5 px-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-1 text-[11px] font-bold shadow-2xs ${
+              isExpanded
+                ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                : 'bg-[#0f2b5c] text-white hover:bg-[#163a75]'
+            }`}
+            title={isExpanded ? 'คลิกเพื่อย่อตัวกรอง (ลดพื้นที่)' : 'คลิกเพื่อขยายตัวกรอง'}
           >
-            <RotateCcw className="w-3 h-3" />
-            <span>ล้างตัวกรอง</span>
+            <span>{isExpanded ? 'ย่อ' : 'ขยาย'}</span>
+            {isExpanded ? (
+              <ChevronUp className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5" />
+            )}
           </button>
-        ) : (
-          <span className="text-[10px] text-slate-500 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
-            {filteredCount} ดีล
-          </span>
-        )}
+        </div>
       </div>
 
-      {/* 2. ค้นหาสินค้า */}
+      {/* เมื่อย่ออยู่ (Collapsed State): แสดงป้ายสรุปตัวกรองอย่างกระชับ */}
+      {!isExpanded && (
+        <div className="pt-2 border-t border-slate-100/80 flex items-center justify-between text-xs">
+          <div className="flex flex-wrap items-center gap-1 text-[10px]">
+            {isAnyFilterActive ? (
+              <>
+                {selectedStore !== 'all' && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold">
+                    {selectedStore}
+                  </span>
+                )}
+                {selectedCategory !== 'all' && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold">
+                    {selectedCategory === 'coffee' ? 'กาแฟ' : 'บะหมี่'}
+                  </span>
+                )}
+                {selectedSubCategory !== 'all' && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold">
+                    {selectedSubCategory}
+                  </span>
+                )}
+                {selectedBrand !== 'all' && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold">
+                    {selectedBrand}
+                  </span>
+                )}
+                {searchQuery.trim() && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold truncate max-w-[90px]">
+                    &quot;{searchQuery}&quot;
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="text-slate-400 font-medium">แสดงสินค้าทุกหมวดหมู่ ({rawListLength} รายการ)</span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={toggleExpanded}
+            className="text-[10px] text-sky-700 hover:text-sky-900 font-bold cursor-pointer underline shrink-0 ml-1"
+          >
+            ปรับเงื่อนไข
+          </button>
+        </div>
+      )}
+
+      {isExpanded && (
+        <>
+          {/* 2. ค้นหาสินค้า */}
       <div className="space-y-1.5">
         <label className="text-[11px] font-bold text-[#0f2b5c] flex items-center justify-between">
           <span className="flex items-center gap-1.5">
@@ -609,6 +719,8 @@ function DashboardFilterControls({
           )}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }
