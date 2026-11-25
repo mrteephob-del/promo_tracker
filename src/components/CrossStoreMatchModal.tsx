@@ -47,27 +47,17 @@ export default function CrossStoreMatchModal({
     // ดึงเฉพาะคำสำคัญของรสชาติ/ชนิดสินค้าเพื่อค้นหาข้ามห้างอย่างแม่นยำ
     const normalizedCore = coreName.toLowerCase().replace(brand.toLowerCase(), '').trim();
 
-    // ค้นหาสินค้าที่ตรงกันหรือใกล้เคียงกันที่สุดใน rawList
+    // ค้นหาสินค้าของแบรนด์เดียวกันใน rawList ของทุกห้าง โดยไม่จำกัดรสชาติ
     const matchedItems = rawList.filter((r) => {
       // 1. แบรนด์ต้องตรงกัน
-      const rBrand = (r.brand || '').toLowerCase();
-      const bBrand = brand.toLowerCase();
+      const rBrand = (r.brand || '').toLowerCase().trim();
+      const bBrand = brand.toLowerCase().trim();
       if (!rBrand.includes(bBrand) && !bBrand.includes(rBrand)) return false;
 
-      // 2. หมวดหมู่ย่อยควรสอดคล้องกัน (เช่น กาแฟเหมือนกัน หรือ บะหมี่เหมือนกัน)
+      // 2. หมวดหมู่สินค้าต้องตรงกัน (เช่น กาแฟ หรือ บะหมี่)
       if (item.category && r.category && item.category !== r.category) return false;
 
-      // 3. ชื่อหลักตรงกัน หรือมีคำสำคัญของสินค้า
-      const rCore = cleanCoreProductName(r.brand, r.itemName).toLowerCase();
-      if (rCore === coreName.toLowerCase()) return true;
-
-      // เช็กคีย์เวิร์ดรสชาติเด่น (เช่น ต้มยำกุ้ง, ริชอโรมา, เอสเปรสโซ, หมูสับ, เป็ดพะโล้)
-      if (normalizedCore.length >= 3) {
-        const rName = (r.itemName || '').toLowerCase();
-        if (rName.includes(normalizedCore) || normalizedCore.includes(rName)) return true;
-      }
-
-      return false;
+      return true;
     });
 
     // จัดกลุ่มตาม 4 ห้างหลัก
