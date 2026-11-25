@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { History, PlusCircle, LayoutDashboard, KeyRound, Landmark, ShieldCheck } from 'lucide-react';
+import { History, PlusCircle, LayoutDashboard, KeyRound, Landmark, ShieldCheck, Swords } from 'lucide-react';
 import ApiKeyModal from '@/components/ApiKeyModal';
 
 export default function Header() {
@@ -33,6 +33,7 @@ export default function Header() {
     { href: '/', label: 'บันทึกโปรโมชั่น', shortLabel: 'บันทึก', icon: PlusCircle },
     { href: '/history', label: 'คลังประวัติข้อมูล', shortLabel: 'ประวัติ', icon: History },
     { href: '/dashboard', label: 'ศูนย์วิเคราะห์ข้อมูล', shortLabel: 'แดชบอร์ด', icon: LayoutDashboard },
+    { href: '/dashboard?tab=comparison', label: 'เทียบราคาข้ามห้าง', shortLabel: 'เทียบราคา', icon: Swords, highlight: true },
   ];
 
   return (
@@ -92,18 +93,26 @@ export default function Header() {
             {navLinks.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
+              const isHighlight = item.highlight;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                    isActive
+                    isHighlight
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-md shadow-orange-950/40 border border-amber-300/50 font-black'
+                      : isActive
                       ? 'bg-sky-600 text-white shadow-sm border-b-2 border-sky-200 font-bold'
                       : 'text-sky-100 hover:bg-blue-900/70 hover:text-white'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-sky-300'}`} />
+                  <Icon className={`w-4 h-4 ${isHighlight ? 'text-amber-100' : isActive ? 'text-white' : 'text-sky-300'}`} />
                   <span>{item.label}</span>
+                  {isHighlight && (
+                    <span className="text-[9px] bg-rose-600 text-white px-1.5 py-0.2 rounded-full font-black">
+                      HOT
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -139,18 +148,21 @@ export default function Header() {
         {navLinks.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+          const isHighlight = item.highlight;
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition-all ${
-                isActive
+                isHighlight
+                  ? 'text-amber-300 font-black'
+                  : isActive
                   ? 'text-sky-300 font-bold'
                   : 'text-sky-200/60 hover:text-white font-medium'
               }`}
             >
               <div className={`p-1 rounded-lg transition-colors ${
-                isActive ? 'bg-sky-500/20 text-sky-300' : ''
+                isHighlight ? 'bg-amber-500/20 text-amber-300' : isActive ? 'bg-sky-500/20 text-sky-300' : ''
               }`}>
                 <Icon className="w-5 h-5" />
               </div>

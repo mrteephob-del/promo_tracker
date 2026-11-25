@@ -767,6 +767,7 @@ export default function DashboardPage() {
   const [selectedStore, setSelectedStore] = useState<string>('all');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [instantRadarQuery, setInstantRadarQuery] = useState<string>('');
 
   // Modal ดูรูปภาพขยายใหญ่
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string; store: string } | null>(null);
@@ -776,6 +777,25 @@ export default function DashboardPage() {
 
   // Desktop Sidebar State: ควบคุมการเปิด/ปิด แบบสไลด์ (Collapsible Sliding Sidebar) เพื่อขยายพื้นที่ดูข้อมูล
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState<boolean>(true);
+
+  // ตรวจจับ URL Search Params (?tab=comparison) เพื่อเปิดแท็บที่ต้องการทันที
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab === 'comparison') {
+          setViewMode('comparison');
+        } else if (tab === 'monthly') {
+          setViewMode('monthly');
+        } else if (tab === 'frequency') {
+          setViewMode('frequency');
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // ดึงค่าการเปิด/ปิด Sidebar ที่บันทึกไว้ใน localStorage
   useEffect(() => {
@@ -2327,6 +2347,143 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* INSTANT CROSS-STORE PRICE RADAR HERO WIDGET (ระบบเทียบราคาข้ามห้างทันทีในคลิกเดียว) */}
+            <div className="bg-gradient-to-br from-[#071d3a] via-[#0f2b5c] to-[#0284c7] rounded-3xl p-5 sm:p-6 text-white border-2 border-sky-400/40 shadow-xl relative overflow-hidden">
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-2.5 max-w-2xl">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-md shrink-0">
+                      ⚔️
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+                      เรดาร์เทียบราคาข้ามห้างทันทีในคลิกเดียว (Instant Store Price Radar)
+                    </h3>
+                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-400 text-emerald-950 shadow-2xs">
+                      พร้อมใช้งาน ⚡️
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-sky-100/90 leading-relaxed">
+                    ค้นหาหรือคลิกสินค้าตัวไหนก็ได้ เพื่อดูราคาเทียบพร้อมกัน 4 ห้างทันที (<strong className="text-amber-300">CJ More, Mini BigC, Lotus Go Fresh, Tops</strong>) ระบบจะคำนวณส่วนต่างและความคุ้มค่าให้ทันทีในคลิกเดียว
+                  </p>
+
+                  {/* Hot Sample Chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                    <span className="text-[11px] text-sky-200 font-bold shrink-0">คลิกเทียบด่วน:</span>
+                    {[
+                      { name: 'มาม่า ต้มยำกุ้ง', brand: 'มาม่า' },
+                      { name: 'มาม่า หมูสับ', brand: 'มาม่า' },
+                      { name: 'เนสกาแฟ ริชอโรมา', brand: 'เนสกาแฟ' },
+                      { name: 'คนอร์ คัพโจ๊ก', brand: 'คนอร์' },
+                      { name: 'ไวไว รสดั้งเดิม', brand: 'ไวไว' },
+                      { name: 'มอคโคน่า ทรีอินวัน', brand: 'มอคโคน่า' },
+                    ].map((sample) => (
+                      <button
+                        key={sample.name}
+                        type="button"
+                        onClick={() => {
+                          const matched = rawList.find((r) =>
+                            r.itemName.toLowerCase().includes(sample.name.toLowerCase()) ||
+                            (r.brand.toLowerCase() === sample.brand.toLowerCase() && r.itemName.toLowerCase().includes(sample.name.split(' ')[1] || ''))
+                          );
+                          if (matched) {
+                            setCrossStoreMatchItem(matched);
+                          } else {
+                            setCrossStoreMatchItem({
+                              itemName: sample.name,
+                              brand: sample.brand,
+                              category: sample.brand === 'เนสกาแฟ' || sample.brand === 'มอคโคน่า' ? 'coffee' : 'noodle',
+                              store: 'CJ More',
+                              proPrice: 15,
+                              retailPrice: 18,
+                              packSize: 1,
+                            });
+                          }
+                        }}
+                        className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-sky-100 hover:text-white border border-sky-300/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 active:scale-95 shadow-2xs"
+                      >
+                        <span>⚡️ {sample.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Instant Search & Full Arena CTA */}
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full lg:w-80 shrink-0">
+                  <div className="relative w-full">
+                    <Search className="w-4 h-4 text-sky-300 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="พิมพ์ชื่อสินค้าเพื่อเทียบราคาข้ามห้าง..."
+                      value={instantRadarQuery}
+                      onChange={(e) => setInstantRadarQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && instantRadarQuery.trim()) {
+                          const query = instantRadarQuery.trim().toLowerCase();
+                          const matched = rawList.find((r) =>
+                            r.itemName.toLowerCase().includes(query) ||
+                            r.brand.toLowerCase().includes(query)
+                          );
+                          if (matched) {
+                            setCrossStoreMatchItem(matched);
+                          } else {
+                            setCrossStoreMatchItem({
+                              itemName: instantRadarQuery.trim(),
+                              brand: 'ทั่วไป',
+                              category: 'noodle',
+                              store: 'CJ More',
+                              proPrice: 15,
+                              retailPrice: 18,
+                              packSize: 1,
+                            });
+                          }
+                        }
+                      }}
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white/15 border border-sky-300/40 text-white placeholder-sky-200/70 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 backdrop-blur-sm"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const query = instantRadarQuery.trim().toLowerCase() || 'มาม่า';
+                        const matched = rawList.find((r) =>
+                          r.itemName.toLowerCase().includes(query) ||
+                          r.brand.toLowerCase().includes(query)
+                        );
+                        if (matched) {
+                          setCrossStoreMatchItem(matched);
+                        } else {
+                          setCrossStoreMatchItem(rawList[0] || {
+                            itemName: 'มาม่า ต้มยำกุ้ง',
+                            brand: 'มาม่า',
+                            category: 'noodle',
+                            store: 'CJ More',
+                            proPrice: 15,
+                            retailPrice: 18,
+                            packSize: 1,
+                          });
+                        }
+                      }}
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                    >
+                      <Swords className="w-4 h-4 text-slate-900" />
+                      <span>เทียบราคาทันที</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('comparison')}
+                      className="py-2.5 px-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/25 font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                      title="เปิดหน้าสนามประลองเปรียบเทียบเต็มรูปแบบ"
+                    >
+                      <span>ดูทั้งตาราง ↗</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* MONTHLY PROMOTION SEASONALITY CARD */}
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -3856,16 +4013,40 @@ export default function DashboardPage() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1 mt-1.5">
-                        <span className="text-[10px] text-slate-400 font-semibold">วางขายใน:</span>
-                        {sku.stores.map((st) => (
-                          <span
-                            key={st}
-                            className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-200/70 text-slate-700"
-                          >
-                            {st}
-                          </span>
-                        ))}
+                      <div className="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-slate-100 flex-wrap">
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-slate-400 font-semibold">วางขายใน:</span>
+                          {sku.stores.map((st) => (
+                            <span
+                              key={st}
+                              className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-200/70 text-slate-700"
+                            >
+                              {st}
+                            </span>
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const matched = rawList.find(r => r.itemName.toLowerCase().includes(sku.name.toLowerCase()) || sku.name.toLowerCase().includes(r.itemName.toLowerCase()));
+                            if (matched) {
+                              setCrossStoreMatchItem(matched);
+                            } else {
+                              setCrossStoreMatchItem({
+                                itemName: sku.name,
+                                brand: sku.brand,
+                                store: sku.stores[0] || 'CJ More',
+                                proPrice: sku.sampleProPrice || 15,
+                                category: sku.brand.includes('เนส') || sku.brand.includes('เบอร์ดี้') ? 'coffee' : 'noodle',
+                              });
+                            }
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                          title="เทียบราคาของสินค้านี้ในห้างอื่นทันที"
+                        >
+                          <Swords className="w-3 h-3 text-sky-700" />
+                          <span>เทียบราคา</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -4991,12 +5172,36 @@ export default function DashboardPage() {
                             </div>
                           </div>
 
-                          {/* Savings Pill */}
-                          <div className="flex items-center gap-2">
+                          {/* Savings Pill & Radar Modal Launcher */}
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="px-3 py-1 rounded-xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
                               <Crown className="w-3.5 h-3.5 text-amber-500" />
                               <span>ซื้อที่ <strong>{item.cheapestStores.map((s: string) => s === "Lotus's" ? 'Lotus Go Fresh' : s).join(', ')}</strong> ถูกกว่า {item.diff} ฿ (-{item.diffPercent}%)</span>
                             </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const sampleStore = item.cheapestStores[0] || Object.keys(item.stores)[0];
+                                const sampleData = item.stores[sampleStore];
+                                const syntheticItem = {
+                                  itemName: item.name,
+                                  brand: item.brand,
+                                  store: sampleStore,
+                                  proPrice: sampleData?.proPrice,
+                                  retailPrice: sampleData?.retailPrice,
+                                  category: item.category,
+                                  imageUrl: sampleData?.imageUrl,
+                                  unitPrice: sampleData?.unitPrice,
+                                  packSize: sampleData?.packSize,
+                                };
+                                setCrossStoreMatchItem(syntheticItem);
+                              }}
+                              className="px-2.5 py-1 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all hover:scale-105 active:scale-95"
+                              title="เปิดหน้าต่างเรดาร์เทียบ 4 ห้างทันที (Instant Radar Modal)"
+                            >
+                              <Swords className="w-3.5 h-3.5 text-sky-700" />
+                              <span>เปิดเรดาร์ 4 ห้าง</span>
+                            </button>
                           </div>
                         </div>
 
