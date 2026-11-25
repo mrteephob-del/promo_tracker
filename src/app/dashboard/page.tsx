@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import StoreLogo from '@/components/StoreLogo';
+import CrossStoreMatchModal from '@/components/CrossStoreMatchModal';
 import {
   TrendingUp,
   DollarSign,
@@ -64,6 +65,7 @@ import { fetchRecentSheetRows } from '@/lib/sheets';
 import {
   calculateDiscount,
   calculatePricePerSachet,
+  cleanCoreProductName,
   classifyNoodleSubCategory,
   formatPeriodDisplay,
   buildCrossStoreComparisons,
@@ -768,6 +770,8 @@ export default function DashboardPage() {
 
   // Modal ดูรูปภาพขยายใหญ่
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string; store: string } | null>(null);
+  // Modal เปรียบเทียบราคาข้ามห้างทันที (Instant Cross-Store Match)
+  const [crossStoreMatchItem, setCrossStoreMatchItem] = useState<any | null>(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
   // Desktop Sidebar State: ควบคุมการเปิด/ปิด แบบสไลด์ (Collapsible Sliding Sidebar) เพื่อขยายพื้นที่ดูข้อมูล
@@ -1245,6 +1249,19 @@ export default function DashboardPage() {
     setStoreB(b.storeB);
     setSelectedItemBId(b.itemIdB);
     setComparisonSubTab('custom');
+  };
+
+  const handleSendToArenaFromRadar = (stA: string, idA: string, stB: string, idB: string) => {
+    setViewMode('comparison');
+    setComparisonSubTab('custom');
+    if (stA) setStoreA(stA);
+    if (idA) setSelectedItemAId(idA);
+    if (stB) setStoreB(stB);
+    if (idB) setSelectedItemBId(idB);
+    setCrossStoreMatchItem(null);
+    setTimeout(() => {
+      window.scrollTo({ top: 380, behavior: 'smooth' });
+    }, 150);
   };
 
   // รายการหลังกรอง
@@ -5353,17 +5370,31 @@ export default function DashboardPage() {
                             )}
                           </div>
 
-                          {r.imageUrl && (
-                            <a
-                              href={r.imageUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-[11px] text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1 mt-1 sm:mt-1.5 hover:underline"
+                          <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMechanicModal(null);
+                                setCrossStoreMatchItem(r);
+                              }}
+                              className="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-[11px] font-bold flex items-center gap-1 cursor-pointer shadow-2xs transition-all"
+                              title="ดูราคาของสินค้านี้ในห้างอื่นทันที (Cross-Store Radar)"
                             >
-                              <span>เปิดดูรูป</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
+                              <Swords className="w-3 h-3 text-sky-700" />
+                              <span>เทียบราคา</span>
+                            </button>
+                            {r.imageUrl && (
+                              <a
+                                href={r.imageUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[11px] text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1 hover:underline"
+                              >
+                                <span>เปิดดูรูป</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -5498,6 +5529,19 @@ export default function DashboardPage() {
                               </a>
                             )}
                           </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedMechanicModal(null);
+                              setCrossStoreMatchItem(r);
+                            }}
+                            className="w-full py-1.5 px-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs transition-all"
+                            title="ดูราคาของสินค้านี้ในห้างอื่นทันที (Cross-Store Radar)"
+                          >
+                            <Swords className="w-3.5 h-3.5 text-sky-700" />
+                            <span>เทียบราคาห้างอื่น</span>
+                          </button>
                         </div>
                       </div>
                     );
@@ -5717,20 +5761,14 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setViewMode('comparison');
-                    setComparisonSubTab('custom');
-                    if (selectedProductModal.store) {
-                      setStoreA(selectedProductModal.store);
-                    }
-                    if (selectedProductModal.id) {
-                      setSelectedItemAId(selectedProductModal.id);
-                    }
+                    const item = selectedProductModal;
                     setSelectedProductModal(null);
+                    setCrossStoreMatchItem(item);
                   }}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0f2b5c] to-[#1a428a] hover:from-[#163a75] hover:to-[#2252a5] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
                 >
                   <Swords className="w-4 h-4 text-amber-400" />
-                  <span>นำไปเทียบราคากับห้างอื่น</span>
+                  <span>ดูราคาห้างอื่นทันที (Cross-Store Radar)</span>
                 </button>
 
                 {selectedProductModal.imageUrl && (
@@ -6005,6 +6043,16 @@ export default function DashboardPage() {
             <span className="w-2 h-2 rounded-full bg-sky-300 animate-pulse" />
           )}
         </button>
+      )}
+      {/* Instant Cross-Store Match Modal (ระบบเทียบราคาข้ามห้างทันทีในคลิกเดียว) */}
+      {crossStoreMatchItem && (
+        <CrossStoreMatchModal
+          item={crossStoreMatchItem}
+          rawList={rawList}
+          onClose={() => setCrossStoreMatchItem(null)}
+          onSendToArena={handleSendToArenaFromRadar}
+          onPreviewImage={(img) => setPreviewImage(img)}
+        />
       )}
     </div>
   );

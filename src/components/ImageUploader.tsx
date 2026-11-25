@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   UploadCloud,
   Camera,
@@ -15,6 +15,9 @@ import {
   Loader2,
   KeyRound,
   Crop,
+  CheckCircle2,
+  Clock,
+  Layers,
 } from 'lucide-react';
 import ApiKeyModal from '@/components/ApiKeyModal';
 import ImageCropModal from '@/components/ImageCropModal';
@@ -52,6 +55,22 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [isCropModalOpen, setIsCropModalOpen] = useState<boolean>(false);
   const [selectedCropIndex, setSelectedCropIndex] = useState<number>(0);
+
+  // Batch Image Queue State: ติดตามสถานะของแต่ละรูปในคิวแบบเรียลไทม์
+  const [imageStatuses, setImageStatuses] = useState<Record<number, {
+    status: 'waiting' | 'scanning' | 'done' | 'error';
+    count: number;
+    error?: string;
+  }>>({});
+  const cancelBatchRef = useRef<boolean>(false);
+
+  const completedCount = useMemo(() => {
+    return Object.values(imageStatuses).filter((s) => s.status === 'done' || s.status === 'error').length;
+  }, [imageStatuses]);
+
+  const totalDealsFound = useMemo(() => {
+    return Object.values(imageStatuses).reduce((acc, curr) => acc + (curr.count || 0), 0);
+  }, [imageStatuses]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -122,6 +141,14 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
     setAnalyzing(true);
     setError(null);
+    cancelBatchRef.current = false;
+
+    // เริ่มต้นสถานะทุกรูปเป็น waiting
+    const initialStatuses: Record<number, { status: 'waiting' | 'scanning' | 'done' | 'error'; count: number; error?: string }> = {};
+    for (let i = 0; i < images.length; i++) {
+      initialStatuses[i] = { status: 'waiting', count: 0 };
+    }
+    setImageStatuses(initialStatuses);
 
     const allItems: PromotionItem[] = [];
     const errors: string[] = [];
@@ -129,6 +156,15 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
 
     try {
       for (let i = 0; i < images.length; i++) {
+        if (cancelBatchRef.current) {
+          break;
+        }
+
+        setImageStatuses((prev) => ({
+          ...prev,
+          [i]: { status: 'scanning', count: 0 },
+        }));
+
         setAnalysisProgress(`กำลังวิเคราะห์รูปที่ ${i + 1} จาก ${images.length}...`);
         const img = images[i];
 
@@ -144,6 +180,10 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           });
 
           if (!data || !data.ok) {
+            setImageStatuses((prev) => ({
+              ...prev,
+              [i]: { status: 'error', count: 0, error: data?.error || 'วิเคราะห์ไม่สำเร็จ' },
+            }));
             errors.push(`รูปที่ ${i + 1}: ${data?.error || 'วิเคราะห์ไม่สำเร็จ'}`);
             continue;
           }
@@ -155,8 +195,21 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             imagePreviewUrl: img.dataUrl,
           }));
 
+          setImageStatuses((prev) => ({
+            ...prev,
+            [i]: { status: 'done', count: itemsWithImage.length },
+          }));
+
           allItems.push(...itemsWithImage);
         } catch (fetchErr) {
+          setImageStatuses((prev) => ({
+            ...prev,
+            [i]: {
+              status: 'error',
+              count: 0,
+              error: fetchErr instanceof Error ? fetchErr.message : 'เชื่อมต่อล้มเหลว',
+            },
+          }));
           errors.push(
             `รูปที่ ${i + 1}: ${fetchErr instanceof Error ? fetchErr.message : 'เชื่อมต่อล้มเหลว'}`
           );
@@ -386,6 +439,10 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           onClick={() => fileInputRef.current?.click()}
           className="border-2 border-dashed border-sky-300 hover:border-sky-500 bg-sky-50/25 hover:bg-sky-50/60 rounded-2xl p-6 text-center cursor-pointer transition-colors"
         >
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-[11px] font-bold mb-2 shadow-2xs">
+            <Layers className="w-3.5 h-3.5 text-sky-600" />
+            <span>รองรับเลือกหลายรูปพร้อมกัน (Batch Upload สูงสุด 30 รูป)</span>
+          </div>
           <UploadCloud className="w-10 h-10 text-sky-500 mx-auto mb-2" />
           <p className="text-sm font-bold text-[#0f2b5c]">
             แตะหรือลากรูปภาพมาวางที่นี่
@@ -401,6 +458,53 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
         <div className="flex items-center justify-center gap-2 p-3 bg-sky-50 text-sky-800 rounded-xl text-xs sm:text-sm font-bold border border-sky-200">
           <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
           <span>กำลังปรับขนาดและบีบอัดรูปภาพ...</span>
+        </div>
+      )}
+
+      {/* Batch Processing Queue Monitor */}
+      {analyzing && (
+        <div className="p-4 bg-gradient-to-r from-sky-50 via-blue-50/60 to-sky-50 border border-sky-300 rounded-2xl space-y-3 shadow-xs animate-in fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <Loader2 className="w-5 h-5 animate-spin text-white" />
+              </div>
+              <div>
+                <span className="text-xs font-black text-[#0f2b5c] block">
+                  ระบบกำลังวิเคราะห์รูปภาพตามคิว (Batch Image Queue)
+                </span>
+                <span className="text-[11px] text-slate-600 font-medium">
+                  {analysisProgress || 'ระบบ AI กำลังประมวลผลตามลำดับ...'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <span className="text-xs font-black px-2.5 py-1 rounded-xl bg-white border border-sky-200 text-sky-900 font-mono shadow-2xs">
+                {completedCount} / {images.length} รูป ({Math.round((completedCount / (images.length || 1)) * 100)}%)
+              </span>
+              <button
+                type="button"
+                onClick={() => { cancelBatchRef.current = true; }}
+                className="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-colors cursor-pointer"
+              >
+                หยุดคิว
+              </button>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full bg-sky-200/60 rounded-full h-2.5 overflow-hidden p-0.5">
+            <div
+              className="bg-gradient-to-r from-sky-600 to-blue-700 h-1.5 rounded-full transition-all duration-300 shadow-xs"
+              style={{ width: `${Math.max(5, (completedCount / (images.length || 1)) * 100)}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium pt-0.5">
+            <span>✨ สกัดได้แล้วรวม: <strong className="text-emerald-700">{totalDealsFound} รายการโปรโมชั่น</strong></span>
+            <span>โมเดล AI: <strong className="text-slate-800">{modelMode === 'pro' ? 'Gemini Pro' : 'Gemini Flash'}</strong></span>
+          </div>
         </div>
       )}
 
@@ -468,6 +572,44 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
+
+                {/* Live Queue Status Overlay */}
+                {imageStatuses[idx] && (
+                  <div className="absolute inset-0 bg-black/45 backdrop-blur-2xs flex flex-col items-center justify-center p-2 text-center text-white pointer-events-none z-10 animate-in fade-in">
+                    {imageStatuses[idx].status === 'scanning' && (
+                      <div className="flex flex-col items-center gap-1.5 animate-pulse">
+                        <Loader2 className="w-6 h-6 animate-spin text-sky-300" />
+                        <span className="text-[10px] font-black bg-sky-600 px-2 py-0.5 rounded-full shadow-xs">
+                          กำลังสแกน...
+                        </span>
+                      </div>
+                    )}
+                    {imageStatuses[idx].status === 'done' && (
+                      <div className="flex flex-col items-center gap-1">
+                        <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                        <span className="text-[10px] font-black bg-emerald-600 text-white px-2 py-0.5 rounded-full shadow-xs">
+                          พบ {imageStatuses[idx].count} ดีล
+                        </span>
+                      </div>
+                    )}
+                    {imageStatuses[idx].status === 'error' && (
+                      <div className="flex flex-col items-center gap-1">
+                        <AlertCircle className="w-6 h-6 text-rose-400" />
+                        <span className="text-[10px] font-black bg-rose-600 text-white px-2 py-0.5 rounded-full shadow-xs">
+                          ไม่พบดีล
+                        </span>
+                      </div>
+                    )}
+                    {imageStatuses[idx].status === 'waiting' && (
+                      <div className="flex flex-col items-center gap-1 opacity-85">
+                        <Clock className="w-5 h-5 text-slate-300" />
+                        <span className="text-[10px] font-bold bg-slate-800/90 text-slate-200 px-2 py-0.5 rounded-full shadow-xs">
+                          รอคิว
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Bottom info banner */}
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent text-white text-[10px] px-2 py-1 flex items-center justify-between">
@@ -540,7 +682,13 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
           ) : (
             <>
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <span>วิเคราะห์รูปภาพ ({images.length} รูป)</span>
+              <span>
+                {images.length > 1
+                  ? `เริ่มสแกนรูปภาพแบบคิว (${images.length} รูป)`
+                  : images.length === 1
+                  ? 'วิเคราะห์รูปภาพโปรโมชั่น'
+                  : 'เลือกรูปภาพเพื่อเริ่มสแกน'}
+              </span>
             </>
           )}
         </button>

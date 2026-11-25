@@ -521,7 +521,7 @@ export default function HomePage() {
                     ตรวจสอบข้อมูลรายการ ({items.length} รายการ)
                   </h2>
                   <p className="text-xs text-slate-500 font-medium">
-                    เลือกบันทึกแล้ว <strong className="text-sky-700">{selectedCount}</strong> จาก {items.length} รายการ
+                    สแกนจาก {compressedImages.length} รูปภาพ • เลือกบันทึก <strong className="text-sky-700">{selectedCount}</strong> จาก {items.length} รายการ
                   </p>
                 </div>
               </div>
