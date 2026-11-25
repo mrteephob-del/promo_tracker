@@ -1,7 +1,7 @@
 import { extractPromotionFromImage } from '@/lib/gemini';
 import { checkDuplicatesWithSheet, saveRowsAndImagesToSheet, fetchRecentSheetRows } from '@/lib/sheets';
 import { PromotionItem, PromoCategory, AiModelMode, SheetRowData } from '@/types';
-import { isTrackedBrand, getBangkokTodayDMY, classifyNoodleSubCategory } from '@/lib/calc';
+import { isTrackedBrand, getBangkokTodayDMY, classifyNoodleSubCategory, detectItemCategory } from '@/lib/calc';
 import cachedData from '@/data/cached_sheet_data.json';
 
 export interface ExtractClientParams {
@@ -36,7 +36,7 @@ export async function extractPromotionClient(params: ExtractClientParams): Promi
     throw new Error('กรุณาส่งรูปภาพ base64 เพื่อทำการวิเคราะห์');
   }
 
-  const currentCategory: PromoCategory = category === 'noodle' ? 'noodle' : 'coffee';
+  const currentCategory: PromoCategory = category;
   const currentModelMode: AiModelMode = modelMode === 'flash' ? 'flash' : 'pro';
 
   // เรียก Gemini Vision พร้อมส่ง context ห้างที่เลือกเพื่อให้ AI ใช้เลย์เอาต์ป้ายที่ถูกต้อง
@@ -68,23 +68,29 @@ export async function extractPromotionClient(params: ExtractClientParams): Promi
       period = `ตั้งแต่ ${validS}`;
     }
 
-    const isUntracked = currentCategory === 'coffee' ? !isTrackedBrand(item.brand) : false;
-    const subCat =
-      currentCategory === 'noodle'
-        ? classifyNoodleSubCategory(item.brand, item.item_name, item.mechanic)
-        : 'กาแฟซอง';
+    // ในโหมดสแกนรวม (all) แยกประเภทสินค้าอัตโนมัติเป็น coffee หรือ noodle
+    const itemCategory: PromoCategory =
+      currentCategory === 'all'
+        ? detectItemCategory(item.brand, item.item_name, item.mechanic)
+        : currentCategory;
+
+    const isCoffee = itemCategory === 'coffee';
+    const isUntracked = isCoffee ? !isTrackedBrand(item.brand) : false;
+    const subCat = !isCoffee
+      ? classifyNoodleSubCategory(item.brand, item.item_name, item.mechanic)
+      : 'กาแฟซอง';
 
     return {
       id: `extracted-${Date.now()}-${index}`,
-      category: currentCategory,
+      category: itemCategory,
       subCategory: subCat,
       selected: !isUntracked,
       date: formattedDate,
       store: store,
       brand: item.brand,
       itemName: item.item_name,
-      color: item.color || (currentCategory === 'noodle' ? 'ซอง' : 'แดง'),
-      packSize: item.pack_size ?? (currentCategory === 'noodle' ? 1 : 40),
+      color: item.color || (isCoffee ? 'แดง' : 'ซอง'),
+      packSize: item.pack_size ?? (isCoffee ? 40 : 1),
       bonusSachets: item.bonus_sachets,
       promotion: item.promotion_type || 'ลดราคา',
       channel: channel,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export type PromoCategory = 'coffee' | 'noodle';
+export type PromoCategory = 'coffee' | 'noodle' | 'all';
 export type AiModelMode = 'flash' | 'pro';
 
 export interface CategoryConfig {
@@ -25,6 +25,13 @@ export const CATEGORIES: Record<PromoCategory, CategoryConfig> = {
     sheetName: 'NOODLE',
     icon: '🍜',
     description: 'บะหมี่กึ่งสำเร็จรูป (ซอง/ถ้วย), โจ๊ก (ซอง/ถ้วย), ข้าวต้ม (ถ้วย)',
+  },
+  all: {
+    id: 'all',
+    name: 'สแกนรวม (กาแฟ + บะหมี่ + อื่นๆ)',
+    sheetName: 'PRT & NOODLE',
+    icon: '⚡',
+    description: 'สแกนทั้งกาแฟ บะหมี่ โจ๊ก ข้าวต้ม และสินค้าอื่นๆ ในหน้าเดียวพร้อมกัน',
   },
 };
 

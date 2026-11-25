@@ -54,10 +54,10 @@ export default function HomePage() {
 
   // กรณีเลือกกรอกข้อมูลเอง
   const handleManualEntry = (store: string, channel: string, date: string) => {
-    const isCoffee = category === 'coffee';
+    const isCoffee = category === 'coffee' || category === 'all';
     const newItem: PromotionItem = {
       id: `manual-${Date.now()}`,
-      category,
+      category: isCoffee ? 'coffee' : 'noodle',
       selected: true,
       date: date || getBangkokTodayDMY(),
       store: store || '7-11',
@@ -89,39 +89,112 @@ export default function HomePage() {
     setErrorMessage(null);
 
     try {
-      const sheetRows: SheetRowData[] = currentItems.map((item) => ({
-        date: item.date,
-        store: item.store,
-        brand: item.brand,
-        itemName: item.itemName,
-        color: item.color,
-        packSize: item.packSize,
-        promotion: item.promotion,
-        channel: item.channel,
-        freqWeek: item.freqWeek,
-        freqMonth: item.freqMonth || item.freqWeek,
-        subCategory: item.subCategory,
-        period: item.period,
-        machanic: item.machanic,
-        retailPrice: item.retailPrice,
-        proPrice: item.proPrice,
-      }));
+      if (category === 'all') {
+        const coffeeItemsWithIdx = currentItems
+          .map((item, idx) => ({ item, idx }))
+          .filter(({ item }) => item.category === 'coffee');
+        const noodleItemsWithIdx = currentItems
+          .map((item, idx) => ({ item, idx }))
+          .filter(({ item }) => item.category !== 'coffee');
 
-      const data = await checkDuplicatesClient(sheetRows, CATEGORIES[category].sheetName);
-      if (data && data.ok && Array.isArray(data.results)) {
-        setItems((prev) =>
-          prev.map((item, idx) => {
-            const checkRes = data.results[idx];
-            if (!checkRes) return item;
-            return {
-              ...item,
-              freqWeek: checkRes.freqWeek || item.freqWeek,
-              freqMonth: checkRes.freqMonth || checkRes.freqWeek || item.freqMonth || 1,
-              isDuplicate: checkRes.isDuplicate,
-              duplicateReason: checkRes.duplicateReason,
-            };
-          })
-        );
+        const toRow = (item: PromotionItem): SheetRowData => ({
+          date: item.date,
+          store: item.store,
+          brand: item.brand,
+          itemName: item.itemName,
+          color: item.color,
+          packSize: item.packSize,
+          promotion: item.promotion,
+          channel: item.channel,
+          freqWeek: item.freqWeek,
+          freqMonth: item.freqMonth || item.freqWeek,
+          subCategory: item.subCategory,
+          period: item.period,
+          machanic: item.machanic,
+          retailPrice: item.retailPrice,
+          proPrice: item.proPrice,
+        });
+
+        const updatedItems = [...currentItems];
+
+        if (coffeeItemsWithIdx.length > 0) {
+          const prtRes = await checkDuplicatesClient(
+            coffeeItemsWithIdx.map(({ item }) => toRow(item)),
+            'PRT'
+          );
+          if (prtRes && prtRes.ok && Array.isArray(prtRes.results)) {
+            coffeeItemsWithIdx.forEach(({ idx }, rIdx) => {
+              const res = prtRes.results[rIdx];
+              if (res) {
+                updatedItems[idx] = {
+                  ...updatedItems[idx],
+                  freqWeek: res.freqWeek || updatedItems[idx].freqWeek,
+                  freqMonth: res.freqMonth || res.freqWeek || updatedItems[idx].freqMonth || 1,
+                  isDuplicate: res.isDuplicate,
+                  duplicateReason: res.duplicateReason,
+                };
+              }
+            });
+          }
+        }
+
+        if (noodleItemsWithIdx.length > 0) {
+          const noodleRes = await checkDuplicatesClient(
+            noodleItemsWithIdx.map(({ item }) => toRow(item)),
+            'NOODLE'
+          );
+          if (noodleRes && noodleRes.ok && Array.isArray(noodleRes.results)) {
+            noodleItemsWithIdx.forEach(({ idx }, rIdx) => {
+              const res = noodleRes.results[rIdx];
+              if (res) {
+                updatedItems[idx] = {
+                  ...updatedItems[idx],
+                  freqWeek: res.freqWeek || updatedItems[idx].freqWeek,
+                  freqMonth: res.freqMonth || res.freqWeek || updatedItems[idx].freqMonth || 1,
+                  isDuplicate: res.isDuplicate,
+                  duplicateReason: res.duplicateReason,
+                };
+              }
+            });
+          }
+        }
+
+        setItems(updatedItems);
+      } else {
+        const sheetRows: SheetRowData[] = currentItems.map((item) => ({
+          date: item.date,
+          store: item.store,
+          brand: item.brand,
+          itemName: item.itemName,
+          color: item.color,
+          packSize: item.packSize,
+          promotion: item.promotion,
+          channel: item.channel,
+          freqWeek: item.freqWeek,
+          freqMonth: item.freqMonth || item.freqWeek,
+          subCategory: item.subCategory,
+          period: item.period,
+          machanic: item.machanic,
+          retailPrice: item.retailPrice,
+          proPrice: item.proPrice,
+        }));
+
+        const data = await checkDuplicatesClient(sheetRows, CATEGORIES[category].sheetName);
+        if (data && data.ok && Array.isArray(data.results)) {
+          setItems((prev) =>
+            prev.map((item, idx) => {
+              const checkRes = data.results[idx];
+              if (!checkRes) return item;
+              return {
+                ...item,
+                freqWeek: checkRes.freqWeek || item.freqWeek,
+                freqMonth: checkRes.freqMonth || checkRes.freqWeek || item.freqMonth || 1,
+                isDuplicate: checkRes.isDuplicate,
+                duplicateReason: checkRes.duplicateReason,
+              };
+            })
+          );
+        }
       }
     } catch (err) {
       console.warn('Check duplicates failed, continuing with client state', err);
@@ -142,10 +215,10 @@ export default function HomePage() {
 
   // เพิ่มแถวใหม่
   const handleAddNewRow = () => {
-    const isCoffee = category === 'coffee';
+    const isCoffee = category === 'coffee' || (category === 'all' && items.length % 2 === 0);
     const newItem: PromotionItem = {
       id: `new-${Date.now()}`,
-      category,
+      category: isCoffee ? 'coffee' : 'noodle',
       selected: true,
       date: getBangkokTodayDMY(),
       store: '7-11',
@@ -163,6 +236,7 @@ export default function HomePage() {
       proPrice: null,
       confidence: 1.0,
       notes: 'เพิ่มเอง',
+      subCategory: isCoffee ? 'กาแฟซอง' : 'บะหมี่กึ่งสำเร็จรูป',
     };
     setItems((prev) => [...prev, newItem]);
   };
@@ -229,22 +303,68 @@ export default function HomePage() {
         };
       });
 
-      const data = await saveRowsClient(
-        rowsPayload,
-        imagesPayload,
-        CATEGORIES[category].sheetName
-      );
+      if (category === 'all') {
+        const coffeeIndices: number[] = [];
+        const noodleIndices: number[] = [];
+        selectedItems.forEach((it, idx) => {
+          if (it.category === 'coffee') coffeeIndices.push(idx);
+          else noodleIndices.push(idx);
+        });
 
-      if (!data || !data.ok) {
-        throw new Error(data?.error || 'การบันทึกลง Google Sheet ล้มเหลว');
+        const coffeeRows = coffeeIndices.map((i) => rowsPayload[i]);
+        const noodleRows = noodleIndices.map((i) => rowsPayload[i]);
+
+        let totalAdded = 0;
+        const savedSheets: string[] = [];
+        let finalSpreadsheetUrl = '';
+        const allImageUrls: string[] = [];
+
+        if (coffeeRows.length > 0) {
+          const prtData = await saveRowsClient(coffeeRows, imagesPayload, 'PRT');
+          if (!prtData || !prtData.ok) {
+            throw new Error(prtData?.error || 'บันทึกกาแฟซองลงชีต PRT ล้มเหลว');
+          }
+          totalAdded += prtData.rowsAdded || coffeeRows.length;
+          savedSheets.push('PRT');
+          if (prtData.spreadsheetUrl) finalSpreadsheetUrl = prtData.spreadsheetUrl;
+          if (prtData.imageUrls) allImageUrls.push(...prtData.imageUrls);
+        }
+
+        if (noodleRows.length > 0) {
+          const noodleData = await saveRowsClient(noodleRows, imagesPayload, 'NOODLE');
+          if (!noodleData || !noodleData.ok) {
+            throw new Error(noodleData?.error || 'บันทึกบะหมี่/อาหารลงชีต NOODLE ล้มเหลว');
+          }
+          totalAdded += noodleData.rowsAdded || noodleRows.length;
+          savedSheets.push('NOODLE');
+          if (noodleData.spreadsheetUrl) finalSpreadsheetUrl = noodleData.spreadsheetUrl;
+          if (noodleData.imageUrls) allImageUrls.push(...noodleData.imageUrls);
+        }
+
+        setSaveSuccessData({
+          rowsAdded: totalAdded,
+          sheetName: savedSheets.join(' และ '),
+          spreadsheetUrl: finalSpreadsheetUrl,
+          imageUrls: Array.from(new Set(allImageUrls)),
+        });
+      } else {
+        const data = await saveRowsClient(
+          rowsPayload,
+          imagesPayload,
+          CATEGORIES[category].sheetName
+        );
+
+        if (!data || !data.ok) {
+          throw new Error(data?.error || 'การบันทึกลง Google Sheet ล้มเหลว');
+        }
+
+        setSaveSuccessData({
+          rowsAdded: data.rowsAdded || rowsPayload.length,
+          sheetName: data.sheetName || CATEGORIES[category].sheetName,
+          spreadsheetUrl: data.spreadsheetUrl,
+          imageUrls: data.imageUrls,
+        });
       }
-
-      setSaveSuccessData({
-        rowsAdded: data.rowsAdded || rowsPayload.length,
-        sheetName: data.sheetName || CATEGORIES[category].sheetName,
-        spreadsheetUrl: data.spreadsheetUrl,
-        imageUrls: data.imageUrls,
-      });
     } catch (err) {
       console.error('Save to sheet error:', err);
       setErrorMessage(
@@ -282,14 +402,14 @@ export default function HomePage() {
 
       <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:px-8 pb-24 space-y-6">
         {/* Category Switcher Tabs (ระบบสลับประเภทสินค้า - ดีไซน์ราชการ ขาว/ฟ้า/น้ำเงิน) */}
-        <div className="flex p-1.5 bg-slate-200/90 border border-blue-200/70 rounded-2xl max-w-lg mx-auto sm:mx-0 shadow-xs">
+        <div className="flex flex-wrap p-1.5 bg-slate-200/90 border border-blue-200/70 rounded-2xl max-w-2xl mx-auto sm:mx-0 shadow-xs gap-1.5">
           <button
             type="button"
             onClick={() => {
               setCategory('coffee');
               if (step === 'upload') setItems([]);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'coffee'
                 ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
                 : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
@@ -310,7 +430,7 @@ export default function HomePage() {
               setCategory('noodle');
               if (step === 'upload') setItems([]);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex-1 min-w-[170px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               category === 'noodle'
                 ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
                 : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
@@ -322,6 +442,27 @@ export default function HomePage() {
               category === 'noodle' ? 'bg-sky-500/25 text-sky-200 border border-sky-400/30' : 'bg-slate-300/80 text-slate-700'
             }`}>
               NOODLE
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setCategory('all');
+              if (step === 'upload') setItems([]);
+            }}
+            className={`flex-1 min-w-[185px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              category === 'all'
+                ? 'bg-[#0f2b5c] text-white shadow-md border-b-2 border-sky-400'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
+            }`}
+          >
+            <span className="text-base">⚡</span>
+            <span>สแกนรวม (กาแฟ + บะหมี่ + อื่นๆ)</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+              category === 'all' ? 'bg-sky-500/25 text-sky-200 border border-sky-400/30' : 'bg-slate-300/80 text-slate-700'
+            }`}>
+              ALL
             </span>
           </button>
         </div>
@@ -340,12 +481,16 @@ export default function HomePage() {
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                {category === 'coffee'
+                {category === 'all'
+                  ? 'ระบบบันทึกและสแกนรวมทุกหมวดหมู่ (กาแฟ + บะหมี่ โจ๊ก ข้าวต้ม + อื่นๆ)'
+                  : category === 'coffee'
                   ? 'ระบบบันทึกและตรวจสอบราคาโปรโมชั่นกาแฟซอง'
                   : 'ระบบบันทึกและตรวจสอบราคาโปรโมชั่น บะหมี่ โจ๊ก ข้าวต้ม'}
               </h1>
               <p className="text-sky-100/90 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed">
-                {category === 'coffee'
+                {category === 'all'
+                  ? 'ระบบสแกนและสกัดข้อมูลโปรโมชั่นทุกชนิดในใบปลิวหรือป้ายราคาในหน้าเดียว AI จะแยกประเภทและบันทึกลงชีต PRT (กาแฟ) และ NOODLE (บะหมี่/อาหาร) ให้อัตโนมัติ'
+                  : category === 'coffee'
                   ? 'ระบบสกัดข้อมูลโปรโมชั่นของ 4 แบรนด์หลัก (เนสกาแฟ, มอคโคน่า, เบอร์ดี้, ซุปเปอร์) เพื่อติดตามดัชนีราคาและส่วนลดเฉลี่ย'
                   : 'ระบบสกัดข้อมูลโปรโมชั่นบะหมี่กึ่งสำเร็จรูปทุกแบรนด์ โจ๊ก และข้าวต้ม เพื่อวิเคราะห์โครงสร้างราคาเปรียบเทียบ'}
               </p>

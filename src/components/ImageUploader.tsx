@@ -169,16 +169,17 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
       if (allItems.length === 0) {
         // ถ้า AI อ่านรูปไม่ได้เลย ให้เปิดฟอร์มกรอกเองได้ (manual entry) ใช้ตารางเดียวกันตามข้อกำหนด
         for (let idx = 0; idx < images.length; idx++) {
+          const fallbackCat: PromoCategory = category === 'noodle' ? 'noodle' : 'coffee';
           allItems.push({
             id: `manual-fallback-${Date.now()}-${idx}`,
-            category,
+            category: fallbackCat,
             selected: true,
             date: recordDateDMY,
             store: selectedStore === 'auto' ? '7-11' : selectedStore,
-            brand: category === 'noodle' ? 'มาม่า' : 'เนสกาแฟ',
-            itemName: category === 'noodle' ? 'มาม่า บะหมี่กึ่งสำเร็จรูป' : '',
-            color: category === 'noodle' ? 'ซอง' : 'แดง',
-            packSize: category === 'noodle' ? 1 : 40,
+            brand: fallbackCat === 'noodle' ? 'มาม่า' : 'เนสกาแฟ',
+            itemName: fallbackCat === 'noodle' ? 'มาม่า บะหมี่กึ่งสำเร็จรูป' : '',
+            color: fallbackCat === 'noodle' ? 'ซอง' : 'แดง',
+            packSize: fallbackCat === 'noodle' ? 1 : 40,
             bonusSachets: 0,
             promotion: 'ลดราคา',
             channel: selectedChannel,
@@ -188,7 +189,7 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
             retailPrice: null,
             proPrice: null,
             confidence: 0,
-            notes: `AI ไม่พบรายการโปรโมชั่น${category === 'noodle' ? 'บะหมี่/โจ๊ก/ข้าวต้ม' : 'กาแฟซอง'} จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง`,
+            notes: `AI ไม่พบรายการโปรโมชั่น${category === 'all' ? 'ในรูปภาพ' : category === 'noodle' ? 'บะหมี่/โจ๊ก/ข้าวต้ม' : 'กาแฟซอง'} จึงเปิดแบบฟอร์มให้กรอกข้อมูลเอง`,
             imageId: `img-${idx}`,
             imagePreviewUrl: images[idx].dataUrl,
           });

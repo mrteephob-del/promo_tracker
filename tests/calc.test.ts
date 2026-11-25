@@ -131,6 +131,9 @@ describe('Categories and Sheet Mapping', () => {
     const { CATEGORIES, COMMON_NOODLE_BRANDS, NOODLE_SUB_CATEGORIES } = await import('../src/types');
     expect(CATEGORIES.coffee.sheetName).toBe('PRT');
     expect(CATEGORIES.noodle.sheetName).toBe('NOODLE');
+    expect(CATEGORIES.all.id).toBe('all');
+    expect(CATEGORIES.all.sheetName).toContain('PRT');
+    expect(CATEGORIES.all.sheetName).toContain('NOODLE');
     expect(COMMON_NOODLE_BRANDS).toContain('มาม่า');
     expect(COMMON_NOODLE_BRANDS).toContain('ไวไว');
     expect(COMMON_NOODLE_BRANDS).toContain('ยำยำ');
@@ -141,6 +144,25 @@ describe('Categories and Sheet Mapping', () => {
     expect(NOODLE_SUB_CATEGORIES).toContain('โจ๊ก');
     expect(NOODLE_SUB_CATEGORIES).toContain('ข้าวต้ม');
     expect(NOODLE_SUB_CATEGORIES).toContain('มันบด');
+  });
+
+  it('correctly detects item category in all-in-one scanning mode', async () => {
+    const { detectItemCategory } = await import('../src/lib/calc');
+
+    // กาแฟ
+    expect(detectItemCategory('เนสกาแฟ', 'เบลนด์ แอนด์ บรู ริช อโรมา')).toBe('coffee');
+    expect(detectItemCategory('มอคโคน่า', 'ทรีอินวัน เอสเปรสโซ')).toBe('coffee');
+    expect(detectItemCategory('Birdy', 'เบอร์ดี้ โรบัสต้า กาแฟกระป๋อง')).toBe('coffee');
+    expect(detectItemCategory('ซุปเปอร์', 'Super Coffee 3in1')).toBe('coffee');
+    expect(detectItemCategory('เขาช่อง', 'กาแฟปรุงสำเร็จ')).toBe('coffee');
+    expect(detectItemCategory('Boss', 'บอส คอฟฟี่ ลาเต้')).toBe('coffee');
+
+    // บะหมี่ โจ๊ก ข้าวต้ม และอื่นๆ
+    expect(detectItemCategory('มาม่า', 'บะหมี่กึ่งสำเร็จรูป รสต้มยำกุ้ง')).toBe('noodle');
+    expect(detectItemCategory('ไวไว', 'เส้นหมี่อบแห้ง 180 ก.')).toBe('noodle');
+    expect(detectItemCategory('คนอร์', 'คัพโจ๊ก รสหมู')).toBe('noodle');
+    expect(detectItemCategory('เกษตร', 'ข้าวต้มกึ่งสำเร็จรูป รสกุ้ง')).toBe('noodle');
+    expect(detectItemCategory('เลย์', 'มันฝรั่งทอดกรอบ รสออริจินัล')).toBe('noodle');
   });
 
   it('correctly classifies items into 4 NOODLE sub-categories', async () => {

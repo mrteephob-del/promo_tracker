@@ -54,6 +54,20 @@ export default function PromotionCard({
   const isLowConfidence = item.confidence < 0.7;
   const isUntracked = isCoffee && !isTrackedBrand(item.brand);
 
+  const handleSwitchCategory = (newCat: 'coffee' | 'noodle') => {
+    if (item.category === newCat) return;
+    const isNowCoffee = newCat === 'coffee';
+    const updated: PromotionItem = {
+      ...item,
+      category: newCat,
+      isUntrackedBrand: isNowCoffee ? !isTrackedBrand(item.brand) : false,
+      color: isNowCoffee ? 'แดง' : 'ซอง',
+      packSize: isNowCoffee ? (item.packSize === 1 ? 40 : item.packSize) : (item.packSize === 40 ? 1 : item.packSize),
+      subCategory: isNowCoffee ? 'กาแฟซอง' : (item.subCategory === 'กาแฟซอง' ? 'บะหมี่กึ่งสำเร็จรูป' : (item.subCategory || 'บะหมี่กึ่งสำเร็จรูป')),
+    };
+    onUpdate(updated);
+  };
+
   const handleChange = (field: keyof PromotionItem, value: any) => {
     const updated = { ...item, [field]: value };
     // ตรวจสอบแบรนด์ใหม่กรณีผู้ใช้แก้ไข
@@ -83,7 +97,7 @@ export default function PromotionCard({
       {/* Card Header */}
       <div className="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between gap-3">
         {/* Selection Checkbox & Index */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <input
             type="checkbox"
             checked={item.selected}
@@ -103,6 +117,40 @@ export default function PromotionCard({
               </span>
             )}
           </label>
+
+          {/* Category Pill Switcher (บันทึกลงชีต PRT หรือ NOODLE) */}
+          <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-xl border border-slate-200">
+            <button
+              type="button"
+              onClick={() => handleSwitchCategory('coffee')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                isCoffee
+                  ? 'bg-[#0f2b5c] text-white shadow-xs'
+                  : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
+              }`}
+              title="บันทึกข้อมูลนี้ลงชีต PRT (กาแฟซอง)"
+            >
+              <span>☕ กาแฟ</span>
+              <span className={`text-[9px] px-1 py-0.2 rounded font-mono ${
+                isCoffee ? 'bg-sky-500/30 text-sky-200' : 'bg-slate-200 text-slate-600'
+              }`}>PRT</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSwitchCategory('noodle')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                !isCoffee
+                  ? 'bg-[#0f2b5c] text-white shadow-xs'
+                  : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
+              }`}
+              title="บันทึกข้อมูลนี้ลงชีต NOODLE (บะหมี่/โจ๊ก/อื่นๆ)"
+            >
+              <span>🍜 บะหมี่/อาหาร</span>
+              <span className={`text-[9px] px-1 py-0.2 rounded font-mono ${
+                !isCoffee ? 'bg-sky-500/30 text-sky-200' : 'bg-slate-200 text-slate-600'
+              }`}>NOODLE</span>
+            </button>
+          </div>
         </div>
 
         {/* Thumbnail and Delete button */}

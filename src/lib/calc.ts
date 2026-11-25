@@ -587,6 +587,60 @@ export function classifyNoodleSubCategory(
 }
 
 /**
+ * ตรวจสอบและแยกหมวดหมู่สินค้าอัตโนมัติ สำหรับโหมดสแกนรวม (All-in-One Mode)
+ * คืนค่า 'coffee' หากเป็นสินค้าเกี่ยวกับกาแฟ หรือ 'noodle' หากเป็นบะหมี่ โจ๊ก ข้าวต้ม หรือสินค้าอื่นๆ
+ */
+export function detectItemCategory(
+  brand: string = '',
+  itemName: string = '',
+  mechanic: string = ''
+): 'coffee' | 'noodle' {
+  const text = `${brand} ${itemName} ${mechanic}`.toLowerCase();
+
+  const coffeeKeywords = [
+    'เนสกาแฟ',
+    'nescafe',
+    'nescafé',
+    'มอคโคน่า',
+    'moccona',
+    'เบอร์ดี้',
+    'birdy',
+    'ซุปเปอร์ กาแฟ',
+    'super coffee',
+    'กาแฟ',
+    'coffee',
+    'คาปูชิโน่',
+    'cappuccino',
+    'เอสเปรสโซ',
+    'espresso',
+    'ลาเต้',
+    'latte',
+    'อเมริกาโน่',
+    'americano',
+    'โรบัสต้า',
+    'robusta',
+    'อาราบิก้า',
+    'arabica',
+    'ริช อโรมา',
+    'ทรีอินวัน',
+    '3in1',
+    '3-in-1',
+    'คอฟฟี่',
+    'เขาช่อง',
+    'บอส คอฟฟี่',
+    'boss coffee',
+  ];
+
+  for (const kw of coffeeKeywords) {
+    if (text.includes(kw)) {
+      return 'coffee';
+    }
+  }
+
+  return 'noodle';
+}
+
+/**
  * คาดการณ์ระยะเวลาโปรโมชั่น (Period) สำหรับรายการที่เว้นว่างไว้หรือไม่ระบุ
  * โดยอ้างอิงจากรอบโปรโมชั่น/ใบปลิวของห้างในชุดเดียวกันที่อยู่ติดกัน
  */
