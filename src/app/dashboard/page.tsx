@@ -53,6 +53,7 @@ import {
   Check,
   ShoppingBag,
   Calculator,
+  RotateCcw,
 } from 'lucide-react';
 import { PromoCategory } from '@/types';
 import { getCachedHistoryRows } from '@/lib/client-api';
@@ -180,6 +181,437 @@ const MONTH_INSIGHT_NOTES: Record<number, { title: string; desc: string; icon: s
     icon: '🎄',
   },
 };
+
+interface DashboardFilterControlsProps {
+  searchQuery: string;
+  setSearchQuery: (val: string) => void;
+  selectedStore: string;
+  setSelectedStore: (val: string) => void;
+  storeCounts: Record<string, number>;
+  rawListLength: number;
+  selectedCategory: 'all' | 'coffee' | 'noodle';
+  setSelectedCategory: (val: 'all' | 'coffee' | 'noodle') => void;
+  coffeeCount: number;
+  noodleCount: number;
+  selectedSubCategory: SubCategoryFilter;
+  setSelectedSubCategory: (val: SubCategoryFilter) => void;
+  subCategoryCounts: Record<string, number>;
+  selectedBrand: string;
+  setSelectedBrand: (val: string) => void;
+  availableBrands: string[];
+  isAnyFilterActive: boolean;
+  clearAllFilters: () => void;
+  filteredCount: number;
+}
+
+function DashboardFilterControls({
+  searchQuery,
+  setSearchQuery,
+  selectedStore,
+  setSelectedStore,
+  storeCounts,
+  rawListLength,
+  selectedCategory,
+  setSelectedCategory,
+  coffeeCount,
+  noodleCount,
+  selectedSubCategory,
+  setSelectedSubCategory,
+  subCategoryCounts,
+  selectedBrand,
+  setSelectedBrand,
+  availableBrands,
+  isAnyFilterActive,
+  clearAllFilters,
+  filteredCount,
+}: DashboardFilterControlsProps) {
+  return (
+    <div className="bg-white rounded-3xl p-4 border border-blue-200/80 shadow-xs space-y-3.5">
+      {/* 1. Header: หัวข้อตัวกรอง + ปุ่มรีเซ็ต */}
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-sky-100 flex items-center justify-center text-[#0f2b5c]">
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+          </div>
+          <div>
+            <span className="text-xs font-black text-[#0f2b5c] block leading-tight">
+              ตัวกรองข้อมูล
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium block">
+              ค้นหา & จัดกลุ่มสินค้า
+            </span>
+          </div>
+        </div>
+
+        {isAnyFilterActive ? (
+          <button
+            type="button"
+            onClick={clearAllFilters}
+            className="text-[11px] font-bold text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200 transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+            title="ล้างตัวกรองทั้งหมด"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>ล้างตัวกรอง</span>
+          </button>
+        ) : (
+          <span className="text-[10px] text-slate-500 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
+            {filteredCount} ดีล
+          </span>
+        )}
+      </div>
+
+      {/* 2. ค้นหาสินค้า */}
+      <div className="space-y-1.5">
+        <label className="text-[11px] font-bold text-[#0f2b5c] flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <Search className="w-3.5 h-3.5 text-sky-700" />
+            <span>ค้นหาสินค้า</span>
+          </span>
+          {searchQuery && (
+            <span className="text-[10px] text-sky-700 bg-sky-50 px-1.5 py-0.2 rounded font-semibold">
+              ค้นหาอยู่
+            </span>
+          )}
+        </label>
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="ค้นหาชื่อสินค้า, แบรนด์, รสชาติ..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8.5 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 font-medium transition-all"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 cursor-pointer"
+              title="ล้างข้อความค้นหา"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 3. ห้างสรรพสินค้า (4 ปุ่มสีสุภาพ สะอาดตา สไตล์ราชการไทย เลือกแล้วเป็นสีน้ำเงินกรมท่า) */}
+      <div className="space-y-1.5 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between text-[11px] font-bold text-[#0f2b5c]">
+          <span className="flex items-center gap-1.5">
+            <Store className="w-3.5 h-3.5 text-sky-700" />
+            <span>ห้างสรรพสินค้า</span>
+          </span>
+          {selectedStore !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setSelectedStore('all')}
+              className="text-[10px] text-sky-700 hover:text-sky-900 font-semibold cursor-pointer"
+            >
+              ดูทุกห้าง
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {/* ทุกห้าง */}
+          <button
+            type="button"
+            onClick={() => setSelectedStore('all')}
+            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+              selectedStore === 'all'
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span>ทุกห้าง</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
+              selectedStore === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
+            }`}>
+              {rawListLength}
+            </span>
+          </button>
+
+          {/* CJ More */}
+          <button
+            type="button"
+            onClick={() => setSelectedStore(selectedStore === 'CJ More' ? 'all' : 'CJ More')}
+            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+              selectedStore === 'CJ More'
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span className="flex items-center gap-1.5 truncate">
+              <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0" />
+              <span className="truncate">CJ More</span>
+            </span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+              selectedStore === 'CJ More' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
+            }`}>
+              {storeCounts['CJ More'] || 0}
+            </span>
+          </button>
+
+          {/* Mini BigC */}
+          <button
+            type="button"
+            onClick={() => setSelectedStore(selectedStore === 'Mini BigC' ? 'all' : 'Mini BigC')}
+            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+              selectedStore === 'Mini BigC'
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span className="flex items-center gap-1.5 truncate">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="truncate">Mini BigC</span>
+            </span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+              selectedStore === 'Mini BigC' ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
+            }`}>
+              {storeCounts['Mini BigC'] || 0}
+            </span>
+          </button>
+
+          {/* Lotus Go */}
+          <button
+            type="button"
+            onClick={() => setSelectedStore(selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'all' : 'Lotus Go Fresh')}
+            className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+              selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's"
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+            }`}
+          >
+            <span className="flex items-center gap-1.5 truncate">
+              <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
+              <span className="truncate">Lotus Go</span>
+            </span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono shrink-0 ml-1 ${
+              selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-600'
+            }`}>
+              {storeCounts['Lotus Go Fresh'] || 0}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4. หมวดหมู่สินค้า (Segmented Control 3 แท็บ เรียงแนวนอน กระชับ สบายตา) */}
+      <div className="space-y-1.5 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between text-[11px] font-bold text-[#0f2b5c]">
+          <span className="flex items-center gap-1.5">
+            <Tag className="w-3.5 h-3.5 text-sky-700" />
+            <span>หมวดหมู่สินค้า</span>
+          </span>
+          {selectedCategory !== 'all' && (
+            <button
+              type="button"
+              onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
+              className="text-[10px] text-sky-700 hover:text-sky-900 font-semibold cursor-pointer"
+            >
+              ดูทั้งหมด
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-3 p-1 bg-slate-100 rounded-2xl border border-slate-200/80 gap-1">
+          <button
+            type="button"
+            onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
+            className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center justify-center cursor-pointer ${
+              selectedCategory === 'all'
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
+            }`}
+          >
+            <span>ทั้งหมด</span>
+            <span className={`text-[10px] font-mono mt-0.5 ${selectedCategory === 'all' ? 'text-sky-200' : 'text-slate-400'}`}>
+              {coffeeCount + noodleCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setSelectedCategory('coffee'); setSelectedSubCategory('all'); }}
+            className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center justify-center cursor-pointer ${
+              selectedCategory === 'coffee'
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
+            }`}
+          >
+            <span className="flex items-center gap-1">
+              <span>☕</span>
+              <span>กาแฟ</span>
+            </span>
+            <span className={`text-[10px] font-mono mt-0.5 ${selectedCategory === 'coffee' ? 'text-sky-200' : 'text-slate-400'}`}>
+              {coffeeCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setSelectedCategory('noodle'); setSelectedSubCategory('all'); }}
+            className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center flex flex-col items-center justify-center cursor-pointer ${
+              selectedCategory === 'noodle'
+                ? 'bg-[#0f2b5c] text-white shadow-xs'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-white/60'
+            }`}
+          >
+            <span className="flex items-center gap-1">
+              <span>🍜</span>
+              <span>บะหมี่</span>
+            </span>
+            <span className={`text-[10px] font-mono mt-0.5 ${selectedCategory === 'noodle' ? 'text-sky-200' : 'text-slate-400'}`}>
+              {noodleCount}
+            </span>
+          </button>
+        </div>
+
+        {/* 5. ประเภทย่อย (ชิปแนวนอน แสดงเฉพาะเมื่อเลือกบะหมี่หรือทั้งหมด และหม่นตัวเลือกที่มี 0 ชิ้น) */}
+        {(selectedCategory === 'noodle' || selectedCategory === 'all') && (
+          <div className="pt-2 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#0f2b5c]">
+              <span>ประเภทย่อยอาหาร</span>
+              {selectedSubCategory !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedSubCategory('all')}
+                  className="text-[10px] text-sky-700 hover:text-sky-900 font-semibold cursor-pointer"
+                >
+                  ทั้งหมด
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { id: 'all', label: 'ทั้งหมด', count: (subCategoryCounts['บะหมี่กึ่งสำเร็จรูป'] || 0) + (subCategoryCounts['โจ๊ก'] || 0) + (subCategoryCounts['ข้าวต้ม'] || 0) + (subCategoryCounts['มันบด'] || 0) },
+                { id: 'บะหมี่กึ่งสำเร็จรูป', label: '🍜 บะหมี่', count: subCategoryCounts['บะหมี่กึ่งสำเร็จรูป'] || 0 },
+                { id: 'โจ๊ก', label: '🥣 โจ๊ก', count: subCategoryCounts['โจ๊ก'] || 0 },
+                { id: 'ข้าวต้ม', label: '🍲 ข้าวต้ม', count: subCategoryCounts['ข้าวต้ม'] || 0 },
+                { id: 'มันบด', label: '🥔 มันบด', count: subCategoryCounts['มันบด'] || 0 },
+              ].map((sc) => {
+                const active = selectedSubCategory === sc.id;
+                const hasItems = sc.count > 0;
+                return (
+                  <button
+                    key={sc.id}
+                    type="button"
+                    disabled={!hasItems && sc.id !== 'all'}
+                    onClick={() => setSelectedSubCategory(active && sc.id !== 'all' ? 'all' : (sc.id as any))}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      active
+                        ? 'bg-sky-700 text-white shadow-2xs'
+                        : hasItems
+                        ? 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                        : 'bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed opacity-40'
+                    }`}
+                  >
+                    <span>{sc.label}</span>
+                    <span className={`text-[10px] font-mono px-1 rounded-sm ${
+                      active ? 'bg-white/20 text-white' : hasItems ? 'bg-slate-200/80 text-slate-600' : 'text-slate-300'
+                    }`}>
+                      {sc.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 6. แบรนด์สินค้า */}
+      <div className="space-y-1.5 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between text-[11px] font-bold text-[#0f2b5c]">
+          <span>แบรนด์สินค้า</span>
+          {selectedBrand !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setSelectedBrand('all')}
+              className="text-[10px] text-sky-700 hover:text-sky-900 font-semibold cursor-pointer"
+            >
+              ทุกแบรนด์
+            </button>
+          )}
+        </div>
+        <select
+          value={selectedBrand}
+          onChange={(e) => setSelectedBrand(e.target.value)}
+          className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-2xs transition-all"
+        >
+          <option value="all">ทุกแบรนด์ ({availableBrands.length} แบรนด์)</option>
+          {availableBrands.map((b) => (
+            <option key={b} value={b}>{b}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* 7. สรุปผลลัพธ์ & ป้ายเงื่อนไขที่ใช้งานอยู่ */}
+      <div className="pt-2.5 border-t border-slate-100 space-y-2">
+        {isAnyFilterActive && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] text-slate-400 font-bold">เงื่อนไข:</span>
+            {selectedStore !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                <span>{selectedStore}</span>
+                <button type="button" onClick={() => setSelectedStore('all')} className="hover:text-rose-600 cursor-pointer">
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+            {selectedCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                <span>{selectedCategory === 'coffee' ? 'กาแฟ' : 'บะหมี่'}</span>
+                <button type="button" onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }} className="hover:text-rose-600 cursor-pointer">
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+            {selectedSubCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                <span>{selectedSubCategory}</span>
+                <button type="button" onClick={() => setSelectedSubCategory('all')} className="hover:text-rose-600 cursor-pointer">
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+            {selectedBrand !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                <span>{selectedBrand}</span>
+                <button type="button" onClick={() => setSelectedBrand('all')} className="hover:text-rose-600 cursor-pointer">
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+            {searchQuery.trim() && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                <span>&quot;{searchQuery}&quot;</span>
+                <button type="button" onClick={() => setSearchQuery('')} className="hover:text-rose-600 cursor-pointer">
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-slate-500 font-medium">
+            ผลลัพธ์: <strong className="text-[#0f2b5c] font-black">{filteredCount}</strong> จาก {rawListLength} รายการ
+          </span>
+          {isAnyFilterActive ? (
+            <span className="text-[10px] text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full font-bold border border-sky-200">
+              กรองอยู่
+            </span>
+          ) : (
+            <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
+              ทั้งหมด
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'overview' | 'monthly' | 'frequency' | 'comparison'>('overview');
@@ -1325,278 +1757,27 @@ export default function DashboardPage() {
           </div>
 
           {/* Complete Filters Card in Sidebar */}
-          <div className="bg-white rounded-3xl p-4 border border-blue-200/80 shadow-xs space-y-3.5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-sky-700" />
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#0f2b5c]">
-                  ตัวกรองและจำแนกข้อมูล
-                </span>
-              </div>
-              {isAnyFilterActive ? (
-                <button
-                  type="button"
-                  onClick={clearAllFilters}
-                  className="text-[10px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-0.5 rounded-lg border border-rose-200/60 flex items-center gap-1 transition-colors cursor-pointer"
-                  title="ล้างการเลือกตัวกรองทั้งหมด"
-                >
-                  <X className="w-3 h-3" />
-                  <span>ล้างตัวกรอง</span>
-                </button>
-              ) : (
-                <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
-                  {filteredList.length} ดีล
-                </span>
-              )}
-            </div>
-
-            {/* 1. ค้นหาสินค้า (Search Box) */}
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                <span>ค้นหาสินค้า</span>
-                {searchQuery && (
-                  <span className="text-[9px] text-amber-600 font-medium">พบผลลัพธ์</span>
-                )}
-              </div>
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="ค้นหาชื่อสินค้า, แบรนด์..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-7 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* 2. ห้างสรรพสินค้า (Stores) */}
-            <div className="space-y-1.5 pt-1 border-t border-slate-100">
-              <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <span className="flex items-center gap-1">
-                  <Store className="w-3 h-3 text-slate-400" />
-                  <span>ห้างสรรพสินค้า</span>
-                </span>
-                {selectedStore !== 'all' && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStore('all')}
-                    className="text-[10px] text-amber-600 hover:underline cursor-pointer"
-                  >
-                    รีเซ็ต
-                  </button>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setSelectedStore('all')}
-                  className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between cursor-pointer ${
-                    selectedStore === 'all'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/60'
-                  }`}
-                >
-                  <span>ทุกห้าง</span>
-                  <span className="text-[10px] opacity-75">({rawList.length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedStore(selectedStore === 'CJ More' ? 'all' : 'CJ More')}
-                  className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between cursor-pointer ${
-                    selectedStore === 'CJ More'
-                      ? 'bg-orange-500 text-white shadow-xs'
-                      : 'bg-orange-50/60 hover:bg-orange-100 text-orange-900 border border-orange-200/60'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-2 h-2 rounded-full bg-orange-400 shrink-0" />
-                    <span className="truncate">CJ More</span>
-                  </div>
-                  <span className="text-[10px] opacity-80 shrink-0">({storeCounts['CJ More'] || 0})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedStore(selectedStore === 'Mini BigC' ? 'all' : 'Mini BigC')}
-                  className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between cursor-pointer ${
-                    selectedStore === 'Mini BigC'
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-emerald-50/60 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/60'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                    <span className="truncate">Mini BigC</span>
-                  </div>
-                  <span className="text-[10px] opacity-80 shrink-0">({storeCounts['Mini BigC'] || 0})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedStore(selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'all' : 'Lotus Go Fresh')}
-                  className={`px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between cursor-pointer ${
-                    selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's"
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'bg-sky-50/60 hover:bg-sky-100 text-sky-900 border border-sky-200/60'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-2 h-2 rounded-full bg-sky-400 shrink-0" />
-                    <span className="truncate">Lotus Go</span>
-                  </div>
-                  <span className="text-[10px] opacity-80 shrink-0">({storeCounts['Lotus Go Fresh'] || 0})</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 3. หมวดหมู่สินค้า (Categories) */}
-            <div className="space-y-1.5 pt-1 border-t border-slate-100">
-              <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <span className="flex items-center gap-1">
-                  <Tag className="w-3 h-3 text-slate-400" />
-                  <span>หมวดหมู่สินค้า</span>
-                </span>
-                {selectedCategory !== 'all' && (
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
-                    className="text-[10px] text-amber-600 hover:underline cursor-pointer"
-                  >
-                    ทั้งหมด
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-col gap-1">
-                <button
-                  type="button"
-                  onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    selectedCategory === 'all' && selectedSubCategory === 'all'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  <span>ทุกหมวดหมู่</span>
-                  <span className="text-[10px] opacity-75">({coffeeRows.length + noodleRows.length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setSelectedCategory(selectedCategory === 'coffee' ? 'all' : 'coffee'); setSelectedSubCategory('all'); }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    selectedCategory === 'coffee'
-                      ? 'bg-amber-600 text-white shadow-xs'
-                      : 'text-amber-800 bg-amber-50/70 hover:bg-amber-100 border border-amber-200/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Coffee className="w-3.5 h-3.5" />
-                    <span>☕ กาแฟ</span>
-                  </div>
-                  <span className="text-[10px] opacity-80">({coffeeRows.length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setSelectedCategory(selectedCategory === 'noodle' ? 'all' : 'noodle'); setSelectedSubCategory('all'); }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    selectedCategory === 'noodle'
-                      ? 'bg-orange-500 text-white shadow-xs'
-                      : 'text-orange-900 bg-orange-50/70 hover:bg-orange-100 border border-orange-200/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <UtensilsCrossed className="w-3.5 h-3.5" />
-                    <span>🍜 บะหมี่ / โจ๊ก</span>
-                  </div>
-                  <span className="text-[10px] opacity-80">({noodleRows.length})</span>
-                </button>
-              </div>
-
-              {/* Subcategories (บะหมี่, โจ๊ก, ข้าวต้ม, มันบด) */}
-              {(selectedCategory === 'noodle' || selectedCategory === 'all') && (
-                <div className="pt-1.5 space-y-1">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    ประเภทย่อย (บะหมี่/โจ๊ก)
-                  </div>
-                  <div className="grid grid-cols-2 gap-1">
-                    {[
-                      { id: 'บะหมี่กึ่งสำเร็จรูป', label: '🍜 บะหมี่', count: subCategoryCounts['บะหมี่กึ่งสำเร็จรูป'] },
-                      { id: 'โจ๊ก', label: '🥣 โจ๊ก', count: subCategoryCounts['โจ๊ก'] },
-                      { id: 'ข้าวต้ม', label: '🍲 ข้าวต้ม', count: subCategoryCounts['ข้าวต้ม'] },
-                      { id: 'มันบด', label: '🥔 มันบด', count: subCategoryCounts['มันบด'] },
-                    ].map((sc) => {
-                      const active = selectedSubCategory === sc.id;
-                      return (
-                        <button
-                          key={sc.id}
-                          type="button"
-                          onClick={() => setSelectedSubCategory(active ? 'all' : (sc.id as any))}
-                          className={`px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center justify-between cursor-pointer ${
-                            active
-                              ? 'bg-slate-800 text-white shadow-2xs'
-                              : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60'
-                          }`}
-                        >
-                          <span className="truncate">{sc.label}</span>
-                          <span className="text-[10px] opacity-75 shrink-0 ml-1">({sc.count})</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 4. แบรนด์สินค้า (Brand) */}
-            <div className="space-y-1.5 pt-1 border-t border-slate-100">
-              <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <span>แบรนด์สินค้า</span>
-                {selectedBrand !== 'all' && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBrand('all')}
-                    className="text-[10px] text-amber-600 hover:underline cursor-pointer"
-                  >
-                    ทั้งหมด
-                  </button>
-                )}
-              </div>
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-2xs"
-              >
-                <option value="all">ทุกแบรนด์ ({availableBrands.length})</option>
-                {availableBrands.map((b) => (
-                  <option key={b} value={b}>{b}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Summary & Active Indicator */}
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <span className="font-medium">
-                ผลลัพธ์: <strong className="text-slate-900 font-bold">{filteredList.length}</strong> รายการ
-              </span>
-              {isAnyFilterActive && (
-                <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-bold border border-amber-200/60">
-                  กรองอยู่
-                </span>
-              )}
-            </div>
-          </div>
+          <DashboardFilterControls
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedStore={selectedStore}
+            setSelectedStore={setSelectedStore}
+            storeCounts={storeCounts}
+            rawListLength={rawList.length}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            coffeeCount={coffeeRows.length}
+            noodleCount={noodleRows.length}
+            selectedSubCategory={selectedSubCategory}
+            setSelectedSubCategory={setSelectedSubCategory}
+            subCategoryCounts={subCategoryCounts}
+            selectedBrand={selectedBrand}
+            setSelectedBrand={setSelectedBrand}
+            availableBrands={availableBrands}
+            isAnyFilterActive={isAnyFilterActive}
+            clearAllFilters={clearAllFilters}
+            filteredCount={filteredList.length}
+          />
 
           {/* Quick Actions in Sidebar */}
           <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-xs space-y-2">
@@ -5584,192 +5765,28 @@ export default function DashboardPage() {
               </div>
 
               {/* Mobile Filter Section */}
-              <div className="pt-3 border-t border-slate-100 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-700">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-amber-600" />
-                    <span>ตัวกรองข้อมูล</span>
-                  </div>
-                  {isAnyFilterActive ? (
-                    <button
-                      type="button"
-                      onClick={clearAllFilters}
-                      className="text-[10px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200/60 flex items-center gap-1"
-                    >
-                      <X className="w-3 h-3" />
-                      <span>ล้างตัวกรอง</span>
-                    </button>
-                  ) : (
-                    <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
-                      {filteredList.length} ดีล
-                    </span>
-                  )}
-                </div>
-
-                {/* Search */}
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="ค้นหาสินค้า, แบรนด์..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-7 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Stores */}
-                <div className="space-y-1.5">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                    <Store className="w-3 h-3 text-slate-400" />
-                    <span>ห้างสรรพสินค้า</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedStore('all')}
-                      className={`px-2.5 py-2 rounded-xl text-xs font-bold text-center transition-all ${
-                        selectedStore === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      ทุกห้าง ({rawList.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedStore(selectedStore === 'CJ More' ? 'all' : 'CJ More')}
-                      className={`px-2.5 py-2 rounded-xl text-xs font-bold text-center transition-all ${
-                        selectedStore === 'CJ More' ? 'bg-orange-500 text-white shadow-xs' : 'bg-orange-50 text-orange-900'
-                      }`}
-                    >
-                      CJ More ({storeCounts['CJ More'] || 0})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedStore(selectedStore === 'Mini BigC' ? 'all' : 'Mini BigC')}
-                      className={`px-2.5 py-2 rounded-xl text-xs font-bold text-center transition-all ${
-                        selectedStore === 'Mini BigC' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-emerald-50 text-emerald-900'
-                      }`}
-                    >
-                      Mini BigC ({storeCounts['Mini BigC'] || 0})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedStore(selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'all' : 'Lotus Go Fresh')}
-                      className={`px-2.5 py-2 rounded-xl text-xs font-bold text-center transition-all ${
-                        selectedStore === 'Lotus Go Fresh' || selectedStore === "Lotus's" ? 'bg-sky-600 text-white shadow-xs' : 'bg-sky-50 text-sky-900'
-                      }`}
-                    >
-                      Lotus Go ({storeCounts['Lotus Go Fresh'] || 0})
-                    </button>
-                  </div>
-                </div>
-
-                {/* Categories */}
-                <div className="space-y-1.5 pt-1 border-t border-slate-100">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                    <Tag className="w-3 h-3 text-slate-400" />
-                    <span>หมวดหมู่</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                        selectedCategory === 'all' && selectedSubCategory === 'all'
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      <span>ทุกหมวดหมู่</span>
-                      <span className="text-[10px] opacity-75">({coffeeRows.length + noodleRows.length})</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedCategory(selectedCategory === 'coffee' ? 'all' : 'coffee'); setSelectedSubCategory('all'); }}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                        selectedCategory === 'coffee'
-                          ? 'bg-amber-600 text-white shadow-xs'
-                          : 'bg-amber-50 text-amber-900'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Coffee className="w-3.5 h-3.5" />
-                        <span>กาแฟ</span>
-                      </div>
-                      <span className="text-[10px] opacity-80">({coffeeRows.length})</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedCategory(selectedCategory === 'noodle' ? 'all' : 'noodle'); setSelectedSubCategory('all'); }}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                        selectedCategory === 'noodle'
-                          ? 'bg-orange-500 text-white shadow-xs'
-                          : 'bg-orange-50 text-orange-900'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <UtensilsCrossed className="w-3.5 h-3.5" />
-                        <span>บะหมี่ / โจ๊ก</span>
-                      </div>
-                      <span className="text-[10px] opacity-80">({noodleRows.length})</span>
-                    </button>
-                  </div>
-
-                  {/* Subcategories */}
-                  {(selectedCategory === 'noodle' || selectedCategory === 'all') && (
-                    <div className="grid grid-cols-2 gap-1 pt-1">
-                      {[
-                        { id: 'บะหมี่กึ่งสำเร็จรูป', label: '🍜 บะหมี่', count: subCategoryCounts['บะหมี่กึ่งสำเร็จรูป'] },
-                        { id: 'โจ๊ก', label: '🥣 โจ๊ก', count: subCategoryCounts['โจ๊ก'] },
-                        { id: 'ข้าวต้ม', label: '🍲 ข้าวต้ม', count: subCategoryCounts['ข้าวต้ม'] },
-                        { id: 'มันบด', label: '🥔 มันบด', count: subCategoryCounts['มันบด'] },
-                      ].map((sc) => {
-                        const active = selectedSubCategory === sc.id;
-                        return (
-                          <button
-                            key={sc.id}
-                            type="button"
-                            onClick={() => setSelectedSubCategory(active ? 'all' : (sc.id as any))}
-                            className={`px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center justify-between ${
-                              active
-                                ? 'bg-slate-800 text-white shadow-2xs'
-                                : 'bg-slate-50 text-slate-600 border border-slate-200/60'
-                            }`}
-                          >
-                            <span className="truncate">{sc.label}</span>
-                            <span className="text-[10px] opacity-75 ml-1">({sc.count})</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Brands */}
-                <div className="space-y-1.5 pt-1 border-t border-slate-100">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    แบรนด์สินค้า
-                  </div>
-                  <select
-                    value={selectedBrand}
-                    onChange={(e) => setSelectedBrand(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="all">ทุกแบรนด์ ({availableBrands.length})</option>
-                    {availableBrands.map((b) => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
-                  </select>
-                </div>
+              <div className="pt-2 border-t border-slate-100">
+                <DashboardFilterControls
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  selectedStore={selectedStore}
+                  setSelectedStore={setSelectedStore}
+                  storeCounts={storeCounts}
+                  rawListLength={rawList.length}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  coffeeCount={coffeeRows.length}
+                  noodleCount={noodleRows.length}
+                  selectedSubCategory={selectedSubCategory}
+                  setSelectedSubCategory={setSelectedSubCategory}
+                  subCategoryCounts={subCategoryCounts}
+                  selectedBrand={selectedBrand}
+                  setSelectedBrand={setSelectedBrand}
+                  availableBrands={availableBrands}
+                  isAnyFilterActive={isAnyFilterActive}
+                  clearAllFilters={clearAllFilters}
+                  filteredCount={filteredList.length}
+                />
               </div>
 
               {/* Mobile Quick Data Tools */}
