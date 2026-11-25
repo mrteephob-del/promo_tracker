@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { History, PlusCircle, LayoutDashboard, KeyRound, Landmark, ShieldCheck, Swords } from 'lucide-react';
+import { History, PlusCircle, LayoutDashboard, KeyRound, Landmark, ShieldCheck } from 'lucide-react';
 import ApiKeyModal from '@/components/ApiKeyModal';
 
 export default function Header() {
@@ -29,11 +29,10 @@ export default function Header() {
     }
   }, []);
 
-  const navLinks = [
+  const navLinks: { href: string; label: string; shortLabel: string; icon: any; highlight?: boolean }[] = [
     { href: '/', label: 'บันทึกโปรโมชั่น', shortLabel: 'บันทึก', icon: PlusCircle },
     { href: '/history', label: 'คลังประวัติข้อมูล', shortLabel: 'ประวัติ', icon: History },
     { href: '/dashboard', label: 'ศูนย์วิเคราะห์ข้อมูล', shortLabel: 'แดชบอร์ด', icon: LayoutDashboard },
-    { href: '/dashboard?tab=comparison', label: 'เทียบราคาข้ามห้าง', shortLabel: 'เทียบราคา', icon: Swords, highlight: true },
   ];
 
   return (

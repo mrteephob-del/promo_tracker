@@ -21,7 +21,6 @@ import {
   RefreshCw,
   CheckCheck,
   Info,
-  Swords,
   ChevronRight,
 } from 'lucide-react';
 
@@ -468,35 +467,6 @@ export default function HomePage() {
               ALL
             </span>
           </button>
-        </div>
-
-        {/* Banner ทางลัด: ระบบเทียบราคาข้ามห้างทันที (Instant Store Price Radar) */}
-        <div className="bg-gradient-to-r from-[#0d2b5c] via-[#103b7b] to-[#0284c7] border-2 border-sky-400/50 rounded-2xl p-4 sm:p-5 text-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg shadow-blue-950/20">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-xl shadow-md shrink-0 border border-amber-300/60">
-              <Swords className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-black text-sm sm:text-base text-white tracking-tight">
-                  ฟีเจอร์เทียบราคาข้ามห้างทันทีในคลิกเดียว (Instant Cross-Store Price Radar)
-                </span>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 shadow-2xs">
-                  แนะนำ ⚡️
-                </span>
-              </div>
-              <p className="text-xs text-sky-100/90 mt-1 leading-relaxed">
-                เช็คได้ทันทีว่าสินค้าชิ้นไหน ห้างไหนขายถูกสุด (CJ More, Mini BigC, Lotus Go Fresh, Tops) พร้อมคำนวณส่วนต่างและความคุ้มค่า
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/dashboard?tab=comparison"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm shadow-md transition-all shrink-0 border border-amber-300/50 group"
-          >
-            <span>เปิดระบบเทียบราคาข้ามห้าง</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
         </div>
 
         {step === 'upload' ? (
