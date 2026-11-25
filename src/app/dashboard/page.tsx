@@ -4584,7 +4584,8 @@ export default function DashboardPage() {
                       {/* Clean Product Hero Content */}
                       {selectedItemA ? (
                         <div className="pt-2 space-y-3">
-                          <div className="flex items-start gap-3">
+                          {/* LARGE IMAGE CONTAINER (รูปภาพใหญ่ ดูง่าย ชัดเจน) */}
+                          <div className="w-full">
                             {selectedItemA.imageUrl ? (
                               <button
                                 type="button"
@@ -4593,48 +4594,50 @@ export default function DashboardPage() {
                                   title: `${selectedItemA.brand} - ${selectedItemA.itemName}`,
                                   store: selectedItemA.store,
                                 })}
-                                className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden shrink-0 group relative hover:ring-2 hover:ring-amber-500 transition-all cursor-pointer shadow-2xs"
-                                title="คลิกดูภาพขยายใหญ่"
+                                className="w-full h-48 sm:h-56 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 border border-slate-200 overflow-hidden relative group hover:ring-2 hover:ring-amber-500 transition-all cursor-pointer shadow-inner flex items-center justify-center p-2"
+                                title="คลิกดูภาพขยายใหญ่เต็มหน้าจอ"
                               >
                                 <img
                                   src={getGoogleDriveThumbUrl(selectedItemA.imageUrl)}
                                   alt=""
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                  className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
-                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                  <ZoomIn className="w-4 h-4 text-white" />
+                                <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-bold gap-1.5 backdrop-blur-2xs">
+                                  <ZoomIn className="w-5 h-5 text-white" />
+                                  <span>คลิกดูภาพขยาย</span>
                                 </div>
                               </button>
                             ) : (
-                              <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-400">
-                                <ImageIcon className="w-6 h-6" />
+                              <div className="w-full h-48 sm:h-56 rounded-2xl bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-2">
+                                <ImageIcon className="w-10 h-10 opacity-30" />
+                                <span className="text-xs font-bold">ไม่มีรูปภาพโปรโมชั่น</span>
                               </div>
                             )}
+                          </div>
 
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className={`inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full text-white ${
-                                  selectedItemA.store === 'CJ More'
-                                    ? 'bg-orange-500'
-                                    : selectedItemA.store === 'Mini BigC'
-                                      ? 'bg-emerald-600'
-                                      : 'bg-sky-600'
-                                }`}>
-                                  <StoreLogo store={selectedItemA.store} className="w-3.5 h-3.5" />
-                                  <span>{selectedItemA.store}</span>
-                                </span>
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                                  {selectedItemA.brand}
-                                </span>
-                                <span className="text-[10px] text-slate-400 font-medium">
-                                  {selectedItemA.subCategory}
-                                </span>
-                              </div>
-                              <h4 className="text-xs sm:text-sm font-black text-slate-900 mt-1 leading-snug line-clamp-2">
-                                {selectedItemA.itemName}
-                              </h4>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full text-white shadow-2xs ${
+                                selectedItemA.store === 'CJ More'
+                                  ? 'bg-orange-500'
+                                  : selectedItemA.store === 'Mini BigC'
+                                    ? 'bg-emerald-600'
+                                    : 'bg-sky-600'
+                              }`}>
+                                <StoreLogo store={selectedItemA.store} className="w-3.5 h-3.5" />
+                                <span>{selectedItemA.store}</span>
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                                {selectedItemA.brand}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                {selectedItemA.subCategory}
+                              </span>
                             </div>
+                            <h4 className="text-sm font-black text-slate-900 leading-snug line-clamp-2">
+                              {selectedItemA.itemName}
+                            </h4>
                           </div>
 
                           {/* Hero Price Badge */}
@@ -4787,7 +4790,8 @@ export default function DashboardPage() {
                       {/* Clean Product Hero Content */}
                       {selectedItemB ? (
                         <div className="pt-2 space-y-3">
-                          <div className="flex items-start gap-3">
+                          {/* LARGE IMAGE CONTAINER (รูปภาพใหญ่ ดูง่าย ชัดเจน) */}
+                          <div className="w-full">
                             {selectedItemB.imageUrl ? (
                               <button
                                 type="button"
@@ -4796,48 +4800,50 @@ export default function DashboardPage() {
                                   title: `${selectedItemB.brand} - ${selectedItemB.itemName}`,
                                   store: selectedItemB.store,
                                 })}
-                                className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden shrink-0 group relative hover:ring-2 hover:ring-amber-500 transition-all cursor-pointer shadow-2xs"
-                                title="คลิกดูภาพขยายใหญ่"
+                                className="w-full h-48 sm:h-56 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 border border-slate-200 overflow-hidden relative group hover:ring-2 hover:ring-amber-500 transition-all cursor-pointer shadow-inner flex items-center justify-center p-2"
+                                title="คลิกดูภาพขยายใหญ่เต็มหน้าจอ"
                               >
                                 <img
                                   src={getGoogleDriveThumbUrl(selectedItemB.imageUrl)}
                                   alt=""
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                  className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
-                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                  <ZoomIn className="w-4 h-4 text-white" />
+                                <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-bold gap-1.5 backdrop-blur-2xs">
+                                  <ZoomIn className="w-5 h-5 text-white" />
+                                  <span>คลิกดูภาพขยาย</span>
                                 </div>
                               </button>
                             ) : (
-                              <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-400">
-                                <ImageIcon className="w-6 h-6" />
+                              <div className="w-full h-48 sm:h-56 rounded-2xl bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-2">
+                                <ImageIcon className="w-10 h-10 opacity-30" />
+                                <span className="text-xs font-bold">ไม่มีรูปภาพโปรโมชั่น</span>
                               </div>
                             )}
+                          </div>
 
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className={`inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full text-white ${
-                                  selectedItemB.store === 'CJ More'
-                                    ? 'bg-orange-500'
-                                    : selectedItemB.store === 'Mini BigC'
-                                      ? 'bg-emerald-600'
-                                      : 'bg-sky-600'
-                                }`}>
-                                  <StoreLogo store={selectedItemB.store} className="w-3.5 h-3.5" />
-                                  <span>{selectedItemB.store}</span>
-                                </span>
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                                  {selectedItemB.brand}
-                                </span>
-                                <span className="text-[10px] text-slate-400 font-medium">
-                                  {selectedItemB.subCategory}
-                                </span>
-                              </div>
-                              <h4 className="text-xs sm:text-sm font-black text-slate-900 mt-1 leading-snug line-clamp-2">
-                                {selectedItemB.itemName}
-                              </h4>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full text-white shadow-2xs ${
+                                selectedItemB.store === 'CJ More'
+                                  ? 'bg-orange-500'
+                                  : selectedItemB.store === 'Mini BigC'
+                                    ? 'bg-emerald-600'
+                                    : 'bg-sky-600'
+                              }`}>
+                                <StoreLogo store={selectedItemB.store} className="w-3.5 h-3.5" />
+                                <span>{selectedItemB.store}</span>
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                                {selectedItemB.brand}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                {selectedItemB.subCategory}
+                              </span>
                             </div>
+                            <h4 className="text-sm font-black text-slate-900 leading-snug line-clamp-2">
+                              {selectedItemB.itemName}
+                            </h4>
                           </div>
 
                           {/* Hero Price Badge */}

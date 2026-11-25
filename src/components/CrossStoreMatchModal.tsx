@@ -1,20 +1,22 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Swords,
   Crown,
   X,
   ZoomIn,
+  ArrowLeftRight,
   TrendingDown,
   Tag,
   Calendar,
   Sparkles,
   CheckCircle2,
   AlertCircle,
-  ArrowRight,
   Store,
   Layers,
+  SlidersHorizontal,
+  Check,
 } from 'lucide-react';
 import StoreLogo from '@/components/StoreLogo';
 import { cleanCoreProductName } from '@/lib/calc';
@@ -142,23 +144,69 @@ export default function CrossStoreMatchModal({
     };
   }, [item, rawList]);
 
+  // คัดเลือกห้างที่จะเทียบ 2 ฝั่ง (Side A vs Side B)
+  const sortedStoreEntries = useMemo(() => {
+    if (!comparisonData) return [];
+    return Object.entries(comparisonData.storeBestDeals).sort(
+      (a: any, b: any) => a[1].unitPrice - b[1].unitPrice
+    );
+  }, [comparisonData]);
+
+  // กำหนดค่าเริ่มต้นของ 2 ฝั่ง
+  const [selectedSideA, setSelectedSideA] = useState<string>('');
+  const [selectedSideB, setSelectedSideB] = useState<string>('');
+
+  useEffect(() => {
+    if (sortedStoreEntries.length >= 2) {
+      setSelectedSideA(sortedStoreEntries[0][0]);
+      setSelectedSideB(sortedStoreEntries[1][0]);
+    } else if (sortedStoreEntries.length === 1) {
+      setSelectedSideA(sortedStoreEntries[0][0]);
+      const other = ['CJ More', 'Mini BigC', 'Lotus Go Fresh', 'Tops'].find(
+        (s) => s !== sortedStoreEntries[0][0]
+      );
+      setSelectedSideB(other || 'Mini BigC');
+    } else {
+      setSelectedSideA('CJ More');
+      setSelectedSideB('Mini BigC');
+    }
+  }, [sortedStoreEntries]);
+
   if (!item || !comparisonData) return null;
 
-  // จัดอันดับห้างเพื่อส่งเข้าสนามประลอง (อันดับ 1 vs อันดับ 2)
-  const sortedStoreEntries = Object.entries(comparisonData.storeBestDeals).sort(
-    (a: any, b: any) => a[1].unitPrice - b[1].unitPrice
-  );
-  const storeAEntry = sortedStoreEntries[0];
-  const storeBEntry = sortedStoreEntries[1];
+  const dealA = comparisonData.storeBestDeals[selectedSideA];
+  const dealB = comparisonData.storeBestDeals[selectedSideB];
+
+  const priceA = dealA?.unitPrice || 0;
+  const priceB = dealB?.unitPrice || 0;
+
+  let winnerSide: 'A' | 'B' | 'TIE' | 'NONE' = 'NONE';
+  let diff = 0;
+  let diffPercent = 0;
+
+  if (dealA && dealB) {
+    if (priceA < priceB) {
+      winnerSide = 'A';
+      diff = Number((priceB - priceA).toFixed(2));
+      diffPercent = priceB > 0 ? Number(((diff / priceB) * 100).toFixed(1)) : 0;
+    } else if (priceB < priceA) {
+      winnerSide = 'B';
+      diff = Number((priceA - priceB).toFixed(2));
+      diffPercent = priceA > 0 ? Number(((diff / priceA) * 100).toFixed(1)) : 0;
+    } else {
+      winnerSide = 'TIE';
+    }
+  }
+
+  const handleSwap = () => {
+    const temp = selectedSideA;
+    setSelectedSideA(selectedSideB);
+    setSelectedSideB(temp);
+  };
 
   const handleSendToArena = () => {
-    if (onSendToArena && storeAEntry && storeBEntry) {
-      onSendToArena(
-        storeAEntry[0],
-        storeAEntry[1].id || '',
-        storeBEntry[0],
-        storeBEntry[1].id || ''
-      );
+    if (onSendToArena && dealA && dealB) {
+      onSendToArena(selectedSideA, dealA.id || '', selectedSideB, dealB.id || '');
       onClose();
     }
   };
@@ -168,36 +216,38 @@ export default function CrossStoreMatchModal({
     if (url.includes('googleusercontent.com')) return url;
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
-      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
+      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
     }
     return url;
   };
 
+  const availableStores = Object.keys(comparisonData.storeBestDeals);
+
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-2.5 sm:p-5 overflow-y-auto animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl overflow-hidden max-w-4xl w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 my-auto flex flex-col max-h-[92vh]"
+        className="bg-white rounded-3xl overflow-hidden max-w-5xl w-full shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150 my-auto flex flex-col max-h-[94vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-[#0f2b5c] via-[#163a75] to-[#0f2b5c] text-white flex items-center justify-between shrink-0">
+        {/* MODAL HEADER */}
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-[#071d3a] via-[#0f2b5c] to-[#0284c7] text-white flex items-center justify-between shrink-0 shadow-md">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
-              <Swords className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0 shadow-xs">
+              <Swords className="w-5 h-5 text-amber-300" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/15 text-sky-200 uppercase tracking-wider">
-                  Cross-Store Radar
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-2xs">
+                  ตารางเปรียบเทียบราคาแยก 2 ฝั่ง
                 </span>
-                <span className="text-xs text-slate-300 font-medium">
+                <span className="text-xs text-sky-200 font-medium">
                   {comparisonData.category}
                 </span>
               </div>
-              <h3 className="text-base sm:text-lg font-black text-white truncate mt-0.5">
+              <h3 className="text-base sm:text-xl font-black text-white truncate mt-0.5">
                 {comparisonData.coreName}
               </h3>
             </div>
@@ -213,238 +263,551 @@ export default function CrossStoreMatchModal({
           </button>
         </div>
 
-        {/* Modal Scrollable Body */}
-        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
-          {/* Winner Banner / Summary */}
-          {comparisonData.comparedCount >= 2 ? (
-            <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-50 to-teal-50 border border-emerald-200/90 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <Crown className="w-6 h-6 text-amber-300" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-emerald-800">
-                      แชมป์ราคาถูกที่สุดรอบนี้
+        {/* MODAL BODY */}
+        <div className="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1 bg-slate-50/50">
+          {/* WINNER VERDICT HERO BANNER */}
+          {dealA && dealB ? (
+            <div
+              className={`p-4 sm:p-5 rounded-2xl border transition-all shadow-xs ${
+                winnerSide !== 'TIE'
+                  ? 'bg-gradient-to-r from-emerald-50 via-teal-50 to-white border-emerald-300'
+                  : 'bg-white border-slate-200'
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-xs ${
+                      winnerSide !== 'TIE' ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-white'
+                    }`}
+                  >
+                    <Crown className="w-6 h-6 text-amber-300" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                      ผลการเปรียบเทียบความคุ้มค่า (Price Verdict)
                     </span>
-                    <span className="text-xs font-black px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-2xs">
-                      {comparisonData.cheapestStore}
+                    {winnerSide === 'A' ? (
+                      <h4 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                        ซื้อที่ <span className="text-emerald-700 underline decoration-emerald-400 decoration-2">{selectedSideA}</span> ถูกกว่า! ประหยัด <span className="text-emerald-600">฿{diff.toFixed(2)} / หน่วย (-{diffPercent}%)</span>
+                      </h4>
+                    ) : winnerSide === 'B' ? (
+                      <h4 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                        ซื้อที่ <span className="text-emerald-700 underline decoration-emerald-400 decoration-2">{selectedSideB}</span> ถูกกว่า! ประหยัด <span className="text-emerald-600">฿{diff.toFixed(2)} / หน่วย (-{diffPercent}%)</span>
+                      </h4>
+                    ) : (
+                      <h4 className="text-base sm:text-lg font-black text-slate-800 mt-0.5">
+                        ทั้ง 2 ห้างราคาเฉลี่ยต่อหน่วยเท่ากันพอดี (฿{priceA.toFixed(2)} / หน่วย)
+                      </h4>
+                    )}
+                  </div>
+                </div>
+
+                {winnerSide !== 'TIE' && (
+                  <div className="text-right bg-white p-2.5 sm:p-3 rounded-xl border border-emerald-200/80 shadow-2xs shrink-0">
+                    <span className="text-[11px] text-slate-400 font-bold block">ส่วนต่างราคาต่อหน่วย</span>
+                    <span className="text-lg font-black text-emerald-700">
+                      -฿{diff.toFixed(2)} <span className="text-xs font-semibold text-slate-500">({diffPercent}%)</span>
                     </span>
                   </div>
-                  <p className="text-sm sm:text-base font-black text-slate-900 mt-0.5">
-                    เฉลี่ยเพียง <span className="text-emerald-700">฿{comparisonData.minUnitPrice.toFixed(2)}</span> / หน่วย
-                  </p>
-                </div>
+                )}
               </div>
-
-              {comparisonData.savingAmount > 0 && (
-                <div className="sm:text-right bg-white sm:bg-transparent p-2.5 sm:p-0 rounded-xl border sm:border-0 border-emerald-200/60">
-                  <span className="text-xs text-slate-500 font-semibold block">
-                    ประหยัดได้สูงสุด
-                  </span>
-                  <span className="text-sm sm:text-base font-black text-emerald-700">
-                    ฿{comparisonData.savingAmount.toFixed(2)} / หน่วย ({comparisonData.savingPercent}%)
-                  </span>
-                </div>
-              )}
             </div>
           ) : (
-            <div className="bg-sky-50/70 border border-sky-200 rounded-2xl p-3.5 flex items-center gap-2.5 text-xs text-sky-900">
-              <Sparkles className="w-4 h-4 text-sky-600 shrink-0" />
+            <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center gap-3 text-xs text-sky-900">
+              <Sparkles className="w-5 h-5 text-sky-600 shrink-0" />
               <span>
-                พบโปรโมชั่นใน <strong>{item.store}</strong> ขณะนี้ยังไม่มีห้างอื่นจัดโปรโมชั่นสินค้ารุ่นนี้ชนกันโดยตรงในรอบปัจจุบัน
+                พบโปรโมชั่นใน <strong>{dealA ? selectedSideA : selectedSideB}</strong> ขณะนี้อีกฝั่งยังไม่มีโปรโมชั่นของสินค้ารุ่นนี้
               </span>
             </div>
           )}
 
-          {/* 4 Stores Side-by-Side Comparison Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            {comparisonData.allStores.map((st) => {
-              const deal = comparisonData.storeBestDeals[st];
-              const isWinner = deal && st === comparisonData.cheapestStore && comparisonData.comparedCount >= 2;
-
-              if (deal) {
-                const imgThumb = getDriveThumb(deal.imageUrl);
-                return (
-                  <div
-                    key={st}
-                    className={`rounded-2xl p-4 border transition-all flex flex-col justify-between relative ${
-                      isWinner
-                        ? 'bg-gradient-to-b from-emerald-50/80 to-white border-emerald-400 ring-2 ring-emerald-400/30 shadow-md'
-                        : 'bg-white hover:bg-slate-50/50 border-slate-200/90 shadow-2xs'
-                    }`}
-                  >
-                    {isWinner && (
-                      <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white shadow-xs flex items-center gap-1">
-                        <Crown className="w-3 h-3 text-amber-300" />
-                        <span>ถูกที่สุด</span>
-                      </span>
-                    )}
-
-                    <div className="space-y-3">
-                      {/* Store Header */}
-                      <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-slate-100">
-                        <div className="flex items-center gap-2 truncate">
-                          <StoreLogo store={st} className="w-7 h-7 shrink-0 shadow-2xs" />
-                          <span className="font-black text-xs text-slate-800 truncate">{st}</span>
-                        </div>
-                        {deal.dealCount > 1 && (
-                          <span className="text-[10px] text-slate-400 font-bold shrink-0">
-                            {deal.dealCount} ดีล
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Product Thumbnail + Name */}
-                      <div className="flex items-center gap-2.5">
-                        {imgThumb ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (onPreviewImage && deal.imageUrl) {
-                                onPreviewImage({
-                                  url: deal.imageUrl,
-                                  title: `${deal.brand} - ${deal.itemName}`,
-                                  store: st,
-                                });
-                              }
-                            }}
-                            className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 group relative hover:ring-2 hover:ring-sky-500 cursor-pointer shadow-2xs"
-                            title="คลิกดูภาพขยาย"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={imgThumb}
-                              alt={deal.itemName}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                            />
-                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
-                              <ZoomIn className="w-3.5 h-3.5" />
-                            </div>
-                          </button>
-                        ) : (
-                          <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-400">
-                            <Tag className="w-5 h-5 opacity-40" />
-                          </div>
-                        )}
-
-                        <div className="min-w-0 flex-1">
-                          <span className="text-[10px] text-slate-400 font-bold block truncate">
-                            {deal.brand}
-                          </span>
-                          <h4 className="text-xs font-bold text-slate-800 line-clamp-2 leading-snug">
-                            {deal.itemName}
-                          </h4>
-                        </div>
-                      </div>
-
-                      {/* Prices */}
-                      <div className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-1">
-                        <div className="flex items-baseline justify-between">
-                          <span className="text-[10px] text-slate-500 font-bold">ราคาป้าย</span>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-base font-black text-slate-900">
-                              ฿{deal.proPrice}
-                            </span>
-                            {deal.retailPrice && (
-                              <span className="text-[10px] text-slate-400 line-through">
-                                ฿{deal.retailPrice}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-baseline justify-between pt-1 border-t border-slate-200/60">
-                          <span className="text-[10px] font-black text-slate-600">เฉลี่ย/หน่วย</span>
-                          <span className={`text-sm font-black ${
-                            isWinner ? 'text-emerald-700 font-black' : 'text-slate-800'
-                          }`}>
-                            ฿{deal.unitPrice.toFixed(2)}
-                            <span className="text-[10px] text-slate-500 font-normal ml-0.5">
-                              /{item.category === 'coffee' ? 'ซอง' : 'หน่วย'}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Details & Specs */}
-                      <div className="text-[11px] text-slate-500 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span>ขนาดแพ็ค:</span>
-                          <span className="font-bold text-slate-700">{deal.packSize} ชิ้น/ซอง</span>
-                        </div>
-                        {deal.period && (
-                          <div className="flex items-center justify-between truncate">
-                            <span>ระยะเวลา:</span>
-                            <span className="font-semibold text-slate-700 truncate max-w-[120px]" title={deal.period}>
-                              {deal.period}
-                            </span>
-                          </div>
-                        )}
-                        {deal.machanic && (
-                          <div className="pt-1">
-                            <span className="inline-block px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200/60 text-[10px] font-bold line-clamp-1">
-                              {deal.machanic}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              // No deal for this store
-              return (
-                <div
-                  key={st}
-                  className="rounded-2xl p-4 border border-dashed border-slate-200 bg-slate-50/50 flex flex-col justify-between text-center min-h-[200px]"
-                >
-                  <div className="flex items-center gap-2 justify-center pb-2 border-b border-slate-200/60">
-                    <StoreLogo store={st} className="w-6 h-6 shrink-0 opacity-60" />
-                    <span className="font-bold text-xs text-slate-500">{st}</span>
+          {/* SIDE-BY-SIDE CARDS WITH LARGE IMAGES (2 ฝั่ง ซ้าย - ขวา) */}
+          <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-stretch">
+            {/* ===================== SIDE A (ฝั่งซ้าย) ===================== */}
+            <div
+              className={`md:col-span-5 rounded-3xl p-4 sm:p-5 border transition-all flex flex-col justify-between ${
+                winnerSide === 'A'
+                  ? 'bg-white border-emerald-400 ring-2 ring-emerald-400/30 shadow-lg'
+                  : 'bg-white border-slate-200/90 shadow-xs'
+              }`}
+            >
+              <div>
+                {/* Store Header & Switcher */}
+                <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-slate-900 text-white font-black text-xs flex items-center justify-center">
+                      A
+                    </span>
+                    <span className="font-bold text-xs text-slate-500">ห้างฝั่งซ้าย:</span>
                   </div>
 
-                  <div className="py-8 space-y-1 text-slate-400">
-                    <Store className="w-8 h-8 mx-auto opacity-30" />
-                    <p className="text-xs font-bold text-slate-500">ไม่มีโปรโมชั่น</p>
-                    <p className="text-[10px] text-slate-400">
-                      ไม่พบดีลสินค้ารุ่นนี้ในรอบปัจจุบัน
-                    </p>
-                  </div>
-
-                  <div className="text-[10px] text-slate-400 pt-2 border-t border-slate-200/40 font-medium">
-                    รอบโปรโมชั่นถัดไปอาจมีรายการ
+                  {/* Store Select Pills */}
+                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                    {['CJ More', 'Mini BigC', 'Lotus Go Fresh', 'Tops'].map((st) => {
+                      const hasDeal = Boolean(comparisonData.storeBestDeals[st]);
+                      return (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => setSelectedSideA(st)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                            selectedSideA === st
+                              ? 'bg-slate-900 text-white shadow-xs'
+                              : hasDeal
+                              ? 'text-slate-700 hover:bg-white'
+                              : 'text-slate-300 hover:text-slate-400'
+                          }`}
+                        >
+                          <StoreLogo store={st} className="w-3.5 h-3.5" />
+                          <span>{st === 'Lotus Go Fresh' ? 'Lotus' : st === 'Mini BigC' ? 'BigC' : st}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              );
-            })}
+
+                {/* Store Brand Title */}
+                <div className="flex items-center justify-between gap-2 mt-3">
+                  <div className="flex items-center gap-2">
+                    <StoreLogo store={selectedSideA} className="w-7 h-7 shadow-2xs" />
+                    <span className="font-black text-base text-slate-900">{selectedSideA}</span>
+                  </div>
+                  {winnerSide === 'A' && (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs flex items-center gap-1">
+                      <Crown className="w-3.5 h-3.5 text-amber-300" />
+                      <span>ถูกกว่า</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* LARGE PRODUCT IMAGE (รูปภาพใหญ่ ชัดเจน) */}
+                <div className="mt-3">
+                  {dealA?.imageUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onPreviewImage) {
+                          onPreviewImage({
+                            url: dealA.imageUrl,
+                            title: `${dealA.brand} - ${dealA.itemName}`,
+                            store: selectedSideA,
+                          });
+                        }
+                      }}
+                      className="w-full h-52 sm:h-64 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 border border-slate-200 overflow-hidden relative group cursor-pointer shadow-inner flex items-center justify-center p-2"
+                      title="คลิกดูภาพขยายใหญ่เต็มหน้าจอ"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getDriveThumb(dealA.imageUrl)}
+                        alt={dealA.itemName}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 font-bold text-xs backdrop-blur-2xs">
+                        <ZoomIn className="w-5 h-5" />
+                        <span>คลิกเพื่อดูรูปภาพขนาดใหญ่</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="w-full h-52 sm:h-64 rounded-2xl bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-2">
+                      <Store className="w-10 h-10 opacity-30" />
+                      <span className="text-xs font-bold">ไม่มีรูปภาพโปรโมชั่นในห้างนี้</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Name & Brand */}
+                <div className="mt-3">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                    {dealA?.brand || comparisonData.brand}
+                  </span>
+                  <h4 className="text-sm font-black text-slate-900 mt-0.5 line-clamp-2">
+                    {dealA?.itemName || comparisonData.coreName}
+                  </h4>
+                </div>
+              </div>
+
+              {/* Price Banner */}
+              <div
+                className={`mt-4 p-3.5 rounded-2xl border transition-all ${
+                  winnerSide === 'A'
+                    ? 'bg-emerald-50/80 border-emerald-200'
+                    : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs font-bold text-slate-500">ราคาเฉลี่ยต่อหน่วย</span>
+                  <div className="flex items-baseline gap-1">
+                    <span
+                      className={`text-2xl font-black ${
+                        winnerSide === 'A' ? 'text-emerald-700' : 'text-slate-900'
+                      }`}
+                    >
+                      ฿{priceA > 0 ? priceA.toFixed(2) : '-'}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400">/หน่วย</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-2 mt-2 border-t border-slate-200/70">
+                  <span>ราคาป้ายโปร:</span>
+                  <span className="font-black text-slate-800">
+                    {dealA?.proPrice ? `฿${dealA.proPrice}` : '-'}
+                    {dealA?.retailPrice && (
+                      <span className="text-[11px] text-slate-400 line-through ml-1.5 font-normal">
+                        ฿{dealA.retailPrice}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* ===================== CENTER VS BADGE ===================== */}
+            <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center gap-3 my-2 md:my-0">
+              <div className="w-11 h-11 rounded-full bg-slate-900 text-white font-black text-sm flex items-center justify-center shadow-lg border-2 border-white">
+                VS
+              </div>
+              <button
+                type="button"
+                onClick={handleSwap}
+                className="p-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 shadow-2xs transition-all cursor-pointer hover:scale-110 active:scale-95"
+                title="สลับฝั่งซ้ายและขวา"
+              >
+                <ArrowLeftRight className="w-4 h-4 text-slate-600" />
+              </button>
+            </div>
+
+            {/* ===================== SIDE B (ฝั่งขวา) ===================== */}
+            <div
+              className={`md:col-span-5 rounded-3xl p-4 sm:p-5 border transition-all flex flex-col justify-between ${
+                winnerSide === 'B'
+                  ? 'bg-white border-emerald-400 ring-2 ring-emerald-400/30 shadow-lg'
+                  : 'bg-white border-slate-200/90 shadow-xs'
+              }`}
+            >
+              <div>
+                {/* Store Header & Switcher */}
+                <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-slate-900 text-white font-black text-xs flex items-center justify-center">
+                      B
+                    </span>
+                    <span className="font-bold text-xs text-slate-500">ห้างฝั่งขวา:</span>
+                  </div>
+
+                  {/* Store Select Pills */}
+                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                    {['CJ More', 'Mini BigC', 'Lotus Go Fresh', 'Tops'].map((st) => {
+                      const hasDeal = Boolean(comparisonData.storeBestDeals[st]);
+                      return (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => setSelectedSideB(st)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                            selectedSideB === st
+                              ? 'bg-slate-900 text-white shadow-xs'
+                              : hasDeal
+                              ? 'text-slate-700 hover:bg-white'
+                              : 'text-slate-300 hover:text-slate-400'
+                          }`}
+                        >
+                          <StoreLogo store={st} className="w-3.5 h-3.5" />
+                          <span>{st === 'Lotus Go Fresh' ? 'Lotus' : st === 'Mini BigC' ? 'BigC' : st}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Store Brand Title */}
+                <div className="flex items-center justify-between gap-2 mt-3">
+                  <div className="flex items-center gap-2">
+                    <StoreLogo store={selectedSideB} className="w-7 h-7 shadow-2xs" />
+                    <span className="font-black text-base text-slate-900">{selectedSideB}</span>
+                  </div>
+                  {winnerSide === 'B' && (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs flex items-center gap-1">
+                      <Crown className="w-3.5 h-3.5 text-amber-300" />
+                      <span>ถูกกว่า</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* LARGE PRODUCT IMAGE (รูปภาพใหญ่ ชัดเจน) */}
+                <div className="mt-3">
+                  {dealB?.imageUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onPreviewImage) {
+                          onPreviewImage({
+                            url: dealB.imageUrl,
+                            title: `${dealB.brand} - ${dealB.itemName}`,
+                            store: selectedSideB,
+                          });
+                        }
+                      }}
+                      className="w-full h-52 sm:h-64 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 border border-slate-200 overflow-hidden relative group cursor-pointer shadow-inner flex items-center justify-center p-2"
+                      title="คลิกดูภาพขยายใหญ่เต็มหน้าจอ"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getDriveThumb(dealB.imageUrl)}
+                        alt={dealB.itemName}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 font-bold text-xs backdrop-blur-2xs">
+                        <ZoomIn className="w-5 h-5" />
+                        <span>คลิกเพื่อดูรูปภาพขนาดใหญ่</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="w-full h-52 sm:h-64 rounded-2xl bg-slate-100 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-2">
+                      <Store className="w-10 h-10 opacity-30" />
+                      <span className="text-xs font-bold">ไม่มีรูปภาพโปรโมชั่นในห้างนี้</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Name & Brand */}
+                <div className="mt-3">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                    {dealB?.brand || comparisonData.brand}
+                  </span>
+                  <h4 className="text-sm font-black text-slate-900 mt-0.5 line-clamp-2">
+                    {dealB?.itemName || comparisonData.coreName}
+                  </h4>
+                </div>
+              </div>
+
+              {/* Price Banner */}
+              <div
+                className={`mt-4 p-3.5 rounded-2xl border transition-all ${
+                  winnerSide === 'B'
+                    ? 'bg-emerald-50/80 border-emerald-200'
+                    : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs font-bold text-slate-500">ราคาเฉลี่ยต่อหน่วย</span>
+                  <div className="flex items-baseline gap-1">
+                    <span
+                      className={`text-2xl font-black ${
+                        winnerSide === 'B' ? 'text-emerald-700' : 'text-slate-900'
+                      }`}
+                    >
+                      ฿{priceB > 0 ? priceB.toFixed(2) : '-'}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400">/หน่วย</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-2 mt-2 border-t border-slate-200/70">
+                  <span>ราคาป้ายโปร:</span>
+                  <span className="font-black text-slate-800">
+                    {dealB?.proPrice ? `฿${dealB.proPrice}` : '-'}
+                    {dealB?.retailPrice && (
+                      <span className="text-[11px] text-slate-400 line-through ml-1.5 font-normal">
+                        ฿{dealB.retailPrice}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===================== ตารางเปรียบเทียบแยก 2 ฝั่งอย่างชัดเจน ===================== */}
+          <div className="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-xs">
+            <div className="px-5 py-3.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-black flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-amber-400" />
+                <span>ตารางเปรียบเทียบสเปกและราคาแยก 2 ฝั่ง (Side-by-Side Comparison Table)</span>
+              </span>
+              <span className="text-xs text-slate-300 font-medium">
+                {selectedSideA} vs {selectedSideB}
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 font-bold">
+                    <th className="py-3 px-4 w-1/3">หัวข้อเปรียบเทียบ</th>
+                    <th
+                      className={`py-3 px-4 w-1/3 ${
+                        winnerSide === 'A' ? 'bg-emerald-50/70 text-emerald-950 font-black' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <StoreLogo store={selectedSideA} className="w-4 h-4" />
+                        <span>{selectedSideA} (ฝั่งซ้าย)</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`py-3 px-4 w-1/3 ${
+                        winnerSide === 'B' ? 'bg-emerald-50/70 text-emerald-950 font-black' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <StoreLogo store={selectedSideB} className="w-4 h-4" />
+                        <span>{selectedSideB} (ฝั่งขวา)</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {/* Row 1: Unit Price */}
+                  <tr className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3.5 px-4 font-black text-slate-900">
+                      ราคาเฉลี่ยต่อหน่วย (Unit Price)
+                    </td>
+                    <td
+                      className={`py-3.5 px-4 font-black text-sm ${
+                        winnerSide === 'A'
+                          ? 'bg-emerald-50/50 text-emerald-700'
+                          : 'text-slate-900'
+                      }`}
+                    >
+                      {priceA > 0 ? (
+                        <div className="flex items-center gap-1.5">
+                          <span>฿{priceA.toFixed(2)}</span>
+                          {winnerSide === 'A' && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+                              👑 ถูกกว่า ฿{diff.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 font-normal">-</span>
+                      )}
+                    </td>
+                    <td
+                      className={`py-3.5 px-4 font-black text-sm ${
+                        winnerSide === 'B'
+                          ? 'bg-emerald-50/50 text-emerald-700'
+                          : 'text-slate-900'
+                      }`}
+                    >
+                      {priceB > 0 ? (
+                        <div className="flex items-center gap-1.5">
+                          <span>฿{priceB.toFixed(2)}</span>
+                          {winnerSide === 'B' && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+                              👑 ถูกกว่า ฿{diff.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 font-normal">-</span>
+                      )}
+                    </td>
+                  </tr>
+
+                  {/* Row 2: Promo Price */}
+                  <tr className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 px-4 text-slate-600 font-bold">ราคาโปรโมชั่นตามป้าย</td>
+                    <td className={`py-3 px-4 font-black text-slate-900 ${winnerSide === 'A' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealA?.proPrice ? `฿${dealA.proPrice}` : '-'}
+                    </td>
+                    <td className={`py-3 px-4 font-black text-slate-900 ${winnerSide === 'B' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealB?.proPrice ? `฿${dealB.proPrice}` : '-'}
+                    </td>
+                  </tr>
+
+                  {/* Row 3: Regular Price */}
+                  <tr className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 px-4 text-slate-600">ราคาปกติก่อนลด</td>
+                    <td className={`py-3 px-4 text-slate-600 ${winnerSide === 'A' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealA?.retailPrice ? `฿${dealA.retailPrice}` : 'ไม่ระบุ'}
+                    </td>
+                    <td className={`py-3 px-4 text-slate-600 ${winnerSide === 'B' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealB?.retailPrice ? `฿${dealB.retailPrice}` : 'ไม่ระบุ'}
+                    </td>
+                  </tr>
+
+                  {/* Row 4: Pack Size */}
+                  <tr className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 px-4 text-slate-600 font-bold">ขนาดบรรจุ / แพ็ค</td>
+                    <td className={`py-3 px-4 font-black text-slate-800 ${winnerSide === 'A' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealA?.packSize ? `${dealA.packSize} ชิ้น/ซอง` : '-'}
+                    </td>
+                    <td className={`py-3 px-4 font-black text-slate-800 ${winnerSide === 'B' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealB?.packSize ? `${dealB.packSize} ชิ้น/ซอง` : '-'}
+                    </td>
+                  </tr>
+
+                  {/* Row 5: Promotion Mechanic */}
+                  <tr className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 px-4 text-slate-600">กลไกโปรโมชั่น (Mechanic)</td>
+                    <td className={`py-3 px-4 ${winnerSide === 'A' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealA?.machanic ? (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200/60 font-bold">
+                          {dealA.machanic}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
+                    </td>
+                    <td className={`py-3 px-4 ${winnerSide === 'B' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealB?.machanic ? (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200/60 font-bold">
+                          {dealB.machanic}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
+                    </td>
+                  </tr>
+
+                  {/* Row 6: Promotion Period */}
+                  <tr className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3 px-4 text-slate-600">ระยะเวลาโปรโมชั่น</td>
+                    <td className={`py-3 px-4 text-slate-700 font-medium ${winnerSide === 'A' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealA?.period || '-'}
+                    </td>
+                    <td className={`py-3 px-4 text-slate-700 font-medium ${winnerSide === 'B' ? 'bg-emerald-50/30' : ''}`}>
+                      {dealB?.period || '-'}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        {/* Modal Footer Action Buttons */}
-        <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-          <div className="text-xs text-slate-500 font-medium">
-            💡 ระบบจับคู่สินค้าด้วย AI โดยเปรียบเทียบจากชื่อแบรนด์ รุ่นสินค้า และราคาต่อหน่วยสุทธิ
+        {/* MODAL FOOTER */}
+        <div className="p-4 sm:p-5 border-t border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+          <div className="text-xs text-slate-500 font-medium flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>ระบบวิเคราะห์ราคาต่อหน่วยเพื่อความยุติธรรมในการเปรียบเทียบข้ามห้าง</span>
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
-            {comparisonData.comparedCount >= 2 && onSendToArena && storeAEntry && storeBEntry && (
+            {dealA && dealB && onSendToArena && (
               <button
                 type="button"
                 onClick={handleSendToArena}
-                className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
+                className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow active:scale-95"
               >
                 <Swords className="w-4 h-4 text-amber-400" />
-                <span>ส่ง {storeAEntry[0]} vs {storeBEntry[0]} เข้าสนามประลอง</span>
+                <span>ส่ง {selectedSideA} vs {selectedSideB} เข้าสนามประลอง</span>
               </button>
             )}
 
             <button
               type="button"
               onClick={onClose}
-              className="py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              className="py-2.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs"
             >
               ปิดหน้าต่าง
             </button>
