@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import ApiKeyModal from '@/components/ApiKeyModal';
 import ImageCropModal from '@/components/ImageCropModal';
+import StoreLogo from '@/components/StoreLogo';
 import {
   TRACKED_STORES,
   TRACKED_CHANNELS,
@@ -265,7 +266,11 @@ export default function ImageUploader({ category, onExtracted, onManualEntry }: 
         {/* Store */}
         <div>
           <label className="block text-xs font-bold text-[#0f2b5c] mb-1 flex items-center gap-1.5">
-            <Store className="w-3.5 h-3.5 text-sky-700" />
+            {selectedStore !== 'auto' ? (
+              <StoreLogo store={selectedStore} className="w-4 h-4" />
+            ) : (
+              <Store className="w-3.5 h-3.5 text-sky-700" />
+            )}
             <span>ห้างค้าปลีก / ร้านค้า</span>
           </label>
           <select

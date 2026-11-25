@@ -27,6 +27,7 @@ import {
   calculatePricePerSachet,
   isTrackedBrand,
 } from '@/lib/calc';
+import StoreLogo from '@/components/StoreLogo';
 
 interface PromotionCardProps {
   item: PromotionItem;
@@ -297,8 +298,9 @@ export default function PromotionCard({
 
         {/* Store */}
         <div>
-          <label className="block text-slate-600 font-semibold mb-1">
-            ร้านค้า <span className="text-rose-500">*</span>
+          <label className="text-slate-600 font-semibold mb-1 flex items-center gap-1.5">
+            <StoreLogo store={item.store} className="w-4 h-4" />
+            <span>ร้านค้า</span> <span className="text-rose-500">*</span>
           </label>
           <select
             value={item.store}
